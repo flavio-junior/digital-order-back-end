@@ -30,6 +30,14 @@ interface ReservationRepository : JpaRepository<Reservation, Long> {
         @Param("name") name: String?, pageable: Pageable
     ): Page<Reservation>?
 
+    @Query(
+        value = "SELECT r FROM Reservation r WHERE r.user.id = :userId AND LOWER(r.name) LIKE LOWER(CONCAT('%', :reservationName, '%'))"
+    )
+    fun findReservationByName(
+        @Param("userId") userId: Long,
+        @Param("reservationName") reservationName: String
+    ): List<Reservation>
+
     @Query(value = "SELECT r FROM Reservation r WHERE r.user.id = :userId AND r.id = :idReservation")
     fun findReservationById(
         @Param("userId") userId: Long,

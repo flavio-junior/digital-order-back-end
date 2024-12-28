@@ -36,6 +36,15 @@ class ReservationService {
     }
 
     @Transactional(readOnly = true)
+    fun findReservationByName(
+        user: User,
+        name: String
+    ): List<ReservationResponseVO> {
+        val reservations: List<Reservation> = reservationRepository.findReservationByName(userId = user.id, reservationName = name)
+        return reservations.map { reservation -> parseObject(reservation, ReservationResponseVO::class.java) }
+    }
+
+    @Transactional(readOnly = true)
     fun findReservationById(
         user: User,
         id: Long
