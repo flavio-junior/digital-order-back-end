@@ -1,6 +1,7 @@
 package br.com.dashboard.company.service
 
 import br.com.dashboard.company.entities.order.Order
+import br.com.dashboard.company.entities.reservation.Reservation
 import br.com.dashboard.company.entities.user.User
 import br.com.dashboard.company.exceptions.ResourceNotFoundException
 import br.com.dashboard.company.repository.OrderRepository
@@ -8,6 +9,7 @@ import br.com.dashboard.company.service.ObjectService.Companion.OBJECT_NOT_FOUND
 import br.com.dashboard.company.service.ReservationService.Companion.RESERVATION_NOT_FOUND
 import br.com.dashboard.company.utils.common.Action
 import br.com.dashboard.company.utils.common.Status
+import br.com.dashboard.company.utils.others.ConverterUtils.parseListObjects
 import br.com.dashboard.company.utils.others.ConverterUtils.parseObject
 import br.com.dashboard.company.vo.`object`.ObjectRequestVO
 import br.com.dashboard.company.vo.`object`.UpdateObjectRequestVO
@@ -15,6 +17,7 @@ import br.com.dashboard.company.vo.order.CloseOrderRequestVO
 import br.com.dashboard.company.vo.order.OrderRequestVO
 import br.com.dashboard.company.vo.order.OrderResponseVO
 import br.com.dashboard.company.vo.order.UpdateStatusDeliveryRequestVO
+import br.com.dashboard.company.vo.reservation.ReservationRequestVO
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
@@ -173,6 +176,17 @@ class OrderService {
         } else {
             throw ResourceNotFoundException(OBJECT_NOT_FOUND)
         }
+    }
+
+    @Transactional
+    fun incrementMoreReservationsOrder(
+        user: User,
+        orderId: Long,
+        reservationsToSava: MutableList<ReservationRequestVO>
+    ) {
+        val orderSaved = getOrder(userId = user.id, orderId = orderId)
+        val converter = parseListObjects(reservationsToSava, Reservation::class.java)
+        orderSaved.reservations?.addAll(converter)
     }
 
     @Transactional
