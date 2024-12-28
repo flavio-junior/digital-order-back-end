@@ -242,6 +242,50 @@ class OrderController {
         return ResponseEntity.created(uri).body(entity)
     }
 
+    @DeleteMapping(
+        value = ["{orderId}/remove/reservation/{reservationId}"],
+        consumes = [APPLICATION_JSON],
+        produces = [APPLICATION_JSON]
+    )
+    @Operation(
+        summary = "Remove Reservation", description = "Remove Reservation",
+        tags = ["ORDER"],
+        responses = [
+            ApiResponse(
+                description = "Success", responseCode = "200", content = [
+                    Content(schema = Schema(implementation = Unit::class))
+                ]
+            ),
+            ApiResponse(
+                description = "Bad Request", responseCode = "400", content = [
+                    Content(schema = Schema(implementation = Unit::class))
+                ]
+            ),
+            ApiResponse(
+                description = "Unauthorized", responseCode = "401", content = [
+                    Content(schema = Schema(implementation = Unit::class))
+                ]
+            ),
+            ApiResponse(
+                description = "Not Found", responseCode = "404", content = [
+                    Content(schema = Schema(implementation = Unit::class))
+                ]
+            ),
+            ApiResponse(
+                description = "Internal Error", responseCode = "500", content = [
+                    Content(schema = Schema(implementation = Unit::class))
+                ]
+            )
+        ]
+    )
+    fun removeReservation(
+        @AuthenticationPrincipal user: User,
+        @PathVariable(value = "orderId") orderId: Long,
+        @PathVariable(value = "reservationId") reservationId: Long
+    ) {
+        return orderService.removeReservation(user = user, orderId = orderId, reservationId = reservationId)
+    }
+
     @PostMapping(
         value = ["{orderId}/increment/more/objects/order"],
         consumes = [APPLICATION_JSON],

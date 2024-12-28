@@ -45,6 +45,16 @@ interface ReservationRepository : JpaRepository<Reservation, Long> {
     ): Reservation?
 
     @Modifying
+    @Query(
+        value = "DELETE FROM tb_order_reservation WHERE fk_order = :orderId AND fk_reservation = :reservationId",
+        nativeQuery = true
+    )
+    fun deleteRelationBetweenReservationAndByIdOrderById(
+        @Param("orderId") orderId: Long,
+        @Param("reservationId") reservationId: Long
+    ): Int
+
+    @Modifying
     @Query(value = "DELETE FROM Reservation r WHERE r.id = :reservationId AND r.user.id = :userId")
     fun deleteReservationById(
         @Param("userId") userId: Long,

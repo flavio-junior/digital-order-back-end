@@ -5,6 +5,7 @@ import br.com.dashboard.company.entities.user.User
 import br.com.dashboard.company.exceptions.ResourceNotFoundException
 import br.com.dashboard.company.repository.OrderRepository
 import br.com.dashboard.company.service.ObjectService.Companion.OBJECT_NOT_FOUND
+import br.com.dashboard.company.service.ReservationService.Companion.RESERVATION_NOT_FOUND
 import br.com.dashboard.company.utils.common.Action
 import br.com.dashboard.company.utils.common.Status
 import br.com.dashboard.company.utils.others.ConverterUtils.parseObject
@@ -33,6 +34,9 @@ class OrderService {
 
     @Autowired
     private lateinit var objectService: ObjectService
+
+    @Autowired
+    private lateinit var reservationService: ReservationService
 
     @Autowired
     private lateinit var paymentService: PaymentService
@@ -168,6 +172,21 @@ class OrderService {
             }
         } else {
             throw ResourceNotFoundException(OBJECT_NOT_FOUND)
+        }
+    }
+
+    @Transactional
+    fun removeReservation(
+        user: User,
+        orderId: Long,
+        reservationId: Long
+    ) {
+        val orderSaved = getOrder(orderId = orderId, userId = user.id)
+        val reservationExisting = orderSaved.reservations?.firstOrNull { it.id == reservationId }
+        if (reservationExisting != null) {
+            reservationService.removeReservationOrder(orderId = orderId, reservationId = reservationId)
+        } else {
+            throw ResourceNotFoundException(RESERVATION_NOT_FOUND)
         }
     }
 

@@ -104,6 +104,14 @@ class ReservationService {
     }
 
     @Transactional
+    fun removeReservationOrder(
+        orderId: Long,
+        reservationId: Long
+    ) {
+        reservationRepository.deleteRelationBetweenReservationAndByIdOrderById(orderId, reservationId)
+    }
+
+    @Transactional
     fun deleteReservation(
         userId: Long,
         reservationId: Long
