@@ -42,6 +42,8 @@ services:
     build: ./back-end
     working_dir: /back-end/
     environment:
+      ACCOUNT_USERNAME: ${ACCOUNT_USERNAME}
+      ACCOUNT_PASSWORD: ${ACCOUNT_PASSWORD}
       TIME_ZONE: ${TIME_ZONE}
       SECRET-KEY: ${SECRET_KEY}
       SERVER_PORT: ${SERVER_PORT}
