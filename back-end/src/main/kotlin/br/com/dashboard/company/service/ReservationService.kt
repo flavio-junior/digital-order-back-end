@@ -74,7 +74,7 @@ class ReservationService {
         reservation: ReservationRequestVO
     ): ReservationResponseVO {
         if (!checkNameReservationAlreadyExists(userId = user.id, name = reservation.name)) {
-            val userAuthenticated = userService.findUserById(id = user.id)
+            val userAuthenticated = userService.findUserById(userId = user.id)
             val reservationResult: Reservation = parseObject(reservation, Reservation::class.java)
             reservationResult.status = ReservationStatus.AVAILABLE
             reservationResult.user = userAuthenticated

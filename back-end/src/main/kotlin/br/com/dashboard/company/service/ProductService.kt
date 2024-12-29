@@ -78,7 +78,7 @@ class ProductService {
         product: ProductRequestVO
     ): ProductResponseVO {
         if (!checkNameProductAlreadyExists(userId = user.id, name = product.name)) {
-            val userAuthenticated = userService.findUserById(id = user.id)
+            val userAuthenticated = userService.findUserById(userId = user.id)
             val productResult: Product = parseObject(product, Product::class.java)
             productResult.categories =
                 categoryService.converterCategories(userId = user.id, categories = product.categories)

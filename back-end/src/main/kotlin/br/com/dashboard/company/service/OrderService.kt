@@ -87,7 +87,7 @@ class OrderService {
         user: User,
         order: OrderRequestVO
     ): OrderResponseVO {
-        val userAuthenticated = userService.findUserById(id = user.id)
+        val userAuthenticated = userService.findUserById(userId = user.id)
         val orderResult: Order = parseObject(order, Order::class.java)
         orderResult.createdAt = LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS)
         orderResult.status = Status.OPEN

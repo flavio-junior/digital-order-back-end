@@ -79,7 +79,7 @@ class CategoryService {
         category: CategoryResponseVO
     ): CategoryResponseVO {
         if (!checkNameCategoryAlreadyExists(id = user.id, name = category.name)) {
-            val userAuthenticated = userService.findUserById(id = user.id)
+            val userAuthenticated = userService.findUserById(userId = user.id)
             val categoryResult: Category = parseObject(category, Category::class.java)
             categoryResult.user = userAuthenticated
             return parseObject(categoryRepository.save(categoryResult), CategoryResponseVO::class.java)

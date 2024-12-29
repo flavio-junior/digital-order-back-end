@@ -77,7 +77,7 @@ class FoodService {
         food: FoodRequestVO
     ): FoodResponseVO {
         if (!checkFoodNameAlreadyExists(userId = user.id, foodName = food.name)) {
-            val userAuthenticated = userService.findUserById(id = user.id)
+            val userAuthenticated = userService.findUserById(userId = user.id)
             val foodResult: Food = parseObject(food, Food::class.java)
             foodResult.categories = categoryService.converterCategories(userId = user.id, categories = food.categories)
             foodResult.createdAt = LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS)

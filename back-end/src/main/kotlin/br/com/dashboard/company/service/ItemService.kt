@@ -75,7 +75,7 @@ class ItemService {
         item: ItemRequestVO
     ): ItemResponseVO {
         if (!checkNameItemAlreadyExists(userId = user.id, name = item.name)) {
-            val userAuthenticated = userService.findUserById(id = user.id)
+            val userAuthenticated = userService.findUserById(userId = user.id)
             val itemResult: Item = parseObject(item, Item::class.java)
             itemResult.user = userAuthenticated
             return parseObject(itemRepository.save(itemResult), ItemResponseVO::class.java)

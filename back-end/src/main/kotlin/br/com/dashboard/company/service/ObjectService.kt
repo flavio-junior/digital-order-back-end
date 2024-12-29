@@ -37,7 +37,7 @@ class ObjectService {
         objectsToSave: MutableList<ObjectRequestVO>? = null
     ): Pair<MutableList<Object>?, Double> {
         var total = 0.0
-        val userAuthenticated = userService.findUserById(id = userId)
+        val userAuthenticated = userService.findUserById(userId = userId)
         val result = objectsToSave?.map { item ->
             when (item.type) {
                 TypeItem.FOOD -> {

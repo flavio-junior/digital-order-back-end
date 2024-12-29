@@ -10,7 +10,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException
 import org.springframework.stereotype.Service
 
 @Service
-class UserService: UserDetailsService {
+class UserService : UserDetailsService {
 
     @Autowired
     private lateinit var userRepository: UserRepository
@@ -20,9 +20,15 @@ class UserService: UserDetailsService {
         return user ?: throw UsernameNotFoundException("$username not found")
     }
 
-    fun findUserById(id: Long): User? {
-       return userRepository.findById(id).orElseThrow {
-            throw ResourceNotFoundException("User with id $id not found")
+    fun findUserById(
+        userId: Long
+    ): User? {
+        return userRepository.findById(userId).orElseThrow {
+            throw ResourceNotFoundException(message = USER_NOT_FOUND)
         }
+    }
+
+    companion object {
+        const val USER_NOT_FOUND = "User not found"
     }
 }
