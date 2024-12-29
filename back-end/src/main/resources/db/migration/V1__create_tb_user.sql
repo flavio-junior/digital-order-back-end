@@ -11,3 +11,17 @@ CREATE TABLE IF NOT EXISTS tb_user (
     credentials_non_expired BOOLEAN DEFAULT TRUE,
     enabled BOOLEAN DEFAULT TRUE
 );
+
+CREATE TABLE IF NOT EXISTS tb_security (
+    id SERIAL PRIMARY KEY,
+    code INT NOT NULL UNIQUE,
+    email VARCHAR(50) NOT NULL UNIQUE,
+    expiration TIMESTAMP NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS tb_recover_password (
+    id SERIAL PRIMARY KEY,
+    token INT NOT NULL UNIQUE,
+    email VARCHAR(50) NOT NULL UNIQUE,
+    expiration TIMESTAMP NOT NULL
+);

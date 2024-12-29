@@ -3,6 +3,10 @@ security:
     token:
       secret-key: ${SECRET-KEY}
       expire-length: ${EXPIRE_TOKEN_TIME:86400000}
+email:
+  password-recover:
+    token:
+      minutes: ${PASSWORD_RECOVER_TOKEN_MINUTES:5}
 spring:
   jackson:
     time-zone: ${TIME_ZONE}
