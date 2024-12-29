@@ -2,6 +2,7 @@ package br.com.dashboard.company.entities.reservation
 
 import br.com.dashboard.company.entities.order.Order
 import br.com.dashboard.company.entities.user.User
+import br.com.dashboard.company.utils.common.ReservationStatus
 import jakarta.persistence.*
 
 @Entity
@@ -12,6 +13,8 @@ data class Reservation(
     var id: Long = 0,
     @Column(name = "name", nullable = false, unique = true)
     var name: String = "",
+    @Enumerated(EnumType.STRING)
+    var status: ReservationStatus? = null,
     @ManyToOne
     @JoinTable(
         name = "tb_order_reservation",

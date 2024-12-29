@@ -1,15 +1,14 @@
 package br.com.dashboard.company.service
 
 import br.com.dashboard.company.entities.order.Order
-import br.com.dashboard.company.entities.reservation.Reservation
 import br.com.dashboard.company.entities.user.User
 import br.com.dashboard.company.exceptions.ResourceNotFoundException
 import br.com.dashboard.company.repository.OrderRepository
 import br.com.dashboard.company.service.ObjectService.Companion.OBJECT_NOT_FOUND
 import br.com.dashboard.company.service.ReservationService.Companion.RESERVATION_NOT_FOUND
 import br.com.dashboard.company.utils.common.Action
+import br.com.dashboard.company.utils.common.ReservationStatus
 import br.com.dashboard.company.utils.common.Status
-import br.com.dashboard.company.utils.others.ConverterUtils.parseListObjects
 import br.com.dashboard.company.utils.others.ConverterUtils.parseObject
 import br.com.dashboard.company.vo.`object`.ObjectRequestVO
 import br.com.dashboard.company.vo.`object`.UpdateObjectRequestVO
@@ -17,7 +16,7 @@ import br.com.dashboard.company.vo.order.CloseOrderRequestVO
 import br.com.dashboard.company.vo.order.OrderRequestVO
 import br.com.dashboard.company.vo.order.OrderResponseVO
 import br.com.dashboard.company.vo.order.UpdateStatusDeliveryRequestVO
-import br.com.dashboard.company.vo.reservation.ReservationRequestVO
+import br.com.dashboard.company.vo.reservation.ReservationResponseVO
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
@@ -92,6 +91,11 @@ class OrderService {
         val orderResult: Order = parseObject(order, Order::class.java)
         orderResult.createdAt = LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS)
         orderResult.status = Status.OPEN
+        orderResult.reservations = reservationService.validateReservationsToSave(
+            userId = user.id,
+            reservations = order.reservations,
+            status = ReservationStatus.RESERVED
+        )
         val addressSaved = order.address?.let { addressService.saveAddress(addressRequestVO = it) }
         orderResult.address = addressSaved
         val objectsSaved = objectService.saveObjects(userId = user.id, objectsToSave = order.objects)
@@ -182,11 +186,15 @@ class OrderService {
     fun incrementMoreReservationsOrder(
         user: User,
         orderId: Long,
-        reservationsToSava: MutableList<ReservationRequestVO>
+        reservationsToSava: MutableList<ReservationResponseVO>
     ) {
         val orderSaved = getOrder(userId = user.id, orderId = orderId)
-        val converter = parseListObjects(reservationsToSava, Reservation::class.java)
-        orderSaved.reservations?.addAll(converter)
+        val reservationsToSaved = reservationService.validateReservationsToSave(
+            userId = user.id,
+            reservations = reservationsToSava,
+            status = ReservationStatus.RESERVED
+        )
+        orderSaved.reservations?.addAll(reservationsToSaved)
     }
 
     @Transactional
@@ -199,6 +207,11 @@ class OrderService {
         val reservationExisting = orderSaved.reservations?.firstOrNull { it.id == reservationId }
         if (reservationExisting != null) {
             reservationService.removeReservationOrder(orderId = orderId, reservationId = reservationId)
+            reservationService.updateStatusReservation(
+                userId = user.id,
+                reservationId = reservationId,
+                status = ReservationStatus.AVAILABLE
+            )
         } else {
             throw ResourceNotFoundException(RESERVATION_NOT_FOUND)
         }
@@ -228,6 +241,9 @@ class OrderService {
         closeOrder: CloseOrderRequestVO
     ) {
         val order = getOrder(userId = user.id, orderId = idOrder)
+        order.reservations?.forEach { reservation ->
+            reservation.status = ReservationStatus.AVAILABLE
+        }
         updateStatusOrder(userId = user.id, orderId = idOrder, status = Status.CLOSED)
         paymentService.updatePayment(closeOrder = closeOrder, order = order)
         checkoutService.saveCheckoutDetails(total = order.total)
@@ -262,6 +278,9 @@ class OrderService {
         orderId: Long
     ) {
         val orderSaved: Order = getOrder(userId = user.id, orderId = orderId)
+        orderSaved.reservations?.forEach { reservation ->
+            reservation.status = ReservationStatus.AVAILABLE
+        }
         orderRepository.deleteOrderById(userId = user.id, orderId = orderSaved.id)
     }
 

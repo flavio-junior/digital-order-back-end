@@ -33,18 +33,18 @@ VALUES
     (1, 6);
 
 INSERT INTO
-    tb_reservation (name)
+    tb_reservation (name, status)
 VALUES
-    ('Mesa 01'),
-    ('Mesa 02'),
-    ('Mesa 03'),
-    ('Mesa 04'),
-    ('Mesa 05'),
-    ('Mesa 06'),
-    ('Mesa 07'),
-    ('Mesa 08'),
-    ('Mesa 09'),
-    ('Mesa 10');
+    ('Mesa 01', 'AVAILABLE'),
+    ('Mesa 02', 'AVAILABLE'),
+    ('Mesa 03', 'AVAILABLE'),
+    ('Mesa 04', 'AVAILABLE'),
+    ('Mesa 05', 'AVAILABLE'),
+    ('Mesa 06', 'AVAILABLE'),
+    ('Mesa 07', 'AVAILABLE'),
+    ('Mesa 08', 'AVAILABLE'),
+    ('Mesa 09', 'AVAILABLE'),
+    ('Mesa 10', 'AVAILABLE');
 
 INSERT INTO
     tb_user_reservation (fk_user, fk_reservation)

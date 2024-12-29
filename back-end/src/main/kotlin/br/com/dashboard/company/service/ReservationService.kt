@@ -2,9 +2,10 @@ package br.com.dashboard.company.service
 
 import br.com.dashboard.company.entities.reservation.Reservation
 import br.com.dashboard.company.entities.user.User
-import br.com.dashboard.company.exceptions.DuplicateNameException
+import br.com.dashboard.company.exceptions.ObjectDuplicateException
 import br.com.dashboard.company.exceptions.ResourceNotFoundException
 import br.com.dashboard.company.repository.ReservationRepository
+import br.com.dashboard.company.utils.common.ReservationStatus
 import br.com.dashboard.company.utils.others.ConverterUtils.parseObject
 import br.com.dashboard.company.vo.reservation.ReservationRequestVO
 import br.com.dashboard.company.vo.reservation.ReservationResponseVO
@@ -40,7 +41,8 @@ class ReservationService {
         user: User,
         name: String
     ): List<ReservationResponseVO> {
-        val reservations: List<Reservation> = reservationRepository.findReservationByName(userId = user.id, reservationName = name)
+        val reservations: List<Reservation> =
+            reservationRepository.findReservationByName(userId = user.id, reservationName = name)
         return reservations.map { reservation -> parseObject(reservation, ReservationResponseVO::class.java) }
     }
 
@@ -53,7 +55,7 @@ class ReservationService {
         return parseObject(reservation, ReservationResponseVO::class.java)
     }
 
-    private fun getReservation(
+   fun getReservation(
         userId: Long,
         reservationId: Long
     ): Reservation {
@@ -74,11 +76,29 @@ class ReservationService {
         if (!checkNameReservationAlreadyExists(userId = user.id, name = reservation.name)) {
             val userAuthenticated = userService.findUserById(id = user.id)
             val reservationResult: Reservation = parseObject(reservation, Reservation::class.java)
+            reservationResult.status = ReservationStatus.AVAILABLE
             reservationResult.user = userAuthenticated
             return parseObject(reservationRepository.save(reservationResult), ReservationResponseVO::class.java)
         } else {
-            throw DuplicateNameException(message = DUPLICATE_NAME_RESERVATION)
+            throw ObjectDuplicateException(message = DUPLICATE_NAME_RESERVATION)
         }
+    }
+
+    fun validateReservationsToSave(
+        userId: Long,
+        reservations: MutableList<ReservationResponseVO>?,
+        status: ReservationStatus
+    ):  MutableList<Reservation> {
+        val reservationsToSave = mutableListOf<Reservation>()
+        reservations?.forEach { reservationVO ->
+            val reservationSave = getReservation(userId = userId, reservationId = reservationVO.id)
+            if (reservationSave.status == ReservationStatus.RESERVED) {
+                throw ObjectDuplicateException(message = "The '${reservationSave.name}' is already in use")
+            }
+            reservationSave.status = status
+            reservationsToSave.add(reservationSave)
+        }
+        return reservationsToSave
     }
 
     private fun checkNameReservationAlreadyExists(
@@ -99,8 +119,21 @@ class ReservationService {
             reservationSaved.name = reservation.name
             return parseObject(reservationRepository.save(reservationSaved), ReservationResponseVO::class.java)
         } else {
-            throw DuplicateNameException(message = DUPLICATE_NAME_RESERVATION)
+            throw ObjectDuplicateException(message = DUPLICATE_NAME_RESERVATION)
         }
+    }
+
+    @Transactional
+    fun updateStatusReservation(
+        userId: Long,
+        reservationId: Long,
+        status: ReservationStatus
+    ) {
+        reservationRepository.updateStatusReservation(
+            userId = userId,
+            reservationId = reservationId,
+            status = status
+        )
     }
 
     @Transactional

@@ -1,6 +1,6 @@
 package br.com.dashboard.company.exceptions.handler
 
-import br.com.dashboard.company.exceptions.DuplicateNameException
+import br.com.dashboard.company.exceptions.ObjectDuplicateException
 import br.com.dashboard.company.exceptions.ForbiddenActionRequestException
 import br.com.dashboard.company.exceptions.InvalidJwtAuthenticationException
 import br.com.dashboard.company.exceptions.ResourceNotFoundException
@@ -52,8 +52,8 @@ class CustomizedResponseEntityExceptionHandler : ResponseEntityExceptionHandler(
         return ResponseEntity<ExceptionResponse>(exceptionResponse, HttpStatus.NOT_FOUND)
     }
 
-    @ExceptionHandler(DuplicateNameException::class)
-    fun handleDuplicateNameException(
+    @ExceptionHandler(ObjectDuplicateException::class)
+    fun handleObjectDuplicateException(
         exception: Exception,
         request: WebRequest
     ): ResponseEntity<ExceptionResponse> {

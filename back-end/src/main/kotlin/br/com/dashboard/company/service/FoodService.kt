@@ -2,7 +2,7 @@ package br.com.dashboard.company.service
 
 import br.com.dashboard.company.entities.food.Food
 import br.com.dashboard.company.entities.user.User
-import br.com.dashboard.company.exceptions.DuplicateNameException
+import br.com.dashboard.company.exceptions.ObjectDuplicateException
 import br.com.dashboard.company.exceptions.ResourceNotFoundException
 import br.com.dashboard.company.repository.FoodRepository
 import br.com.dashboard.company.service.ProductService.Companion.PRODUCT_NOT_FOUND
@@ -84,7 +84,7 @@ class FoodService {
             foodResult.user = userAuthenticated
             return parseObject(foodRepository.save(foodResult), FoodResponseVO::class.java)
         } else {
-            throw DuplicateNameException(message = DUPLICATE_NAME_FOOD)
+            throw ObjectDuplicateException(message = DUPLICATE_NAME_FOOD)
         }
     }
 
@@ -109,7 +109,7 @@ class FoodService {
             foodSaved.price = food.price
             return parseObject(foodRepository.save(foodSaved), FoodResponseVO::class.java)
         } else {
-            throw DuplicateNameException(message = DUPLICATE_NAME_FOOD)
+            throw ObjectDuplicateException(message = DUPLICATE_NAME_FOOD)
         }
     }
 

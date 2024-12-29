@@ -288,7 +288,7 @@ class OrderController {
     fun incrementMoreReservationsOrder(
         @AuthenticationPrincipal user: User,
         @PathVariable(value = "orderId") orderId: Long,
-        @RequestBody reservationsToSava: MutableList<ReservationRequestVO>
+        @RequestBody reservationsToSava: MutableList<ReservationResponseVO>
     ): ResponseEntity<MutableList<OrderResponseVO>> {
         orderService.incrementMoreReservationsOrder(
             user = user,

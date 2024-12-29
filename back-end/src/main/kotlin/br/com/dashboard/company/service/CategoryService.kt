@@ -2,7 +2,7 @@ package br.com.dashboard.company.service
 
 import br.com.dashboard.company.entities.category.Category
 import br.com.dashboard.company.entities.user.User
-import br.com.dashboard.company.exceptions.DuplicateNameException
+import br.com.dashboard.company.exceptions.ObjectDuplicateException
 import br.com.dashboard.company.exceptions.ResourceNotFoundException
 import br.com.dashboard.company.repository.CategoryRepository
 import br.com.dashboard.company.utils.others.ConverterUtils.parseObject
@@ -84,7 +84,7 @@ class CategoryService {
             categoryResult.user = userAuthenticated
             return parseObject(categoryRepository.save(categoryResult), CategoryResponseVO::class.java)
         } else {
-            throw DuplicateNameException(message = DUPLICATE_NAME_CATEGORY)
+            throw ObjectDuplicateException(message = DUPLICATE_NAME_CATEGORY)
         }
     }
 
@@ -105,7 +105,7 @@ class CategoryService {
             categoryResult.name = category.name
             return parseObject(categoryRepository.save(categoryResult), CategoryResponseVO::class.java)
         } else {
-            throw DuplicateNameException(message = DUPLICATE_NAME_CATEGORY)
+            throw ObjectDuplicateException(message = DUPLICATE_NAME_CATEGORY)
 
         }
     }

@@ -2,7 +2,7 @@ package br.com.dashboard.company.service
 
 import br.com.dashboard.company.entities.item.Item
 import br.com.dashboard.company.entities.user.User
-import br.com.dashboard.company.exceptions.DuplicateNameException
+import br.com.dashboard.company.exceptions.ObjectDuplicateException
 import br.com.dashboard.company.exceptions.ResourceNotFoundException
 import br.com.dashboard.company.repository.ItemRepository
 import br.com.dashboard.company.utils.common.PriceRequestVO
@@ -80,7 +80,7 @@ class ItemService {
             itemResult.user = userAuthenticated
             return parseObject(itemRepository.save(itemResult), ItemResponseVO::class.java)
         } else {
-            throw DuplicateNameException(message = DUPLICATE_NAME_ITEM)
+            throw ObjectDuplicateException(message = DUPLICATE_NAME_ITEM)
         }
     }
 
@@ -103,7 +103,7 @@ class ItemService {
             itemSaved.price = item.price
             return parseObject(itemRepository.save(itemSaved), ItemResponseVO::class.java)
         } else {
-            throw DuplicateNameException(message = DUPLICATE_NAME_ITEM)
+            throw ObjectDuplicateException(message = DUPLICATE_NAME_ITEM)
         }
     }
 

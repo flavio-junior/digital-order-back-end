@@ -11,7 +11,8 @@ CREATE TABLE tb_user_category (
 
 CREATE TABLE IF NOT EXISTS tb_reservation(
     id SERIAL PRIMARY KEY,
-    name VARCHAR(60)
+    name VARCHAR(60),
+    status varchar(30) check (status in ('AVAILABLE', 'RESERVED'))
 );
 
 CREATE TABLE tb_user_reservation (
