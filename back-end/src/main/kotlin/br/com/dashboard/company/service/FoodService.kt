@@ -1,15 +1,19 @@
 package br.com.dashboard.company.service
 
 import br.com.dashboard.company.entities.food.Food
+import br.com.dashboard.company.entities.`object`.Object
+import br.com.dashboard.company.entities.order.Order
 import br.com.dashboard.company.entities.user.User
 import br.com.dashboard.company.exceptions.ObjectDuplicateException
 import br.com.dashboard.company.exceptions.ResourceNotFoundException
 import br.com.dashboard.company.repository.FoodRepository
 import br.com.dashboard.company.service.ProductService.Companion.PRODUCT_NOT_FOUND
+import br.com.dashboard.company.utils.common.ObjectStatus
 import br.com.dashboard.company.utils.common.PriceRequestVO
 import br.com.dashboard.company.utils.others.ConverterUtils.parseObject
 import br.com.dashboard.company.vo.food.FoodRequestVO
 import br.com.dashboard.company.vo.food.FoodResponseVO
+import br.com.dashboard.company.vo.`object`.ObjectRequestVO
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
@@ -94,6 +98,29 @@ class FoodService {
     ): Boolean {
         val foodResult = foodRepository.checkNameFoodAlreadyExists(userId = userId, foodName = foodName)
         return foodResult != null
+    }
+
+    @Transactional
+    fun saveObjectFood(
+        user: User? = null,
+        order: Order? = null,
+        foodRequest: ObjectRequestVO
+    ): Pair<Object, Double> {
+        var total = 0.0
+        val productSaved = getFood(userId = user?.id ?: 0, foodId = foodRequest.identifier)
+        val objectItemResult: Object = parseObject(foodRequest, Object::class.java)
+        objectItemResult.identifier = foodRequest.identifier
+        objectItemResult.type = foodRequest.type
+        objectItemResult.name = productSaved.name
+        objectItemResult.price = productSaved.price
+        objectItemResult.quantity = foodRequest.quantity
+        val priceCalculated = (productSaved.price * foodRequest.quantity)
+        objectItemResult.total = priceCalculated
+        objectItemResult.status = ObjectStatus.PENDING
+        objectItemResult.order = order
+        productSaved.user = user
+        total += priceCalculated
+        return Pair(objectItemResult, total)
     }
 
     @Transactional

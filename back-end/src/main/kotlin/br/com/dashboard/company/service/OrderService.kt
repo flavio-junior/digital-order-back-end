@@ -85,12 +85,13 @@ class OrderService {
     @Transactional
     fun createNewOrder(
         user: User,
+        status: Status = Status.OPEN,
         order: OrderRequestVO
     ): OrderResponseVO {
         val userAuthenticated = userService.findUserById(userId = user.id)
         val orderResult: Order = parseObject(order, Order::class.java)
         orderResult.createdAt = LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS)
-        orderResult.status = Status.OPEN
+        orderResult.status = status
         orderResult.reservations = reservationService.validateReservationsToSave(
             userId = user.id,
             reservations = order.reservations,

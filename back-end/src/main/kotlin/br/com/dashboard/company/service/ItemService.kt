@@ -1,14 +1,18 @@
 package br.com.dashboard.company.service
 
 import br.com.dashboard.company.entities.item.Item
+import br.com.dashboard.company.entities.`object`.Object
+import br.com.dashboard.company.entities.order.Order
 import br.com.dashboard.company.entities.user.User
 import br.com.dashboard.company.exceptions.ObjectDuplicateException
 import br.com.dashboard.company.exceptions.ResourceNotFoundException
 import br.com.dashboard.company.repository.ItemRepository
+import br.com.dashboard.company.utils.common.ObjectStatus
 import br.com.dashboard.company.utils.common.PriceRequestVO
 import br.com.dashboard.company.utils.others.ConverterUtils.parseObject
 import br.com.dashboard.company.vo.item.ItemRequestVO
 import br.com.dashboard.company.vo.item.ItemResponseVO
+import br.com.dashboard.company.vo.`object`.ObjectRequestVO
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
@@ -57,7 +61,7 @@ class ItemService {
         }
     }
 
-   fun getItem(
+    fun getItem(
         userId: Long,
         itemId: Long
     ): Item {
@@ -90,6 +94,29 @@ class ItemService {
     ): Boolean {
         val itemResult = itemRepository.checkNameItemAlreadyExists(userId = userId, name = name)
         return itemResult != null
+    }
+
+    @Transactional
+    fun saveObjectItem(
+        user: User? = null,
+        order: Order? = null,
+        itemRequest: ObjectRequestVO
+    ): Pair<Object, Double> {
+        var total = 0.0
+        val productSaved = getItem(userId = user?.id ?: 0, itemId = itemRequest.identifier)
+        val objectItemResult: Object = parseObject(itemRequest, Object::class.java)
+        objectItemResult.identifier = itemRequest.identifier
+        objectItemResult.type = itemRequest.type
+        objectItemResult.name = productSaved.name
+        objectItemResult.price = productSaved.price
+        objectItemResult.quantity = itemRequest.quantity
+        val priceCalculated = (productSaved.price * itemRequest.quantity)
+        objectItemResult.total = priceCalculated
+        objectItemResult.status = ObjectStatus.PENDING
+        objectItemResult.order = order
+        productSaved.user = user
+        total += priceCalculated
+        return Pair(objectItemResult, total)
     }
 
     @Transactional

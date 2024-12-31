@@ -40,6 +40,18 @@ class CustomizedResponseEntityExceptionHandler : ResponseEntityExceptionHandler(
         return ResponseEntity<ExceptionResponse>(exceptionResponse, HttpStatus.FORBIDDEN)
     }
 
+    @ExceptionHandler(InvalidRequest::class)
+    fun handleInvalidRequestException(
+        exception: Exception,
+        request: WebRequest
+    ): ResponseEntity<ExceptionResponse> {
+        val exceptionResponse = ExceptionResponse(
+            status = HttpStatus.BAD_REQUEST.value(),
+            message = exception.message
+        )
+        return ResponseEntity<ExceptionResponse>(exceptionResponse, HttpStatus.BAD_REQUEST)
+    }
+
     @ExceptionHandler(ResourceNotFoundException::class)
     fun handleResourceNotFoundException(
         exception: Exception,

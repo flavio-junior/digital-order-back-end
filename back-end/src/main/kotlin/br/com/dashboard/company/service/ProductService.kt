@@ -1,12 +1,18 @@
 package br.com.dashboard.company.service
 
+import br.com.dashboard.company.entities.`object`.Object
+import br.com.dashboard.company.entities.order.Order
 import br.com.dashboard.company.entities.product.Product
 import br.com.dashboard.company.entities.user.User
 import br.com.dashboard.company.exceptions.ObjectDuplicateException
 import br.com.dashboard.company.exceptions.ResourceNotFoundException
+import br.com.dashboard.company.exceptions.handler.InvalidRequest
 import br.com.dashboard.company.repository.ProductRepository
+import br.com.dashboard.company.utils.common.ObjectStatus
 import br.com.dashboard.company.utils.common.PriceRequestVO
+import br.com.dashboard.company.utils.others.ConstantsUtils.ZERO_QUANTITY_ERROR
 import br.com.dashboard.company.utils.others.ConverterUtils.parseObject
+import br.com.dashboard.company.vo.`object`.ObjectRequestVO
 import br.com.dashboard.company.vo.product.ProductRequestVO
 import br.com.dashboard.company.vo.product.ProductResponseVO
 import br.com.dashboard.company.vo.product.RestockProductRequestVO
@@ -99,6 +105,44 @@ class ProductService {
     }
 
     @Transactional
+    fun buyProduct(
+        user: User? = null,
+        order: Order? = null,
+        productRequest: ObjectRequestVO
+    ): Pair<Object, Double> {
+        var total = 0.0
+        val productSaved = getProduct(userId = user?.id ?: 0, productId = productRequest.identifier)
+        checkBodyProduct(product = productSaved, quantityRequest = productRequest.quantity)
+        val objectProductResult: Object = parseObject(productRequest, Object::class.java)
+        objectProductResult.identifier = productRequest.identifier
+        objectProductResult.type = productRequest.type
+        objectProductResult.name = productSaved.name
+        objectProductResult.price = productSaved.price
+        objectProductResult.quantity = productRequest.quantity
+        val priceCalculated = (productSaved.price * productRequest.quantity)
+        objectProductResult.total = priceCalculated
+        objectProductResult.status = ObjectStatus.PENDING
+        objectProductResult.order = order
+        productSaved.user = user
+        total += priceCalculated
+        productRepository.buyProduct(userId = user?.id ?: 0, productId = productSaved.id, quantity = productRequest.quantity)
+        return Pair(objectProductResult, total)
+    }
+
+    fun checkBodyProduct(
+        product: Product,
+        quantityRequest: Int
+    ) {
+        if (quantityRequest == 0 || quantityRequest < 0) {
+            throw InvalidRequest(message = ZERO_QUANTITY_ERROR)
+        } else if (product.quantity == 0) {
+            throw ObjectDuplicateException(message = PRODUCT_WITH_EMPTY_STOCK)
+        } else if (quantityRequest > (product.quantity ?: 0)) {
+            throw InvalidRequest(message = REQUESTED_QUANTITY_EXCEEDS_STOCK)
+        }
+    }
+
+    @Transactional
     fun updateProduct(
         user: User,
         product: ProductResponseVO
@@ -134,7 +178,11 @@ class ProductService {
         restockProduct: RestockProductRequestVO
     ) {
         val productSaved = getProduct(userId = user.id, productId = productId)
-        productRepository.restockProduct(userId = user.id, idProduct = productSaved.id, quantity = restockProduct.quantity)
+        productRepository.restockProduct(
+            userId = user.id,
+            idProduct = productSaved.id,
+            quantity = restockProduct.quantity
+        )
     }
 
     @Transactional
@@ -149,6 +197,8 @@ class ProductService {
 
     companion object {
         const val PRODUCT_NOT_FOUND = "Product not found!"
+        const val PRODUCT_WITH_EMPTY_STOCK = "Product with empty stock!"
+        const val REQUESTED_QUANTITY_EXCEEDS_STOCK = "The requested quantity exceeds the available stock."
         const val DUPLICATE_NAME_PRODUCT = "The product already exists"
     }
 }

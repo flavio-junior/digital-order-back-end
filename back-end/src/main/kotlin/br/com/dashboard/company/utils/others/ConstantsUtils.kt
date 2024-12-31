@@ -1,6 +1,7 @@
 package br.com.dashboard.company.utils.others
 
 object ConstantsUtils {
+    const val ZERO_QUANTITY_ERROR = "The requested quantity cannot be zero."
     const val EMPTY_FIELDS = "Alert! Fields are empty! Please check and complete!"
     const val EXPIRED_CODE = "Expired Code!"
     const val FROM: Long = 1000

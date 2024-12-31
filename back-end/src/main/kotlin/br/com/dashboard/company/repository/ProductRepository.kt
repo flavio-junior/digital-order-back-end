@@ -54,6 +54,14 @@ interface ProductRepository : JpaRepository<Product, Long> {
     )
 
     @Modifying
+    @Query("UPDATE Product p SET p.quantity = p.quantity - :quantity WHERE p.user.id = :userId AND p.id = :productId")
+    fun buyProduct(
+        @Param("userId") userId: Long,
+        @Param("productId") productId: Long,
+        @Param("quantity") quantity: Int
+    )
+
+    @Modifying
     @Query("UPDATE Product p SET p.quantity = p.quantity + :quantity WHERE p.user.id = :userId AND p.id = :id")
     fun restockProduct(
         @Param("userId") userId: Long,

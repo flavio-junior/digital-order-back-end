@@ -6,7 +6,6 @@ import br.com.dashboard.company.exceptions.ResourceNotFoundException
 import br.com.dashboard.company.repository.ObjectRepository
 import br.com.dashboard.company.utils.common.ObjectStatus
 import br.com.dashboard.company.utils.common.TypeItem
-import br.com.dashboard.company.utils.others.ConverterUtils.parseObject
 import br.com.dashboard.company.vo.`object`.ObjectRequestVO
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
@@ -41,54 +40,33 @@ class ObjectService {
         val result = objectsToSave?.map { item ->
             when (item.type) {
                 TypeItem.FOOD -> {
-                    val objectSaved = foodService.getFood(userId = userId, foodId = item.identifier)
-                    val objectResult: Object = parseObject(objectsToSave, Object::class.java)
-                    objectResult.identifier = item.identifier
-                    objectResult.type = item.type
-                    objectResult.name = objectSaved.name
-                    objectResult.price = objectSaved.price
-                    objectResult.quantity = item.quantity
-                    val priceCalculated = (objectSaved.price * item.quantity)
-                    objectResult.total = priceCalculated
-                    objectResult.status = ObjectStatus.PENDING
-                    objectResult.order  = order
-                    objectSaved.user = userAuthenticated
-                    total += priceCalculated
-                    objectRepository.save(objectResult)
+                    val objectSaved = foodService.saveObjectFood(
+                        user = userAuthenticated,
+                        order = order,
+                        foodRequest = item,
+                    )
+                    total += objectSaved.second
+                    objectRepository.save(objectSaved.first)
                 }
 
                 TypeItem.ITEM -> {
-                    val objectSaved = itemService.getItem(userId = userId, itemId = item.identifier)
-                    val objectResult: Object = parseObject(objectsToSave, Object::class.java)
-                    objectResult.identifier = item.identifier
-                    objectResult.type = item.type
-                    objectResult.name = objectSaved.name
-                    objectResult.price = objectSaved.price
-                    objectResult.quantity = item.quantity
-                    val priceCalculated = (objectSaved.price * item.quantity)
-                    objectResult.total = priceCalculated
-                    objectResult.status = ObjectStatus.PENDING
-                    objectResult.order  = order
-                    objectSaved.user = userAuthenticated
-                    total += priceCalculated
-                    objectRepository.save(objectResult)
+                    val objectSaved = itemService.saveObjectItem(
+                        user = userAuthenticated,
+                        order = order,
+                        itemRequest = item,
+                    )
+                    total += objectSaved.second
+                    objectRepository.save(objectSaved.first)
                 }
 
                 else -> {
-                    val objectSaved = productService.getProduct(userId = userId, productId = item.identifier)
-                    val objectResult: Object = parseObject(objectsToSave, Object::class.java)
-                    objectResult.identifier = item.identifier
-                    objectResult.type = item.type
-                    objectResult.name = objectSaved.name
-                    objectResult.price = objectSaved.price
-                    objectResult.quantity = item.quantity
-                    val priceCalculated = (objectSaved.price * item.quantity)
-                    objectResult.total = priceCalculated
-                    objectResult.status = ObjectStatus.PENDING
-                    objectResult.order  = order
-                    objectSaved.user = userAuthenticated
-                    total += priceCalculated
-                    objectRepository.save(objectResult)
+                   val objectProductInstanced = productService.buyProduct(
+                        user = userAuthenticated,
+                        order = order,
+                        productRequest = item
+                    )
+                    total += objectProductInstanced.second
+                    objectRepository.save(objectProductInstanced.first)
                 }
             }
         }
