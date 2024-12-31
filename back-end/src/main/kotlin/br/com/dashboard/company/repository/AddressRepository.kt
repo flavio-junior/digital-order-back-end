@@ -11,16 +11,14 @@ import org.springframework.stereotype.Repository
 @Repository
 interface AddressRepository : JpaRepository<Address, Long> {
 
-    @Query(value = "SELECT a FROM Address a WHERE a.id = :addressId AND a.order.id = :orderId")
+    @Query(value = "SELECT a FROM Address a WHERE a.id = :addressId")
     fun findAddressById(
-        @Param("addressId") addressId: Long,
-        @Param("orderId") orderId: Long
+        @Param("addressId") addressId: Long
     ): Address?
 
     @Modifying
-    @Query("UPDATE Address a SET a.status =:status WHERE a.id = :addressId AND a.id =:orderId")
+    @Query("UPDATE Address a SET a.status =:status WHERE a.id = :addressId")
     fun updateStatusDelivery(
-        @Param("orderId") orderId: Long,
         @Param("addressId") addressId: Long,
         @Param("status") status: AddressStatus
     )

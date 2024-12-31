@@ -16,11 +16,11 @@ class AddressService {
     @Autowired
     private lateinit var repository: AddressRepository
 
+    @Transactional(readOnly = true)
     fun findAddressById(
-        orderId: Long,
         addressId: Long
     ): Address {
-        val orderSaved: Address? = repository.findAddressById(addressId = addressId, orderId = orderId)
+        val orderSaved: Address? = repository.findAddressById(addressId = addressId)
         if (orderSaved != null) {
             return orderSaved
         } else {
@@ -38,14 +38,11 @@ class AddressService {
 
     @Transactional
     fun updateStatusDelivery(
-        orderId: Long,
-        addressId: Long? = null,
+        addressId: Long,
         status: UpdateStatusDeliveryRequestVO
     ) {
-        addressId?.let { result ->
-            findAddressById(orderId = orderId, addressId = result)
-            repository.updateStatusDelivery(orderId = orderId, addressId = result, status = status.status)
-        }
+        findAddressById(addressId = addressId)
+        repository.updateStatusDelivery(addressId = addressId, status = status.status)
     }
 
     companion object {

@@ -265,11 +265,7 @@ class OrderService {
         status: UpdateStatusDeliveryRequestVO
     ) {
         val orderSaved = getOrder(userId = user.id, orderId = orderId)
-        addressService.updateStatusDelivery(
-            orderId = orderSaved.id,
-            addressId = orderSaved.address?.id,
-            status = status
-        )
+        addressService.updateStatusDelivery(addressId = orderSaved.address?.id ?: 0, status = status)
     }
 
     @Transactional
