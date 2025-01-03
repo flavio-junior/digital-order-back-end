@@ -92,59 +92,6 @@ class OrderController {
     }
 
     @GetMapping(
-        value = ["/closed"],
-        produces = [APPLICATION_JSON]
-    )
-    @Operation(
-        summary = "Find All Orders Closed", description = "Find All Orders Closed",
-        tags = ["Order"], responses = [
-            ApiResponse(
-                description = "Success", responseCode = "200", content = [
-                    Content(array = ArraySchema(schema = Schema(implementation = OrderResponseVO::class)))
-                ]
-            ),
-            ApiResponse(
-                description = "Bad Request", responseCode = "400", content = [
-                    Content(schema = Schema(implementation = Unit::class))
-                ]
-            ),
-            ApiResponse(
-                description = "Unauthorized", responseCode = "401", content = [
-                    Content(schema = Schema(implementation = Unit::class))
-                ]
-            ),
-            ApiResponse(
-                description = "Operation Unauthorized", responseCode = "403", content = [
-                    Content(schema = Schema(implementation = Unit::class))
-                ]
-            ),
-            ApiResponse(
-                description = "Not Found", responseCode = "404", content = [
-                    Content(schema = Schema(implementation = Unit::class))
-                ]
-            ),
-            ApiResponse(
-                description = "Internal Error", responseCode = "500", content = [
-                    Content(schema = Schema(implementation = Unit::class))
-                ]
-            )
-        ]
-    )
-    fun findAllOrdersClosed(
-        @AuthenticationPrincipal user: User,
-        @RequestParam(value = "page", defaultValue = "0") page: Int,
-        @RequestParam(value = "size", defaultValue = "12") size: Int,
-        @RequestParam(value = "sort", defaultValue = "asc") sort: String
-    ): ResponseEntity<Page<OrderResponseVO>> {
-        val sortDirection: Sort.Direction =
-            if ("desc".equals(sort, ignoreCase = true)) Sort.Direction.DESC else Sort.Direction.ASC
-        val pageable: Pageable = PageRequest.of(page, size, Sort.by(sortDirection, "createdAt"))
-        return ResponseEntity.ok(
-            orderService.findAllOrders(user = user, status = Status.CLOSED, pageable = pageable)
-        )
-    }
-
-    @GetMapping(
         value = ["/{id}"],
         produces = [APPLICATION_JSON]
     )
