@@ -141,5 +141,6 @@ CREATE TABLE tb_order_payment (
 CREATE TABLE tb_checkout_details (
     id SERIAL PRIMARY KEY,
     date DATE NOT NULL,
+    type varchar(30) check (type in ('DELIVERY', 'ORDER', 'RESERVATION', 'SHOPPING_CART'))
     total NUMERIC(10, 2) DEFAULT 0.0
 );

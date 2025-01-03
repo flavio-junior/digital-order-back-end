@@ -1,6 +1,7 @@
 package br.com.dashboard.company.service
 
 import br.com.dashboard.company.entities.order.Order
+import br.com.dashboard.company.entities.payment.Payment
 import br.com.dashboard.company.entities.user.User
 import br.com.dashboard.company.exceptions.ResourceNotFoundException
 import br.com.dashboard.company.repository.OrderRepository
@@ -9,13 +10,14 @@ import br.com.dashboard.company.service.ReservationService.Companion.RESERVATION
 import br.com.dashboard.company.utils.common.Action
 import br.com.dashboard.company.utils.common.ReservationStatus
 import br.com.dashboard.company.utils.common.Status
+import br.com.dashboard.company.utils.common.TypeOrder
 import br.com.dashboard.company.utils.others.ConverterUtils.parseObject
 import br.com.dashboard.company.vo.`object`.ObjectRequestVO
 import br.com.dashboard.company.vo.`object`.UpdateObjectRequestVO
-import br.com.dashboard.company.vo.order.CloseOrderRequestVO
 import br.com.dashboard.company.vo.order.OrderRequestVO
 import br.com.dashboard.company.vo.order.OrderResponseVO
 import br.com.dashboard.company.vo.order.UpdateStatusDeliveryRequestVO
+import br.com.dashboard.company.vo.payment.PaymentRequestVO
 import br.com.dashboard.company.vo.reservation.ReservationResponseVO
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.data.domain.Page
@@ -85,13 +87,12 @@ class OrderService {
     @Transactional
     fun createNewOrder(
         user: User,
-        status: Status = Status.OPEN,
         order: OrderRequestVO
     ): OrderResponseVO {
         val userAuthenticated = userService.findUserById(userId = user.id)
         val orderResult: Order = parseObject(order, Order::class.java)
         orderResult.createdAt = LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS)
-        orderResult.status = status
+        orderResult.status = if (order.type == TypeOrder.SHOPPING_CART) Status.CLOSED else Status.OPEN
         orderResult.reservations = reservationService.validateReservationsToSave(
             userId = user.id,
             reservations = order.reservations,
@@ -103,6 +104,14 @@ class OrderService {
         orderResult.objects = objectsSaved.first
         orderResult.quantity = order.objects?.size ?: 0
         orderResult.total = objectsSaved.second
+        if (order.payment?.type != null) {
+           orderResult.payment = Payment(
+                createdAt = LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS),
+                type = order.payment?.type,
+                total = objectsSaved.second
+            )
+            order.type?.let { checkoutService.saveCheckoutDetails(total = objectsSaved.second, type = it) }
+        }
         orderResult.user = userAuthenticated
         return parseObject(orderRepository.save(orderResult), OrderResponseVO::class.java)
     }
@@ -239,15 +248,15 @@ class OrderService {
     fun closeOrder(
         user: User,
         idOrder: Long,
-        closeOrder: CloseOrderRequestVO
+        payment: PaymentRequestVO
     ) {
-        val order = getOrder(userId = user.id, orderId = idOrder)
-        order.reservations?.forEach { reservation ->
+        val orderResult = getOrder(userId = user.id, orderId = idOrder)
+        orderResult.reservations?.forEach { reservation ->
             reservation.status = ReservationStatus.AVAILABLE
         }
         updateStatusOrder(userId = user.id, orderId = idOrder, status = Status.CLOSED)
-        paymentService.updatePayment(closeOrder = closeOrder, order = order)
-        checkoutService.saveCheckoutDetails(total = order.total)
+        paymentService.updatePayment(payment = payment, order = orderResult)
+        orderResult.type?.let { checkoutService.saveCheckoutDetails(total = orderResult.total, type = it) }
     }
 
     @Transactional

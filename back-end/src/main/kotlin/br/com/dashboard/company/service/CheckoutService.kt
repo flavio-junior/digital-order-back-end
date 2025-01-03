@@ -2,6 +2,7 @@ package br.com.dashboard.company.service
 
 import br.com.dashboard.company.entities.checkout.Checkout
 import br.com.dashboard.company.repository.CheckoutRepository
+import br.com.dashboard.company.utils.common.TypeOrder
 import br.com.dashboard.company.vo.checkout.GeneralBalanceResponseVO
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
@@ -16,9 +17,10 @@ class CheckoutService {
 
     @Transactional
     fun saveCheckoutDetails(
-        total: Double
+        total: Double,
+        type: TypeOrder
     ) {
-        checkoutRepository.save(Checkout(date = Date(), total = total))
+        checkoutRepository.save(Checkout(date = Date(), total = total, type = type))
     }
 
     @Transactional

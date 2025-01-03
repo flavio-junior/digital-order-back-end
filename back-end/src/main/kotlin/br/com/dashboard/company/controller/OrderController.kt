@@ -7,10 +7,10 @@ import br.com.dashboard.company.utils.others.MediaType.APPLICATION_JSON
 import br.com.dashboard.company.vo.`object`.ObjectRequestVO
 import br.com.dashboard.company.vo.`object`.ObjectResponseVO
 import br.com.dashboard.company.vo.`object`.UpdateObjectRequestVO
-import br.com.dashboard.company.vo.order.CloseOrderRequestVO
 import br.com.dashboard.company.vo.order.OrderRequestVO
 import br.com.dashboard.company.vo.order.OrderResponseVO
 import br.com.dashboard.company.vo.order.UpdateStatusDeliveryRequestVO
+import br.com.dashboard.company.vo.payment.PaymentRequestVO
 import br.com.dashboard.company.vo.reservation.ReservationResponseVO
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.media.ArraySchema
@@ -470,9 +470,9 @@ class OrderController {
     fun closeOrder(
         @AuthenticationPrincipal user: User,
         @PathVariable(value = "id") idOrder: Long,
-        @RequestBody closeOrder: CloseOrderRequestVO
+        @RequestBody payment: PaymentRequestVO
     ) {
-        return orderService.closeOrder(user = user, idOrder = idOrder, closeOrder = closeOrder)
+        return orderService.closeOrder(user = user, idOrder = idOrder, payment = payment)
     }
 
     @PutMapping(
