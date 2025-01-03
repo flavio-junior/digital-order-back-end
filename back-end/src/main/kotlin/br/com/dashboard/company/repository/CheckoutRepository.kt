@@ -1,23 +1,31 @@
 package br.com.dashboard.company.repository
 
 import br.com.dashboard.company.entities.checkout.Checkout
+import org.springframework.data.domain.Page
+import org.springframework.data.domain.Pageable
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.data.jpa.repository.Query
 import org.springframework.data.repository.query.Param
 import org.springframework.stereotype.Repository
-import java.util.*
+import java.time.LocalDate
 
 @Repository
 interface CheckoutRepository : JpaRepository<Checkout, Long> {
 
+    @Query("SELECT c FROM Checkout c WHERE c.date = :date")
+    fun getAllCheckoutsDay(
+        @Param("date") date: LocalDate = LocalDate.now(),
+        pageable: Pageable
+    ): Page<Checkout>?
+
     @Query("SELECT SUM(c.total) FROM Checkout c WHERE c.date = :date")
     fun getGeneralBalance(
-        @Param("date") date: Date
+        @Param("date") date: LocalDate = LocalDate.now()
     ): Double?
 
     @Query(
         value =
-        """
+            """
             SELECT
                 SUM(c.total) 
             FROM
@@ -31,7 +39,7 @@ interface CheckoutRepository : JpaRepository<Checkout, Long> {
 
     @Query(
         value =
-        """
+            """
             SELECT
                 SUM(c.total) 
             FROM
@@ -47,7 +55,7 @@ interface CheckoutRepository : JpaRepository<Checkout, Long> {
 
     @Query(
         value =
-        """
+            """
             SELECT
                 SUM(c.total) 
             FROM
