@@ -6,6 +6,7 @@ import br.com.dashboard.company.entities.user.User
 import br.com.dashboard.company.exceptions.ObjectDuplicateException
 import br.com.dashboard.company.exceptions.ResourceNotFoundException
 import br.com.dashboard.company.repository.OrderRepository
+import br.com.dashboard.company.service.ObjectService.Companion.OBJECT_ALREADY_EXISTS
 import br.com.dashboard.company.service.ObjectService.Companion.OBJECT_NOT_FOUND
 import br.com.dashboard.company.service.ReservationService.Companion.RESERVATION_NOT_FOUND
 import br.com.dashboard.company.utils.common.*
@@ -122,6 +123,12 @@ class OrderService {
         objects: MutableList<ObjectRequestVO>
     ) {
         val orderSaved = getOrder(orderId = orderId, userId = user.id)
+        objects.map { objectAvailable ->
+            val objectFound = orderSaved.objects?.find { it.identifier ==  objectAvailable.identifier }
+            if (objectFound != null) {
+                throw ObjectDuplicateException(message = OBJECT_ALREADY_EXISTS)
+            }
+        }
         val objectsSaved = objectService.saveObjects(userId = user.id, order = orderSaved, objectsToSave = objects)
         orderRepository.updateQuantityOrder(orderId = orderId, objectsSaved.first?.size)
         incrementDataOrder(

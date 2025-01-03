@@ -133,5 +133,6 @@ class ObjectService {
 
     companion object {
         const val OBJECT_NOT_FOUND = "Object not found!"
+        const val OBJECT_ALREADY_EXISTS = "Object already exists!"
     }
 }
