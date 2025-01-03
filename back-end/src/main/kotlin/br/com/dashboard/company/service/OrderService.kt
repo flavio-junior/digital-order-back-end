@@ -3,14 +3,12 @@ package br.com.dashboard.company.service
 import br.com.dashboard.company.entities.order.Order
 import br.com.dashboard.company.entities.payment.Payment
 import br.com.dashboard.company.entities.user.User
+import br.com.dashboard.company.exceptions.ObjectDuplicateException
 import br.com.dashboard.company.exceptions.ResourceNotFoundException
 import br.com.dashboard.company.repository.OrderRepository
 import br.com.dashboard.company.service.ObjectService.Companion.OBJECT_NOT_FOUND
 import br.com.dashboard.company.service.ReservationService.Companion.RESERVATION_NOT_FOUND
-import br.com.dashboard.company.utils.common.Action
-import br.com.dashboard.company.utils.common.ReservationStatus
-import br.com.dashboard.company.utils.common.Status
-import br.com.dashboard.company.utils.common.TypeOrder
+import br.com.dashboard.company.utils.common.*
 import br.com.dashboard.company.utils.others.ConverterUtils.parseObject
 import br.com.dashboard.company.vo.address.UpdateAddressRequestVO
 import br.com.dashboard.company.vo.`object`.ObjectRequestVO
@@ -106,7 +104,7 @@ class OrderService {
         orderResult.quantity = order.objects?.size ?: 0
         orderResult.total = objectsSaved.second
         if (order.payment?.type != null) {
-           orderResult.payment = Payment(
+            orderResult.payment = Payment(
                 createdAt = LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS),
                 type = order.payment?.type,
                 total = objectsSaved.second
@@ -252,12 +250,20 @@ class OrderService {
         payment: PaymentRequestVO
     ) {
         val orderResult = getOrder(userId = user.id, orderId = idOrder)
-        orderResult.reservations?.forEach { reservation ->
-            reservation.status = ReservationStatus.AVAILABLE
+        if (orderResult.status == Status.CLOSED) {
+            throw ObjectDuplicateException(message = ORDER_ALREADY_CLOSED)
+        } else {
+            if (orderResult.address?.status == AddressStatus.DELIVERED) {
+                orderResult.reservations?.forEach { reservation ->
+                    reservation.status = ReservationStatus.AVAILABLE
+                }
+                updateStatusOrder(userId = user.id, orderId = idOrder, status = Status.CLOSED)
+                paymentService.updatePayment(payment = payment, order = orderResult)
+                orderResult.type?.let { checkoutService.saveCheckoutDetails(total = orderResult.total, type = it) }
+            } else {
+                throw ObjectDuplicateException(message = DELIVERY_ORDER_PENDING)
+            }
         }
-        updateStatusOrder(userId = user.id, orderId = idOrder, status = Status.CLOSED)
-        paymentService.updatePayment(payment = payment, order = orderResult)
-        orderResult.type?.let { checkoutService.saveCheckoutDetails(total = orderResult.total, type = it) }
     }
 
     @Transactional
@@ -304,6 +310,8 @@ class OrderService {
 
     companion object {
         const val ORDER_NOT_FOUND = "Order not found!"
+        const val DELIVERY_ORDER_PENDING = "Delivery order pending"
+        const val ORDER_ALREADY_CLOSED = "Order already closed"
         const val SUBTRACT_ONE = 1
     }
 }
