@@ -89,6 +89,9 @@ class OrderService {
         user: User,
         order: OrderRequestVO
     ): OrderResponseVO {
+        if(objectService.checkIfAlreadyDuplicateObjects(objects = order.objects)) {
+            throw ObjectDuplicateException(message = OBJECT_ALREADY_EXISTS)
+        }
         val userAuthenticated = userService.findUserById(userId = user.id)
         val orderResult: Order = parseObject(order, Order::class.java)
         orderResult.createdAt = LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS)
