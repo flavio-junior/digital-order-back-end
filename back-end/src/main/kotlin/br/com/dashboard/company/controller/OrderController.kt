@@ -4,6 +4,7 @@ import br.com.dashboard.company.entities.user.User
 import br.com.dashboard.company.service.OrderService
 import br.com.dashboard.company.utils.common.Status
 import br.com.dashboard.company.utils.others.MediaType.APPLICATION_JSON
+import br.com.dashboard.company.vo.address.UpdateAddressRequestVO
 import br.com.dashboard.company.vo.`object`.ObjectRequestVO
 import br.com.dashboard.company.vo.`object`.ObjectResponseVO
 import br.com.dashboard.company.vo.`object`.UpdateObjectRequestVO
@@ -381,6 +382,56 @@ class OrderController {
     ): ResponseEntity<MutableList<OrderResponseVO>> {
         orderService.incrementMoreObjectsOrder(user = user, orderId = orderId, objects = objects)
         return ResponseEntity.noContent().build()
+    }
+
+    @PutMapping(
+        value = ["{orderId}/update/address/{addressId}"],
+        consumes = [APPLICATION_JSON],
+        produces = [APPLICATION_JSON]
+    )
+    @Operation(
+        summary = "Update Address Order", description = "Update Address Order",
+        tags = ["ORDER"],
+        responses = [
+            ApiResponse(
+                description = "Success", responseCode = "200", content = [
+                    Content(schema = Schema(implementation = UpdateStatusDeliveryRequestVO::class))
+                ]
+            ),
+            ApiResponse(
+                description = "Bad Request", responseCode = "400", content = [
+                    Content(schema = Schema(implementation = Unit::class))
+                ]
+            ),
+            ApiResponse(
+                description = "Unauthorized", responseCode = "401", content = [
+                    Content(schema = Schema(implementation = Unit::class))
+                ]
+            ),
+            ApiResponse(
+                description = "Not Found", responseCode = "404", content = [
+                    Content(schema = Schema(implementation = Unit::class))
+                ]
+            ),
+            ApiResponse(
+                description = "Internal Error", responseCode = "500", content = [
+                    Content(schema = Schema(implementation = Unit::class))
+                ]
+            )
+        ]
+    )
+    fun updateAddress(
+        @AuthenticationPrincipal user: User,
+        @PathVariable(value = "orderId") orderId: Long,
+        @PathVariable(value = "addressId") addressId: Long,
+        @RequestBody updateAddressRequestVO: UpdateAddressRequestVO
+    ) {
+        return orderService.updateAddressOrder(
+            user = user,
+            orderId = orderId,
+            addressId = addressId,
+            updateAddressRequestVO = updateAddressRequestVO
+        )
     }
 
     @PutMapping(

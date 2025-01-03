@@ -12,6 +12,7 @@ import br.com.dashboard.company.utils.common.ReservationStatus
 import br.com.dashboard.company.utils.common.Status
 import br.com.dashboard.company.utils.common.TypeOrder
 import br.com.dashboard.company.utils.others.ConverterUtils.parseObject
+import br.com.dashboard.company.vo.address.UpdateAddressRequestVO
 import br.com.dashboard.company.vo.`object`.ObjectRequestVO
 import br.com.dashboard.company.vo.`object`.UpdateObjectRequestVO
 import br.com.dashboard.company.vo.order.OrderRequestVO
@@ -266,6 +267,17 @@ class OrderService {
         status: Status
     ) {
         orderRepository.updateStatusOrder(userId = userId, orderId = orderId, status = status)
+    }
+
+    @Transactional
+    fun updateAddressOrder(
+        user: User,
+        orderId: Long,
+        addressId: Long,
+        updateAddressRequestVO: UpdateAddressRequestVO
+    ) {
+        getOrder(userId = user.id, orderId = orderId)
+        addressService.updateAddress(addressId = addressId, updateAddressRequestVO = updateAddressRequestVO)
     }
 
     @Transactional
