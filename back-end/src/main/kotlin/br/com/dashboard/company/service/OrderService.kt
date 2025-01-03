@@ -253,16 +253,24 @@ class OrderService {
         if (orderResult.status == Status.CLOSED) {
             throw ObjectDuplicateException(message = ORDER_ALREADY_CLOSED)
         } else {
-            if (orderResult.address?.status == AddressStatus.DELIVERED) {
-                orderResult.reservations?.forEach { reservation ->
-                    reservation.status = ReservationStatus.AVAILABLE
+            when (orderResult.type) {
+                TypeOrder.DELIVERY -> {
+                    if (orderResult.address?.status != AddressStatus.DELIVERED) {
+                        throw ObjectDuplicateException(message = DELIVERY_ORDER_PENDING)
+                    }
                 }
-                updateStatusOrder(userId = user.id, orderId = idOrder, status = Status.CLOSED)
-                paymentService.updatePayment(payment = payment, order = orderResult)
-                orderResult.type?.let { checkoutService.saveCheckoutDetails(total = orderResult.total, type = it) }
-            } else {
-                throw ObjectDuplicateException(message = DELIVERY_ORDER_PENDING)
+
+                TypeOrder.RESERVATION -> {
+                    orderResult.reservations?.forEach { reservation ->
+                        reservation.status = ReservationStatus.AVAILABLE
+                    }
+                }
+
+                else -> {}
             }
+            updateStatusOrder(userId = user.id, orderId = idOrder, status = Status.CLOSED)
+            paymentService.updatePayment(payment = payment, order = orderResult)
+            orderResult.type?.let { checkoutService.saveCheckoutDetails(total = orderResult.total, type = it) }
         }
     }
 
