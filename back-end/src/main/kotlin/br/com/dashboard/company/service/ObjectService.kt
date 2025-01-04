@@ -33,6 +33,7 @@ class ObjectService {
     fun saveObjects(
         userId: Long,
         order: Order? = null,
+        buy: Boolean = false,
         objectsToSave: MutableList<ObjectRequestVO>? = null
     ): Pair<MutableList<Object>?, Double> {
         var total = 0.0
@@ -63,6 +64,7 @@ class ObjectService {
                    val objectProductInstanced = productService.buyProduct(
                         user = userAuthenticated,
                         order = order,
+                        buy = buy,
                         productRequest = item
                     )
                     total += objectProductInstanced.second
@@ -134,5 +136,6 @@ class ObjectService {
     companion object {
         const val OBJECT_NOT_FOUND = "Object not found!"
         const val OBJECT_ALREADY_EXISTS = "Object already exists!"
+        const val OBJECT_WITH_PENDING_DELIVERY = "Object with pending delivery!"
     }
 }

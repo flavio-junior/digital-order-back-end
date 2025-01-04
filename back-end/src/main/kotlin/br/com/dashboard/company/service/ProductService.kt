@@ -108,6 +108,7 @@ class ProductService {
     fun buyProduct(
         user: User? = null,
         order: Order? = null,
+        buy: Boolean = false,
         productRequest: ObjectRequestVO
     ): Pair<Object, Double> {
         var total = 0.0
@@ -121,7 +122,7 @@ class ProductService {
         objectProductResult.quantity = productRequest.quantity
         val priceCalculated = (productSaved.price * productRequest.quantity)
         objectProductResult.total = priceCalculated
-        objectProductResult.status = ObjectStatus.PENDING
+        objectProductResult.status = if(buy) ObjectStatus.DELIVERED else ObjectStatus.PENDING
         objectProductResult.order = order
         productSaved.user = user
         total += priceCalculated

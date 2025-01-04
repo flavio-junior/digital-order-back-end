@@ -3,11 +3,13 @@ package br.com.dashboard.company.service
 import br.com.dashboard.company.entities.order.Order
 import br.com.dashboard.company.entities.payment.Payment
 import br.com.dashboard.company.entities.user.User
+import br.com.dashboard.company.exceptions.InternalErrorClient
 import br.com.dashboard.company.exceptions.ObjectDuplicateException
 import br.com.dashboard.company.exceptions.ResourceNotFoundException
 import br.com.dashboard.company.repository.OrderRepository
 import br.com.dashboard.company.service.ObjectService.Companion.OBJECT_ALREADY_EXISTS
 import br.com.dashboard.company.service.ObjectService.Companion.OBJECT_NOT_FOUND
+import br.com.dashboard.company.service.ObjectService.Companion.OBJECT_WITH_PENDING_DELIVERY
 import br.com.dashboard.company.service.ReservationService.Companion.RESERVATION_NOT_FOUND
 import br.com.dashboard.company.utils.common.*
 import br.com.dashboard.company.utils.others.ConverterUtils.parseObject
@@ -91,8 +93,19 @@ class OrderService {
     ): OrderResponseVO {
         val userAuthenticated = userService.findUserById(userId = user.id)
         val orderResult: Order = parseObject(order, Order::class.java)
+        val total: Double
         orderResult.createdAt = LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS)
-        orderResult.status = if (order.type == TypeOrder.SHOPPING_CART) Status.CLOSED else Status.OPEN
+        if (order.type == TypeOrder.SHOPPING_CART) {
+            orderResult.status = Status.CLOSED
+            val objectsSaved = objectService.saveObjects(userId = user.id, buy = true, objectsToSave = order.objects)
+            orderResult.objects = objectsSaved.first
+            total = objectsSaved.second
+        } else {
+            orderResult.status = Status.OPEN
+            val objectsSaved = objectService.saveObjects(userId = user.id, objectsToSave = order.objects)
+            orderResult.objects = objectsSaved.first
+            total = objectsSaved.second
+        }
         orderResult.reservations = reservationService.validateReservationsToSave(
             userId = user.id,
             reservations = order.reservations,
@@ -100,17 +113,15 @@ class OrderService {
         )
         val addressSaved = order.address?.let { addressService.saveAddress(addressRequestVO = it) }
         orderResult.address = addressSaved
-        val objectsSaved = objectService.saveObjects(userId = user.id, objectsToSave = order.objects)
-        orderResult.objects = objectsSaved.first
         orderResult.quantity = order.objects?.size ?: 0
-        orderResult.total = objectsSaved.second
+        orderResult.total = total
         if (order.payment?.type != null) {
             orderResult.payment = Payment(
                 createdAt = LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS),
                 type = order.payment?.type,
-                total = objectsSaved.second
+                total = total
             )
-            order.type?.let { checkoutService.saveCheckoutDetails(total = objectsSaved.second, type = it) }
+            order.type?.let { checkoutService.saveCheckoutDetails(total = total, type = it) }
         }
         orderResult.user = userAuthenticated
         return parseObject(orderRepository.save(orderResult), OrderResponseVO::class.java)
@@ -124,7 +135,7 @@ class OrderService {
     ) {
         val orderSaved = getOrder(orderId = orderId, userId = user.id)
         objects.map { objectAvailable ->
-            val objectFound = orderSaved.objects?.find { it.identifier ==  objectAvailable.identifier }
+            val objectFound = orderSaved.objects?.find { it.identifier == objectAvailable.identifier }
             if (objectFound != null) {
                 throw ObjectDuplicateException(message = OBJECT_ALREADY_EXISTS)
             }
@@ -263,7 +274,7 @@ class OrderService {
             when (orderResult.type) {
                 TypeOrder.DELIVERY -> {
                     if (orderResult.address?.status != AddressStatus.DELIVERED) {
-                        throw ObjectDuplicateException(message = DELIVERY_ORDER_PENDING)
+                        throw InternalErrorClient(message = DELIVERY_ORDER_PENDING)
                     }
                 }
 
@@ -274,6 +285,11 @@ class OrderService {
                 }
 
                 else -> {}
+            }
+            orderResult.objects?.map { objectResponse ->
+                if (objectResponse.status == ObjectStatus.PENDING) {
+                    throw InternalErrorClient(message = OBJECT_WITH_PENDING_DELIVERY)
+                }
             }
             updateStatusOrder(userId = user.id, orderId = idOrder, status = Status.CLOSED)
             paymentService.updatePayment(payment = payment, order = orderResult)
