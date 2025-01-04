@@ -1,10 +1,10 @@
 package br.com.dashboard.company.controller
 
 import br.com.dashboard.company.entities.user.User
-import br.com.dashboard.company.service.CheckoutService
+import br.com.dashboard.company.service.PaymentService
 import br.com.dashboard.company.utils.others.MediaType.APPLICATION_JSON
-import br.com.dashboard.company.vo.checkout.CheckoutResponseVO
 import br.com.dashboard.company.vo.checkout.GeneralBalanceResponseVO
+import br.com.dashboard.company.vo.payment.PaymentResponseVO
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.media.ArraySchema
 import io.swagger.v3.oas.annotations.media.Content
@@ -24,23 +24,23 @@ import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
 
 @RestController
-@RequestMapping(value = ["/api/dashboard/company/checkout/v1"])
-@Tag(name = "Checkout", description = "EndPoint For Managing All Checkouts")
-class CheckoutController {
+@RequestMapping(value = ["/api/dashboard/company/payment/v1"])
+@Tag(name = "Payment", description = "EndPoint For Managing All Checkouts")
+class PaymentController {
 
     @Autowired
-    private lateinit var checkoutService: CheckoutService
+    private lateinit var paymentService: PaymentService
 
     @GetMapping(
         value = ["/find/all"],
         produces = [APPLICATION_JSON]
     )
     @Operation(
-        summary = "Find All Checkouts", description = "Find All Checkouts",
-        tags = ["Checkout"], responses = [
+        summary = "Find All Payments", description = "Find All Payments",
+        tags = ["Payment"], responses = [
             ApiResponse(
                 description = "Success", responseCode = "200", content = [
-                    Content(array = ArraySchema(schema = Schema(implementation = CheckoutResponseVO::class)))
+                    Content(array = ArraySchema(schema = Schema(implementation = PaymentResponseVO::class)))
                 ]
             ),
             ApiResponse(
@@ -70,16 +70,16 @@ class CheckoutController {
             )
         ]
     )
-    fun getAllCheckoutsDay(
+    fun getAllPaymentsDay(
         @AuthenticationPrincipal user: User,
         @RequestParam(value = "page", defaultValue = "0") page: Int,
         @RequestParam(value = "size", defaultValue = "12") size: Int,
         @RequestParam(value = "sort", defaultValue = "asc") sort: String
-    ): ResponseEntity<Page<CheckoutResponseVO>> {
+    ): ResponseEntity<Page<PaymentResponseVO>> {
         val sortDirection: Sort.Direction =
             if ("desc".equals(sort, ignoreCase = true)) Sort.Direction.DESC else Sort.Direction.ASC
         val pageable: Pageable = PageRequest.of(page, size, Sort.by(sortDirection, "date"))
-        return ResponseEntity.ok(checkoutService.getAllCheckoutsDay(pageable = pageable))
+        return ResponseEntity.ok(paymentService.getAllPaymentsDay(pageable = pageable))
     }
 
     @GetMapping(
@@ -88,7 +88,7 @@ class CheckoutController {
     )
     @Operation(
         summary = "Get General Balance", description = "Get General Balance",
-        tags = ["Checkout"], responses = [
+        tags = ["Payment"], responses = [
             ApiResponse(
                 description = "Success", responseCode = "200", content = [
                     Content(array = ArraySchema(schema = Schema(implementation = GeneralBalanceResponseVO::class)))
@@ -122,7 +122,7 @@ class CheckoutController {
         ]
     )
     fun getGeneralBalance(): GeneralBalanceResponseVO {
-        return checkoutService.getGeneralBalance()
+        return paymentService.getGeneralBalance()
     }
 
     @GetMapping(
@@ -131,7 +131,7 @@ class CheckoutController {
     )
     @Operation(
         summary = "Get Balance Last 7 Days", description = "Get Balance Last 7 Days",
-        tags = ["Checkout"], responses = [
+        tags = ["Payment"], responses = [
             ApiResponse(
                 description = "Success", responseCode = "200", content = [
                     Content(array = ArraySchema(schema = Schema(implementation = GeneralBalanceResponseVO::class)))
@@ -165,7 +165,7 @@ class CheckoutController {
         ]
     )
     fun getBalanceLast7Days(): GeneralBalanceResponseVO {
-        return checkoutService.getBalanceLast7Days()
+        return paymentService.getBalanceLast7Days()
     }
 
     @GetMapping(
@@ -174,7 +174,7 @@ class CheckoutController {
     )
     @Operation(
         summary = "Get Balance Current Month", description = "Get Balance Current Month",
-        tags = ["Checkout"], responses = [
+        tags = ["Payment"], responses = [
             ApiResponse(
                 description = "Success", responseCode = "200", content = [
                     Content(array = ArraySchema(schema = Schema(implementation = GeneralBalanceResponseVO::class)))
@@ -208,7 +208,7 @@ class CheckoutController {
         ]
     )
     fun getBalanceCurrentMonth(): GeneralBalanceResponseVO {
-        return checkoutService.getBalanceCurrentMonth()
+        return paymentService.getBalanceCurrentMonth()
     }
 
     @GetMapping(
@@ -217,7 +217,7 @@ class CheckoutController {
     )
     @Operation(
         summary = "Get Balance Current Year", description = "Get Balance Current Year",
-        tags = ["Checkout"], responses = [
+        tags = ["Payment"], responses = [
             ApiResponse(
                 description = "Success", responseCode = "200", content = [
                     Content(array = ArraySchema(schema = Schema(implementation = GeneralBalanceResponseVO::class)))
@@ -251,6 +251,6 @@ class CheckoutController {
         ]
     )
     fun getBalanceCurrentYear(): GeneralBalanceResponseVO {
-        return checkoutService.getBalanceCurrentYear()
+        return paymentService.getBalanceCurrentYear()
     }
 }

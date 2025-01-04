@@ -26,7 +26,9 @@ import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Repository
 import org.springframework.transaction.annotation.Transactional
+import java.time.LocalDate
 import java.time.LocalDateTime
+import java.time.LocalTime
 import java.time.temporal.ChronoUnit
 
 @Repository
@@ -46,9 +48,6 @@ class OrderService {
 
     @Autowired
     private lateinit var paymentService: PaymentService
-
-    @Autowired
-    private lateinit var checkoutService: CheckoutService
 
     @Autowired
     private lateinit var userService: UserService
@@ -114,15 +113,23 @@ class OrderService {
         val addressSaved = order.address?.let { addressService.saveAddress(addressRequestVO = it) }
         orderResult.address = addressSaved
         orderResult.quantity = order.objects?.size ?: 0
-        orderResult.total = total
         if (order.payment?.type != null) {
+            var applyDiscount = total
+            if (order.payment?.discount == true) {
+                applyDiscount -= order.payment?.value ?: 0.0
+            }
             orderResult.payment = Payment(
-                createdAt = LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS),
-                type = order.payment?.type,
-                total = total
+                date = LocalDate.now(),
+                hour = LocalTime.now().withNano(0),
+                code = System.currentTimeMillis(),
+                typeOrder = order.type,
+                typePayment = order.payment?.type,
+                discount = order.payment?.discount,
+                valueDiscount = order.payment?.value,
+                total = applyDiscount
             )
-            order.type?.let { checkoutService.saveCheckoutDetails(total = total, type = it) }
         }
+        orderResult.total = total
         orderResult.user = userAuthenticated
         return parseObject(orderRepository.save(orderResult), OrderResponseVO::class.java)
     }
@@ -293,7 +300,6 @@ class OrderService {
             }
             updateStatusOrder(userId = user.id, orderId = idOrder, status = Status.CLOSED)
             paymentService.updatePayment(payment = payment, order = orderResult)
-            orderResult.type?.let { checkoutService.saveCheckoutDetails(total = orderResult.total, type = it) }
         }
     }
 

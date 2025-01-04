@@ -1,13 +1,20 @@
 package br.com.dashboard.company.vo.payment
 
 import br.com.dashboard.company.utils.common.PaymentType
-import com.fasterxml.jackson.annotation.JsonProperty
-import java.time.LocalDateTime
+import br.com.dashboard.company.utils.common.TypeOrder
+import jakarta.persistence.Column
 
 data class PaymentResponseVO(
     var id: Long = 0,
-    @JsonProperty(value = "created_at")
-    var createdAt: LocalDateTime? = null,
-    var type: PaymentType? = null,
+    var date: String? = null,
+    var hour: String? = null,
+    var code: Long? = null,
+    @Column(name = "type_order", nullable = false)
+    var typeOrder: TypeOrder? = null,
+    @Column(name = "type_payment", nullable = false)
+    var typePayment: PaymentType? = null,
+    var discount: Boolean? = null,
+    @Column(name = "value_discount", nullable = true)
+    var valueDiscount: Double? = null,
     var total: Double = 0.0
 )

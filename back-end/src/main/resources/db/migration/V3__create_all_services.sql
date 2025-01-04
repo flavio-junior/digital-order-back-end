@@ -127,8 +127,13 @@ CREATE TABLE tb_order_object (
 
 CREATE TABLE IF NOT EXISTS tb_payment (
     id SERIAL PRIMARY KEY,
-    created_at TIMESTAMP,
-    type varchar(30) check (type in ('CREDIT_CAD', 'DEBIT_CAD', 'MONEY', 'PIX')),
+    date DATE NOT NULL,
+    hour TIME NOT NULL,
+    code BIGINT NOT NULL,
+    type_order varchar(30) check (type_order in ('DELIVERY', 'ORDER', 'RESERVATION', 'SHOPPING_CART')),
+    type_payment varchar(30) check (type_order in ('CREDIT_CAD', 'DEBIT_CAD', 'MONEY', 'PIX')),
+    discount BOOLEAN DEFAULT FALSE,
+    value_discount NUMERIC(10, 2) DEFAULT 0.0,
     total NUMERIC(10, 2) DEFAULT 0.0
 );
 
@@ -136,11 +141,4 @@ CREATE TABLE tb_order_payment (
     fk_order INT REFERENCES tb_order(id),
     fk_payment INT REFERENCES tb_payment(id),
     PRIMARY KEY (fk_order, fk_payment)
-);
-
-CREATE TABLE tb_checkout_details (
-    id SERIAL PRIMARY KEY,
-    date DATE NOT NULL,
-    type varchar(30) check (type in ('DELIVERY', 'ORDER', 'RESERVATION', 'SHOPPING_CART'))
-    total NUMERIC(10, 2) DEFAULT 0.0
 );

@@ -2,13 +2,19 @@ package br.com.dashboard.company.service
 
 import br.com.dashboard.company.entities.order.Order
 import br.com.dashboard.company.entities.payment.Payment
+import br.com.dashboard.company.exceptions.ResourceNotFoundException
 import br.com.dashboard.company.repository.PaymentRepository
 import br.com.dashboard.company.utils.others.ConverterUtils.parseObject
+import br.com.dashboard.company.vo.checkout.GeneralBalanceResponseVO
 import br.com.dashboard.company.vo.payment.PaymentRequestVO
+import br.com.dashboard.company.vo.payment.PaymentResponseVO
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.data.domain.Page
+import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Service
-import java.time.LocalDateTime
-import java.time.temporal.ChronoUnit
+import org.springframework.transaction.annotation.Transactional
+import java.time.LocalDate
+import java.time.LocalTime
 
 @Service
 class PaymentService {
@@ -21,10 +27,54 @@ class PaymentService {
         order: Order
     ) {
         val paymentResult: Payment = parseObject(payment, Payment::class.java)
-        paymentResult.createdAt = LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS)
-        paymentResult.type = payment.type
-        paymentResult.total = order.total
+        var total: Double = order.total
+        paymentResult.date = LocalDate.now()
+        paymentResult.hour = LocalTime.now().withNano(0)
+        paymentResult.code = System.currentTimeMillis()
+        paymentResult.typeOrder = order.type
+        paymentResult.typePayment = payment.type
+        if (payment.discount == true) {
+            total -= payment.value ?: 0.0
+        }
+        paymentResult.discount = payment.discount
+        paymentResult.valueDiscount = payment.value
+        paymentResult.total = total
         paymentResult.order = order
         paymentRepository.save(paymentResult)
+    }
+
+    @Transactional(readOnly = true)
+    fun getAllPaymentsDay(
+        pageable: Pageable
+    ): Page<PaymentResponseVO> {
+        val payments: Page<Payment>? =
+            paymentRepository.getAllPaymentsDay(pageable = pageable)
+        return payments?.map { payment ->
+            parseObject(payment, PaymentResponseVO()::class.java)
+        } ?: throw ResourceNotFoundException(message = PAYMENT_NOT_FOUND)
+    }
+
+    @Transactional
+    fun getGeneralBalance(): GeneralBalanceResponseVO {
+        return GeneralBalanceResponseVO(total = paymentRepository.getGeneralBalance())
+    }
+
+    @Transactional
+    fun getBalanceLast7Days(): GeneralBalanceResponseVO {
+        return GeneralBalanceResponseVO(total = paymentRepository.findBalanceLast7DaysNative())
+    }
+
+    @Transactional
+    fun getBalanceCurrentMonth(): GeneralBalanceResponseVO {
+        return GeneralBalanceResponseVO(total = paymentRepository.findBalanceCurrentMonthNative())
+    }
+
+    @Transactional
+    fun getBalanceCurrentYear(): GeneralBalanceResponseVO {
+        return GeneralBalanceResponseVO(total = paymentRepository.findBalanceCurrentYearNative())
+    }
+
+    companion object {
+        const val PAYMENT_NOT_FOUND = "Payment not found"
     }
 }

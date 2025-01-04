@@ -2,19 +2,10 @@ package br.com.dashboard.company.entities.payment
 
 import br.com.dashboard.company.entities.order.Order
 import br.com.dashboard.company.utils.common.PaymentType
-import jakarta.persistence.CascadeType
-import jakarta.persistence.Column
-import jakarta.persistence.Entity
-import jakarta.persistence.EnumType
-import jakarta.persistence.Enumerated
-import jakarta.persistence.GeneratedValue
-import jakarta.persistence.GenerationType
-import jakarta.persistence.Id
-import jakarta.persistence.JoinColumn
-import jakarta.persistence.JoinTable
-import jakarta.persistence.OneToOne
-import jakarta.persistence.Table
-import java.time.LocalDateTime
+import br.com.dashboard.company.utils.common.TypeOrder
+import jakarta.persistence.*
+import java.time.LocalDate
+import java.time.LocalTime
 
 @Entity
 @Table(name = "tb_payment")
@@ -22,10 +13,18 @@ data class Payment(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     var id: Long = 0,
-    @Column(name = "created_at", nullable = false)
-    var createdAt: LocalDateTime? = null,
+    var date: LocalDate? = null,
+    var hour: LocalTime? = null,
+    var code: Long? = null,
+    @Column(name = "type_order", nullable = false)
     @Enumerated(EnumType.STRING)
-    var type: PaymentType? = null,
+    var typeOrder: TypeOrder? = null,
+    @Column(name = "type_payment", nullable = false)
+    @Enumerated(EnumType.STRING)
+    var typePayment: PaymentType? = null,
+    var discount: Boolean? = null,
+    @Column(name = "value_discount", nullable = true)
+    var valueDiscount: Double? = null,
     var total: Double = 0.0,
     @OneToOne(cascade = [CascadeType.ALL], orphanRemoval = true)
     @JoinTable(
