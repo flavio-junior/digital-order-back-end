@@ -85,11 +85,6 @@ class ObjectService {
         }
     }
 
-    fun checkIfAlreadyDuplicateObjects(objects: List<ObjectRequestVO>?): Boolean {
-        if (objects.isNullOrEmpty()) return false
-        return objects.groupBy { it.identifier }.any { it.value.size > 1 }
-    }
-
     @Transactional
     fun updateStatusObject(
         orderId: Long,
