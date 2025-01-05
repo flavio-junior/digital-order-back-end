@@ -142,3 +142,17 @@ CREATE TABLE tb_order_payment (
     fk_payment INT REFERENCES tb_payment(id),
     PRIMARY KEY (fk_order, fk_payment)
 );
+
+CREATE TABLE IF NOT EXISTS tb_report (
+    id SERIAL PRIMARY KEY,
+    date DATE NOT NULL,
+    hour TIME NOT NULL,
+    resume VARCHAR(1000) NOT NULL,
+    author VARCHAR(30) NOT NULL
+);
+
+CREATE TABLE tb_user_report (
+    fk_user INT REFERENCES tb_user(id),
+    fk_report INT REFERENCES tb_report(id),
+    PRIMARY KEY (fk_user, fk_report)
+);
