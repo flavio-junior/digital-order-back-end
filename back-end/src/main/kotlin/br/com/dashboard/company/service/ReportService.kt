@@ -2,6 +2,7 @@ package br.com.dashboard.company.service
 
 import br.com.dashboard.company.entities.report.Report
 import br.com.dashboard.company.entities.user.User
+import br.com.dashboard.company.exceptions.InternalErrorClient
 import br.com.dashboard.company.exceptions.ResourceNotFoundException
 import br.com.dashboard.company.repository.ReportRepository
 import br.com.dashboard.company.utils.others.ConverterUtils.parseObject
@@ -14,6 +15,7 @@ import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDate
 import java.time.LocalTime
+import java.time.temporal.ChronoUnit
 
 @Service
 class ReportService {
@@ -64,11 +66,20 @@ class ReportService {
         userId: Long,
         reportId: Long
     ) {
+        val actualDate = LocalDate.now()
         val report = getReport(userId = userId, reportId = reportId)
-        reportRepository.deleteReportById(reportId = report.id, userId = userId)
+        if (report.date != null) {
+            val daysDifference = ChronoUnit.DAYS.between(actualDate, report.date)
+            if (daysDifference > 7) {
+                throw InternalErrorClient(message = REPORT_EXPIRATION_DATE_EXPIRED)
+            } else {
+                reportRepository.deleteReportById(reportId = report.id, userId = userId)
+            }
+        }
     }
 
     companion object {
         const val REPORT_NOT_FOUND = "Report not found"
+        const val REPORT_EXPIRATION_DATE_EXPIRED = "Report expiration date expired!"
     }
 }
