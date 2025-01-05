@@ -8,10 +8,15 @@ import br.com.dashboard.company.utils.others.MediaType.APPLICATION_JSON
 import br.com.dashboard.company.vo.report.ReportRequestVO
 import br.com.dashboard.company.vo.report.ReportResponseVO
 import io.swagger.v3.oas.annotations.Operation
+import io.swagger.v3.oas.annotations.media.ArraySchema
 import io.swagger.v3.oas.annotations.media.Content
 import io.swagger.v3.oas.annotations.media.Schema
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.tags.Tag
+import org.springframework.data.domain.Page
+import org.springframework.data.domain.PageRequest
+import org.springframework.data.domain.Pageable
+import org.springframework.data.domain.Sort
 import org.springframework.http.ResponseEntity
 import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.web.bind.annotation.*
@@ -22,6 +27,57 @@ import java.net.URI
 @RequestMapping(value = ["/api/dashboard/company/report/v1"])
 @Tag(name = "Reports", description = "EndPoint For Managing All Reports")
 class ReportController(private val reportService: ReportService) {
+
+    @GetMapping(produces = [APPLICATION_JSON])
+    @Operation(
+        summary = "Find All Reports", description = "Find All Reports",
+        tags = ["Report"], responses = [
+            ApiResponse(
+                description = "Success", responseCode = "200", content = [
+                    Content(array = ArraySchema(schema = Schema(implementation = ReportResponseVO::class)))
+                ]
+            ),
+            ApiResponse(
+                description = "Bad Request", responseCode = "400", content = [
+                    Content(schema = Schema(implementation = Unit::class))
+                ]
+            ),
+            ApiResponse(
+                description = "Unauthorized", responseCode = "401", content = [
+                    Content(schema = Schema(implementation = Unit::class))
+                ]
+            ),
+            ApiResponse(
+                description = "Operation Unauthorized", responseCode = "403", content = [
+                    Content(schema = Schema(implementation = Unit::class))
+                ]
+            ),
+            ApiResponse(
+                description = "Not Found", responseCode = "404", content = [
+                    Content(schema = Schema(implementation = Unit::class))
+                ]
+            ),
+            ApiResponse(
+                description = "Internal Error", responseCode = "500", content = [
+                    Content(schema = Schema(implementation = Unit::class))
+                ]
+            )
+        ]
+    )
+    fun findAllReports(
+        @AuthenticationPrincipal user: User,
+        @RequestParam(required = false) date: String?,
+        @RequestParam(value = "page", defaultValue = "0") page: Int,
+        @RequestParam(value = "size", defaultValue = "12") size: Int,
+        @RequestParam(value = "sort", defaultValue = "asc") sort: String
+    ): ResponseEntity<Page<ReportResponseVO>> {
+        val sortDirection: Sort.Direction =
+            if ("desc".equals(sort, ignoreCase = true)) Sort.Direction.DESC else Sort.Direction.ASC
+        val pageable: Pageable = PageRequest.of(page, size, Sort.by(sortDirection, "date"))
+        return ResponseEntity.ok(
+            reportService.findAllReports(user = user, date = date, pageable = pageable)
+        )
+    }
 
     @PostMapping(
         consumes = [APPLICATION_JSON],

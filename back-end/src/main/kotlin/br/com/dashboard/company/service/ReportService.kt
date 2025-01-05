@@ -8,6 +8,8 @@ import br.com.dashboard.company.utils.others.ConverterUtils.parseObject
 import br.com.dashboard.company.vo.report.ReportRequestVO
 import br.com.dashboard.company.vo.report.ReportResponseVO
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.data.domain.Page
+import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDate
@@ -21,6 +23,16 @@ class ReportService {
 
     @Autowired
     private lateinit var reportRepository: ReportRepository
+
+    @Transactional(readOnly = true)
+    fun findAllReports(
+        user: User,
+        date: String?,
+        pageable: Pageable
+    ): Page<ReportResponseVO> {
+        val reports: Page<Report> = reportRepository.findAllReports(userId = user.id, date = date, pageable = pageable)
+        return reports.map { report -> parseObject(report, ReportResponseVO::class.java) }
+    }
 
     fun getReport(
         userId: Long,

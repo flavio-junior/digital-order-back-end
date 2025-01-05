@@ -39,7 +39,6 @@ class CategoryController {
     @Autowired
     private lateinit var categoryService: CategoryService
 
-
     @GetMapping(produces = [APPLICATION_JSON])
     @Operation(
         summary = "Find All Categories", description = "Find All Categories",
