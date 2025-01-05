@@ -28,7 +28,7 @@ import java.net.URI
 @Tag(name = "Reports", description = "EndPoint For Managing All Reports")
 class ReportController(private val reportService: ReportService) {
 
-    @GetMapping(produces = [APPLICATION_JSON])
+    @GetMapping(path = ["/find/all"], produces = [APPLICATION_JSON])
     @Operation(
         summary = "Find All Reports", description = "Find All Reports",
         tags = ["Report"], responses = [
@@ -66,7 +66,6 @@ class ReportController(private val reportService: ReportService) {
     )
     fun findAllReports(
         @AuthenticationPrincipal user: User,
-        @RequestParam(required = false) date: String?,
         @RequestParam(value = "page", defaultValue = "0") page: Int,
         @RequestParam(value = "size", defaultValue = "12") size: Int,
         @RequestParam(value = "sort", defaultValue = "asc") sort: String
@@ -75,7 +74,58 @@ class ReportController(private val reportService: ReportService) {
             if ("desc".equals(sort, ignoreCase = true)) Sort.Direction.DESC else Sort.Direction.ASC
         val pageable: Pageable = PageRequest.of(page, size, Sort.by(sortDirection, "date"))
         return ResponseEntity.ok(
-            reportService.findAllReports(user = user, date = date, pageable = pageable)
+            reportService.findAllReports(user = user, pageable = pageable)
+        )
+    }
+
+    @GetMapping(path = ["/find/by/date"], produces = [APPLICATION_JSON])
+    @Operation(
+        summary = "Find All Reports", description = "Find All Reports",
+        tags = ["Report"], responses = [
+            ApiResponse(
+                description = "Success", responseCode = "200", content = [
+                    Content(array = ArraySchema(schema = Schema(implementation = ReportResponseVO::class)))
+                ]
+            ),
+            ApiResponse(
+                description = "Bad Request", responseCode = "400", content = [
+                    Content(schema = Schema(implementation = Unit::class))
+                ]
+            ),
+            ApiResponse(
+                description = "Unauthorized", responseCode = "401", content = [
+                    Content(schema = Schema(implementation = Unit::class))
+                ]
+            ),
+            ApiResponse(
+                description = "Operation Unauthorized", responseCode = "403", content = [
+                    Content(schema = Schema(implementation = Unit::class))
+                ]
+            ),
+            ApiResponse(
+                description = "Not Found", responseCode = "404", content = [
+                    Content(schema = Schema(implementation = Unit::class))
+                ]
+            ),
+            ApiResponse(
+                description = "Internal Error", responseCode = "500", content = [
+                    Content(schema = Schema(implementation = Unit::class))
+                ]
+            )
+        ]
+    )
+    fun findReportsByDate(
+        @AuthenticationPrincipal user: User,
+        @RequestParam(value = "date", defaultValue = "") date: String,
+        @RequestParam(value = "page", defaultValue = "0") page: Int,
+        @RequestParam(value = "size", defaultValue = "12") size: Int,
+        @RequestParam(value = "sort", defaultValue = "asc") sort: String
+    ): ResponseEntity<Page<ReportResponseVO>> {
+        val sortDirection: Sort.Direction =
+            if ("desc".equals(sort, ignoreCase = true)) Sort.Direction.DESC else Sort.Direction.ASC
+        val pageable: Pageable = PageRequest.of(page, size, Sort.by(sortDirection, "date"))
+        return ResponseEntity.ok(
+            reportService.findReportsByDate(user = user, date = date, pageable = pageable)
         )
     }
 

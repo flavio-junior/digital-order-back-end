@@ -12,10 +12,16 @@ import org.springframework.stereotype.Repository
 @Repository
 interface ReportRepository : JpaRepository<Report, Long> {
 
-    @Query(value = "SELECT r FROM Report r WHERE r.user.id = :userId AND (:date IS NULL OR r.date = CAST(:date AS date))")
+    @Query(value = "SELECT r FROM Report r WHERE r.user.id = :userId")
     fun findAllReports(
         @Param("userId") userId: Long,
-        @Param("date") date: String?,
+        pageable: Pageable
+    ): Page<Report>
+
+    @Query(value = "SELECT r FROM Report r WHERE r.user.id = :userId AND (:date IS NULL OR r.date = CAST(:date AS date))")
+    fun findReportsByDate(
+        @Param("userId") userId: Long,
+        @Param("date") date: String,
         pageable: Pageable
     ): Page<Report>
 

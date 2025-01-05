@@ -29,10 +29,19 @@ class ReportService {
     @Transactional(readOnly = true)
     fun findAllReports(
         user: User,
-        date: String?,
         pageable: Pageable
     ): Page<ReportResponseVO> {
-        val reports: Page<Report> = reportRepository.findAllReports(userId = user.id, date = date, pageable = pageable)
+        val reports: Page<Report> = reportRepository.findAllReports(userId = user.id, pageable = pageable)
+        return reports.map { report -> parseObject(report, ReportResponseVO::class.java) }
+    }
+
+    @Transactional(readOnly = true)
+    fun findReportsByDate(
+        user: User,
+        date: String,
+        pageable: Pageable
+    ): Page<ReportResponseVO> {
+        val reports: Page<Report> = reportRepository.findReportsByDate(userId = user.id, date = date, pageable = pageable)
         return reports.map { report -> parseObject(report, ReportResponseVO::class.java) }
     }
 
