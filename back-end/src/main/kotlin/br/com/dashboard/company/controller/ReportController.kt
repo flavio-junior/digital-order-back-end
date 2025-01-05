@@ -14,10 +14,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.tags.Tag
 import org.springframework.http.ResponseEntity
 import org.springframework.security.core.annotation.AuthenticationPrincipal
-import org.springframework.web.bind.annotation.PostMapping
-import org.springframework.web.bind.annotation.RequestBody
-import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.bind.annotation.RestController
+import org.springframework.web.bind.annotation.*
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder
 import java.net.URI
 
@@ -74,5 +71,48 @@ class ReportController(private val reportService: ReportService) {
         val uri: URI = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}")
             .buildAndExpand(entity.id).toUri()
         return ResponseEntity.created(uri).body(entity)
+    }
+
+    @DeleteMapping(
+        value = ["/{id}"],
+        produces = [APPLICATION_JSON]
+    )
+    @Operation(
+        summary = "Delete Report By Id", description = "Delete Report By Id",
+        tags = ["Report"],
+        responses = [
+            ApiResponse(
+                description = "No Content", responseCode = "204", content = [
+                    Content(schema = Schema(implementation = Unit::class))
+                ]
+            ),
+            ApiResponse(
+                description = "Bad Request", responseCode = "400", content = [
+                    Content(schema = Schema(implementation = Unit::class))
+                ]
+            ),
+            ApiResponse(
+                description = "Unauthorized", responseCode = "401", content = [
+                    Content(schema = Schema(implementation = Unit::class))
+                ]
+            ),
+            ApiResponse(
+                description = "Not Found", responseCode = "404", content = [
+                    Content(schema = Schema(implementation = Unit::class))
+                ]
+            ),
+            ApiResponse(
+                description = "Internal Error", responseCode = "500", content = [
+                    Content(schema = Schema(implementation = Unit::class))
+                ]
+            )
+        ]
+    )
+    fun deleteReport(
+        @AuthenticationPrincipal user: User,
+        @PathVariable(value = "id") reportId: Long
+    ): ResponseEntity<*> {
+        reportService.deleteReport(userId = user.id, reportId = reportId)
+        return ResponseEntity.noContent().build<Any>()
     }
 }
