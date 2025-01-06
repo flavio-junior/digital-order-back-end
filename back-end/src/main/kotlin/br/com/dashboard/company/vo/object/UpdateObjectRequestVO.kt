@@ -5,6 +5,7 @@ import br.com.dashboard.company.utils.common.ObjectStatus
 
 data class UpdateObjectRequestVO(
     var action: Action,
+    var overview: Long = 0,
     val status: ObjectStatus? = null,
     var quantity: Int = 0
 )

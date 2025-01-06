@@ -12,6 +12,7 @@ import br.com.dashboard.company.service.ObjectService.Companion.OBJECT_NOT_FOUND
 import br.com.dashboard.company.service.ObjectService.Companion.OBJECT_WITH_PENDING_DELIVERY
 import br.com.dashboard.company.service.ReservationService.Companion.RESERVATION_NOT_FOUND
 import br.com.dashboard.company.utils.common.*
+import br.com.dashboard.company.utils.others.ConstantsUtils.ZERO_QUANTITY_ERROR
 import br.com.dashboard.company.utils.others.ConverterUtils.parseObject
 import br.com.dashboard.company.vo.address.UpdateAddressRequestVO
 import br.com.dashboard.company.vo.`object`.ObjectRequestVO
@@ -169,6 +170,9 @@ class OrderService {
             val priceCalculated = (objectSaved.price * objectActual.quantity)
             when (objectActual.action) {
                 Action.UPDATE_STATUS -> {
+                    objectSaved.overview?.forEach { overview ->
+                        throw InternalErrorClient(message = OBJECT_WITH_PENDING_DELIVERY)
+                    }
                     objectService.updateStatusObject(
                         orderId = orderId,
                         objectId = objectId,
@@ -177,6 +181,9 @@ class OrderService {
                 }
 
                 Action.INCREMENT -> {
+                    if(objectActual.quantity == 0) {
+                        throw InternalErrorClient(message = ZERO_QUANTITY_ERROR)
+                    }
                     objectService.incrementMoreItemsObject(
                         orderId = orderId,
                         objectId = objectId,
@@ -190,16 +197,15 @@ class OrderService {
                     )
                 }
 
-                Action.DECREMENT -> {
-                    objectService.decrementItemsObject(
+                Action.REMOVE_OVERVIEW -> {
+                    val overviewResult = objectService.removeOverview(
                         orderId = orderId,
                         objectId = objectId,
-                        quantity = objectActual.quantity,
-                        total = priceCalculated
+                        overviewId = objectActual.overview
                     )
                     decrementDataOrder(
                         orderId = orderId,
-                        total = priceCalculated
+                        total = overviewResult
                     )
                 }
 
