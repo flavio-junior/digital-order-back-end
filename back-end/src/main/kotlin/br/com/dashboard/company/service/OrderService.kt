@@ -181,7 +181,8 @@ class OrderService {
                         orderId = orderId,
                         objectId = objectId,
                         quantity = objectActual.quantity,
-                        total = priceCalculated
+                        total = priceCalculated,
+                        objectResult = objectSaved
                     )
                     incrementDataOrder(
                         orderId = orderId,

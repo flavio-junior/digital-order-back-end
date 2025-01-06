@@ -18,6 +18,9 @@ class ObjectService {
     private lateinit var objectRepository: ObjectRepository
 
     @Autowired
+    private lateinit var overviewService: OverviewService
+
+    @Autowired
     private lateinit var itemService: ItemService
 
     @Autowired
@@ -46,6 +49,11 @@ class ObjectService {
                         order = order,
                         foodRequest = item,
                     )
+                    val overview = overviewService.saveOverview(
+                        status = objectSaved.first.status,
+                        quantity = objectSaved.first.quantity
+                    )
+                    objectSaved.first.overview = arrayListOf(overview)
                     total += objectSaved.second
                     objectRepository.save(objectSaved.first)
                 }
@@ -56,17 +64,27 @@ class ObjectService {
                         order = order,
                         itemRequest = item,
                     )
+                    val overview = overviewService.saveOverview(
+                        status = objectSaved.first.status,
+                        quantity = objectSaved.first.quantity
+                    )
+                    objectSaved.first.overview = arrayListOf(overview)
                     total += objectSaved.second
                     objectRepository.save(objectSaved.first)
                 }
 
                 else -> {
-                   val objectProductInstanced = productService.buyProduct(
+                    val objectProductInstanced = productService.buyProduct(
                         user = userAuthenticated,
                         order = order,
                         buy = buy,
                         productRequest = item
                     )
+                    val overview = overviewService.saveOverview(
+                        status = objectProductInstanced.first.status,
+                        quantity = objectProductInstanced.first.quantity
+                    )
+                    objectProductInstanced.first.overview = arrayListOf(overview)
                     total += objectProductInstanced.second
                     objectRepository.save(objectProductInstanced.first)
                 }
@@ -105,7 +123,8 @@ class ObjectService {
         orderId: Long,
         objectId: Long,
         quantity: Int,
-        total: Double
+        total: Double,
+        objectResult: Object? = null
     ) {
         objectRepository.incrementMoreItemsObject(
             orderId = orderId,
@@ -113,6 +132,7 @@ class ObjectService {
             quantity = quantity,
             total = total
         )
+        overviewService.saveOverview(status = ObjectStatus.PENDING, quantity = quantity, objectResult = objectResult)
     }
 
     @Transactional
@@ -122,7 +142,12 @@ class ObjectService {
         quantity: Int,
         total: Double
     ) {
-        objectRepository.decrementItemsObject(orderId = orderId, objectId = objectId, quantity = quantity, total = total)
+        objectRepository.decrementItemsObject(
+            orderId = orderId,
+            objectId = objectId,
+            quantity = quantity,
+            total = total
+        )
     }
 
     @Transactional

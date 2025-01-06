@@ -11,5 +11,6 @@ data class ObjectResponseVO(
     var price: Double = 0.0,
     var quantity: Int = 0,
     var total: Double = 0.0,
-    var status: ObjectStatus? = null
+    var status: ObjectStatus? = null,
+    var overview: MutableList<OverviewResponseVO>? = null
 )

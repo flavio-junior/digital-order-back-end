@@ -1,6 +1,7 @@
 package br.com.dashboard.company.service
 
 import br.com.dashboard.company.entities.`object`.Object
+import br.com.dashboard.company.entities.`object`.Overview
 import br.com.dashboard.company.entities.order.Order
 import br.com.dashboard.company.entities.product.Product
 import br.com.dashboard.company.entities.user.User
@@ -122,11 +123,26 @@ class ProductService {
         objectProductResult.quantity = productRequest.quantity
         val priceCalculated = (productSaved.price * productRequest.quantity)
         objectProductResult.total = priceCalculated
-        objectProductResult.status = if(buy) ObjectStatus.DELIVERED else ObjectStatus.PENDING
+        if (buy) {
+            objectProductResult.status = ObjectStatus.DELIVERED
+        } else {
+            objectProductResult.status = ObjectStatus.PENDING
+            objectProductResult.overview = arrayListOf(
+                Overview(
+                    createdAt = LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS),
+                    status = ObjectStatus.PENDING,
+                    quantity = productRequest.quantity
+                )
+            )
+        }
         objectProductResult.order = order
         productSaved.user = user
         total += priceCalculated
-        productRepository.buyProduct(userId = user?.id ?: 0, productId = productSaved.id, quantity = productRequest.quantity)
+        productRepository.buyProduct(
+            userId = user?.id ?: 0,
+            productId = productSaved.id,
+            quantity = productRequest.quantity
+        )
         return Pair(objectProductResult, total)
     }
 

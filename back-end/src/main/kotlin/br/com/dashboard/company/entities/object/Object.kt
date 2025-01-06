@@ -8,12 +8,14 @@ import jakarta.persistence.Column
 import jakarta.persistence.Entity
 import jakarta.persistence.EnumType
 import jakarta.persistence.Enumerated
+import jakarta.persistence.FetchType
 import jakarta.persistence.GeneratedValue
 import jakarta.persistence.GenerationType
 import jakarta.persistence.Id
 import jakarta.persistence.JoinColumn
 import jakarta.persistence.JoinTable
 import jakarta.persistence.ManyToOne
+import jakarta.persistence.ManyToMany
 import jakarta.persistence.Table
 
 @Entity
@@ -33,6 +35,13 @@ data class Object(
     @Enumerated(EnumType.STRING)
     @Column(columnDefinition = "varying")
     var status: ObjectStatus? = null,
+    @ManyToMany(cascade = [CascadeType.ALL], fetch = FetchType.EAGER)
+    @JoinTable(
+        name = "tb_object_overview",
+        joinColumns = [JoinColumn(name = "fk_object", referencedColumnName = "id")],
+        inverseJoinColumns = [JoinColumn(name = "fk_overview", referencedColumnName = "id")]
+    )
+    var overview: MutableList<Overview>? = null,
     @ManyToOne(cascade = [CascadeType.ALL])
     @JoinTable(
         name = "tb_order_object",
