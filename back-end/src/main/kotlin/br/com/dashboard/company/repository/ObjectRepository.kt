@@ -51,7 +51,7 @@ interface ObjectRepository : JpaRepository<Object, Long> {
     @Modifying
     @Query(
         value = """
-            UPDATE Object o SET o.quantity = o.quantity - :quantity, o.total = o.total - :total 
+            UPDATE Object o SET o.quantity = :quantity, o.total = o.total - :total 
             WHERE
                 o.order.id = :orderId AND o.id = :objectId
             """
