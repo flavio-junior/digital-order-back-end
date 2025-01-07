@@ -346,6 +346,11 @@ class OrderService {
         status: UpdateStatusDeliveryRequestVO
     ) {
         val orderSaved = getOrder(userId = user.id, orderId = orderId)
+        orderSaved.objects?.forEach {
+           if(it.status == ObjectStatus.PENDING) {
+               throw InternalErrorClient(message = OBJECT_WITH_PENDING_DELIVERY)
+           }
+        }
         addressService.updateStatusDelivery(addressId = orderSaved.address?.id ?: 0, status = status)
     }
 
