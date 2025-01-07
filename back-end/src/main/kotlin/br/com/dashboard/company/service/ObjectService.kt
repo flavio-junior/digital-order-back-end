@@ -139,16 +139,16 @@ class ObjectService {
     fun removeOverview(
         orderId: Long,
         objectId: Long,
-        overviewId: Long,
-        quantity: Int
+        overviewId: Long
     ): Double {
         val objectSaved = getObject(orderId = orderId, objectId = objectId)
         val overviewSaved = overviewService.getOverview(objectId = objectId, overviewId = overviewId)
+        val newQuantityToSave = (objectSaved.quantity - overviewSaved.quantity)
         val priceCalculated = (objectSaved.price * overviewSaved.quantity)
         decrementItemsObject(
             orderId = orderId,
             objectId = objectId,
-            quantity =quantity,
+            quantity = newQuantityToSave,
             total = priceCalculated
         )
         overviewService.deleteOverview(objectId = objectId, overviewId = overviewId)
