@@ -172,11 +172,13 @@ VALUES
     (3, 7);
 
 INSERT INTO
-    tb_payment (created_at, type)
+    tb_payment (date, hour, code, type_order, type_payment, discount, value_discount, total)
 VALUES
-    (null, null),
-    (null, null),
-    (null, null);
+    ('2025-01-07', '10:30:00', 1000000001, 'DELIVERY', 'CREDIT_CAD', TRUE, 5.00, 95.00),
+    ('2025-01-06', '12:00:00', 1000000002, 'ORDER', 'DEBIT_CAD', FALSE, 0.00, 120.00),
+    ('2025-01-05', '15:45:00', 1000000003, 'RESERVATION', 'PIX', TRUE, 10.00, 90.00),
+    ('2025-01-04', '18:20:00', 1000000004, 'SHOPPING_CART', 'MONEY', FALSE, 0.00, 50.00),
+    ('2025-01-03', '20:10:00', 1000000005, 'DELIVERY', 'PIX', TRUE, 15.00, 85.00);
 
 INSERT INTO
     tb_order_payment (fk_order, fk_payment)
@@ -184,14 +186,3 @@ VALUES
     (1, 1),
     (2, 2),
     (3, 3);
-
-INSERT INTO tb_checkout_details (date, total) VALUES (CURRENT_DATE, 100.50);
-INSERT INTO tb_checkout_details (date, total) VALUES (CURRENT_DATE, 200.75);
-INSERT INTO tb_checkout_details (date, total) VALUES (CURRENT_DATE - INTERVAL '1 day', 150.00);
-INSERT INTO tb_checkout_details (date, total) VALUES (CURRENT_DATE - INTERVAL '1 day', 300.25);
-INSERT INTO tb_checkout_details (date, total) VALUES (CURRENT_DATE - INTERVAL '1 day', 50.00);
-INSERT INTO tb_checkout_details (date, total) VALUES (CURRENT_DATE - INTERVAL '1 day', 400.10);
-INSERT INTO tb_checkout_details (date, total) VALUES (CURRENT_DATE - INTERVAL '1 day', 250.40);
-INSERT INTO tb_checkout_details (date, total) VALUES (CURRENT_DATE - INTERVAL '1 day', 120.60);
-INSERT INTO tb_checkout_details (date, total) VALUES (CURRENT_DATE - INTERVAL '1 day', 80.90);
-INSERT INTO tb_checkout_details (date, total) VALUES (CURRENT_DATE - INTERVAL '1 day', 170.30);
