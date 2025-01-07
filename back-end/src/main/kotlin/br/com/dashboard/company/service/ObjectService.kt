@@ -170,6 +170,17 @@ class ObjectService {
     }
 
     @Transactional
+    fun updateStatusOverview(
+        orderId: Long,
+        objectId: Long,
+        overviewId: Long,
+        status: ObjectStatus? = null
+    ) {
+        getObject(orderId = orderId, objectId = objectId)
+        overviewService.updateStatusOverview(objectId = objectId, overviewId = overviewId, status = status)
+    }
+
+    @Transactional
     fun deleteObject(
         orderId: Long,
         objectId: Long

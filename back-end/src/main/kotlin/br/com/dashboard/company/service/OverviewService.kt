@@ -50,6 +50,16 @@ class OverviewService {
     }
 
     @Transactional
+    fun updateStatusOverview(
+        objectId: Long,
+        overviewId: Long,
+        status: ObjectStatus? = null
+    ) {
+        getOverview(objectId = objectId, overviewId = overviewId)
+        overviewRepository.updateStatusOverview(objectId = objectId, overviewId = overviewId, status = status)
+    }
+
+    @Transactional
     fun deleteOverview(
         objectId: Long,
         overviewId: Long
