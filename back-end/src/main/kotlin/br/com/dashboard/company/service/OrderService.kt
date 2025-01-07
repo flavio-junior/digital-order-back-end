@@ -310,6 +310,11 @@ class OrderService {
                 else -> {}
             }
             orderResult.objects?.map { objectResponse ->
+                objectResponse.overview?.forEach { overviewResponse ->
+                    if (overviewResponse.status == ObjectStatus.PENDING) {
+                        throw InternalErrorClient(message = OBJECT_WITH_PENDING_DELIVERY)
+                    }
+                }
                 if (objectResponse.status == ObjectStatus.PENDING) {
                     throw InternalErrorClient(message = OBJECT_WITH_PENDING_DELIVERY)
                 }
