@@ -201,7 +201,8 @@ class OrderService {
                     val overviewResult = objectService.removeOverview(
                         orderId = orderId,
                         objectId = objectId,
-                        overviewId = objectActual.overview
+                        overviewId = objectActual.overview,
+                        quantity = objectActual.quantity
                     )
                     decrementDataOrder(
                         orderId = orderId,
