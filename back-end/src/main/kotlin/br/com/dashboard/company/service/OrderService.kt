@@ -31,9 +31,13 @@ import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.LocalTime
 import java.time.temporal.ChronoUnit
+import java.util.*
 
 @Repository
 class OrderService {
+
+    @Autowired
+    private lateinit var qrCodeService: QRCodeService
 
     @Autowired
     private lateinit var orderRepository: OrderRepository
@@ -94,6 +98,7 @@ class OrderService {
         val userAuthenticated = userService.findUserById(userId = user.id)
         val orderResult: Order = parseObject(order, Order::class.java)
         val total: Double
+        var qrCode = false
         orderResult.createdAt = LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS)
         if (order.type == TypeOrder.SHOPPING_CART) {
             orderResult.status = Status.CLOSED
@@ -129,10 +134,17 @@ class OrderService {
                 valueDiscount = order.payment?.value,
                 total = applyDiscount
             )
+            qrCode = true
         }
         orderResult.total = total
         orderResult.user = userAuthenticated
-        return parseObject(orderRepository.save(orderResult), OrderResponseVO::class.java)
+        val orderResponse = parseObject(orderRepository.save(orderResult), OrderResponseVO::class.java)
+        if (qrCode) {
+            val qrCodeBytes =
+                qrCodeService.generateQRCodeImage(value = orderResponse.payment?.code.toString(), 300, 300)
+            orderResponse.qrCode = Base64.getEncoder().encodeToString(qrCodeBytes)
+        }
+        return orderResponse
     }
 
     @Transactional
@@ -171,7 +183,9 @@ class OrderService {
             when (objectActual.action) {
                 Action.UPDATE_STATUS_OBJECT -> {
                     objectSaved.overview?.forEach { overview ->
-                        throw InternalErrorClient(message = OBJECT_WITH_PENDING_DELIVERY)
+                        if (overview.status == ObjectStatus.PENDING) {
+                            throw InternalErrorClient(message = OBJECT_WITH_PENDING_DELIVERY)
+                        }
                     }
                     objectService.updateStatusObject(
                         orderId = orderId,
@@ -181,7 +195,7 @@ class OrderService {
                 }
 
                 Action.INCREMENT_OVERVIEW -> {
-                    if(objectActual.quantity == 0) {
+                    if (objectActual.quantity == 0) {
                         throw InternalErrorClient(message = ZERO_QUANTITY_ERROR)
                     }
                     objectService.incrementMoreItemsObject(
@@ -289,7 +303,7 @@ class OrderService {
         user: User,
         idOrder: Long,
         payment: PaymentRequestVO
-    ) {
+    ): OrderResponseVO {
         val orderResult = getOrder(userId = user.id, orderId = idOrder)
         if (orderResult.status == Status.CLOSED) {
             throw ObjectDuplicateException(message = ORDER_ALREADY_CLOSED)
@@ -320,7 +334,13 @@ class OrderService {
                 }
             }
             updateStatusOrder(userId = user.id, orderId = idOrder, status = Status.CLOSED)
-            paymentService.updatePayment(payment = payment, order = orderResult)
+            orderResult.status = Status.CLOSED
+            orderResult.payment = paymentService.updatePayment(payment = payment, order = orderResult)
+            val orderResponse = parseObject(orderResult, OrderResponseVO::class.java)
+            val qrCodeBytes =
+                qrCodeService.generateQRCodeImage(value = orderResponse.payment?.code.toString(), 300, 300)
+            orderResponse.qrCode = Base64.getEncoder().encodeToString(qrCodeBytes)
+            return orderResponse
         }
     }
 
@@ -352,9 +372,9 @@ class OrderService {
     ) {
         val orderSaved = getOrder(userId = user.id, orderId = orderId)
         orderSaved.objects?.forEach {
-           if(it.status == ObjectStatus.PENDING) {
-               throw InternalErrorClient(message = OBJECT_WITH_PENDING_DELIVERY)
-           }
+            if (it.status == ObjectStatus.PENDING) {
+                throw InternalErrorClient(message = OBJECT_WITH_PENDING_DELIVERY)
+            }
         }
         addressService.updateStatusDelivery(addressId = orderSaved.address?.id ?: 0, status = status)
     }

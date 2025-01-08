@@ -13,6 +13,8 @@ data class OrderResponseVO(
     var id: Long = 0,
     @JsonProperty(value = "created_at")
     var createdAt: LocalDateTime? = null,
+    @JsonProperty(value = "qr_code")
+    var qrCode: String? = null,
     var type: TypeOrder? = null,
     var status: Status? = null,
     var reservations: MutableList<ReservationResponseVO>? = null,

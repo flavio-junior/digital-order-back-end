@@ -48,6 +48,7 @@
 		<postgresql.version>42.7.4</postgresql.version>
 		<flywaydb.version>10.21.0</flywaydb.version>
 		<modelmapper.version>3.0.0</modelmapper.version>
+		<zxing.version>3.5.3</zxing.version>
 		<springdoc.version>2.6.0</springdoc.version>
 		<surefire.version>3.3.1</surefire.version>
 	</properties>
@@ -114,6 +115,16 @@
 			<groupId>org.modelmapper</groupId>
 			<artifactId>modelmapper</artifactId>
 			<version>${modelmapper.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.google.zxing</groupId>
+			<artifactId>core</artifactId>
+			<version>${zxing.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.google.zxing</groupId>
+			<artifactId>javase</artifactId>
+			<version>${zxing.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.maven.plugins</groupId>

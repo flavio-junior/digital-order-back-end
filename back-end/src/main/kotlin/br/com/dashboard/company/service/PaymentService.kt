@@ -25,7 +25,7 @@ class PaymentService {
     fun updatePayment(
         payment: PaymentRequestVO,
         order: Order
-    ) {
+    ): Payment {
         val paymentResult: Payment = parseObject(payment, Payment::class.java)
         var total: Double = order.total
         paymentResult.date = LocalDate.now()
@@ -40,7 +40,7 @@ class PaymentService {
         paymentResult.valueDiscount = payment.value
         paymentResult.total = total
         paymentResult.order = order
-        paymentRepository.save(paymentResult)
+       return paymentRepository.save(paymentResult)
     }
 
     @Transactional(readOnly = true)

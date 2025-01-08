@@ -469,8 +469,8 @@ class OrderController {
         @AuthenticationPrincipal user: User,
         @PathVariable(value = "id") idOrder: Long,
         @RequestBody payment: PaymentRequestVO
-    ) {
-        return orderService.closeOrder(user = user, idOrder = idOrder, payment = payment)
+    ): ResponseEntity<OrderResponseVO> {
+        return ResponseEntity.ok(orderService.closeOrder(user = user, idOrder = idOrder, payment = payment))
     }
 
     @PutMapping(
