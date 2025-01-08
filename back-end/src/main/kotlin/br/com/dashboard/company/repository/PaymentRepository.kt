@@ -31,7 +31,7 @@ interface PaymentRepository : JpaRepository<Payment, Long> {
                 GROUP BY p.typePayment, p.typeOrder
         """
     )
-    fun getAnalysisDay(@Param("date") date: LocalDate = LocalDate.now()): List<Array<Any>>
+    fun getAnalysisDay(@Param("date") date: LocalDate): List<Array<Any>>
 
     @Query(
         value =

@@ -126,8 +126,12 @@ class PaymentController {
     fun getAnalysisDay(
         @RequestParam(name = "date", required = false) date: String?
     ): ResponseEntity<AnalisePaymentVO> {
-        val parsedDate = date?.let { LocalDate.parse(date) } ?: LocalDate.now()
-        val result = paymentService.getAnalysisDay(date = parsedDate)
+        val parsedDate = try {
+            if (date.isNullOrEmpty()) LocalDate.now() else LocalDate.parse(date)
+        } catch (ex: Exception) {
+            LocalDate.now()
+        }
+        val result = paymentService.getAnalysisDay(date = parsedDate.toString())
         return ResponseEntity.ok(result)
     }
 

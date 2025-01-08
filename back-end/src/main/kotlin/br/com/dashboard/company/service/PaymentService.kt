@@ -58,8 +58,10 @@ class PaymentService {
         } ?: throw ResourceNotFoundException(message = PAYMENT_NOT_FOUND)
     }
 
-    fun getAnalysisDay(date: LocalDate): AnalisePaymentVO {
-        val paymentSummaries = paymentRepository.getAnalysisDay(date = date)
+    fun getAnalysisDay(
+        date: String
+    ): AnalisePaymentVO {
+        val paymentSummaries = paymentRepository.getAnalysisDay(date = LocalDate.parse(date))
             .map {
                 val typePayment = it[0] as PaymentType
                 val typeOrder = it[1] as TypeOrder
@@ -68,7 +70,7 @@ class PaymentService {
                 PaymentSummaryDTO(typeOrder = typeOrder, typePayment = typePayment, count = count, total = total)
             }
         val totalGeneral = paymentSummaries.sumOf { it.total }
-        val totalDiscounts = paymentRepository.getAnalysisDay(date).sumOf { it[4] as Long }
+        val totalDiscounts = paymentRepository.getAnalysisDay(LocalDate.parse(date)).sumOf { it[4] as Long }
         return AnalisePaymentVO(
             analise = paymentSummaries,
             total = totalGeneral,
