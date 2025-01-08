@@ -4,6 +4,7 @@ import br.com.dashboard.company.entities.user.User
 import br.com.dashboard.company.service.PaymentService
 import br.com.dashboard.company.utils.others.MediaType.APPLICATION_JSON
 import br.com.dashboard.company.vo.checkout.GeneralBalanceResponseVO
+import br.com.dashboard.company.vo.payment.AnalisePaymentVO
 import br.com.dashboard.company.vo.payment.PaymentResponseVO
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.media.ArraySchema
@@ -22,6 +23,7 @@ import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
+import java.time.LocalDate
 
 @RestController
 @RequestMapping(value = ["/api/dashboard/company/payment/v1"])
@@ -83,7 +85,7 @@ class PaymentController {
     }
 
     @GetMapping(
-        value = ["/general/balance"],
+        value = ["/types"],
         produces = [APPLICATION_JSON]
     )
     @Operation(
@@ -91,7 +93,7 @@ class PaymentController {
         tags = ["Payment"], responses = [
             ApiResponse(
                 description = "Success", responseCode = "200", content = [
-                    Content(array = ArraySchema(schema = Schema(implementation = GeneralBalanceResponseVO::class)))
+                    Content(array = ArraySchema(schema = Schema(implementation = AnalisePaymentVO::class)))
                 ]
             ),
             ApiResponse(
@@ -121,8 +123,12 @@ class PaymentController {
             )
         ]
     )
-    fun getGeneralBalance(): GeneralBalanceResponseVO {
-        return paymentService.getGeneralBalance()
+    fun getAnalysisDay(
+        @RequestParam(name = "date", required = false) date: String?
+    ): ResponseEntity<AnalisePaymentVO> {
+        val parsedDate = date?.let { LocalDate.parse(date) } ?: LocalDate.now()
+        val result = paymentService.getAnalysisDay(date = parsedDate)
+        return ResponseEntity.ok(result)
     }
 
     @GetMapping(

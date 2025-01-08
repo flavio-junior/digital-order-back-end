@@ -18,10 +18,20 @@ interface PaymentRepository : JpaRepository<Payment, Long> {
         pageable: Pageable
     ): Page<Payment>?
 
-    @Query(value = "SELECT SUM(p.total) FROM Payment p WHERE p.date = :date")
-    fun getGeneralBalance(
-        @Param("date") date: LocalDate = LocalDate.now()
-    ): Double?
+    @Query(
+        value = """
+                SELECT 
+                    p.typePayment, 
+                    p.typeOrder, 
+                    COUNT(p), 
+                    SUM(p.total), 
+                    SUM(CASE WHEN p.discount = true THEN 1 ELSE 0 END)
+                FROM Payment p
+                WHERE p.date = :date
+                GROUP BY p.typePayment, p.typeOrder
+        """
+    )
+    fun getAnalysisDay(@Param("date") date: LocalDate = LocalDate.now()): List<Array<Any>>
 
     @Query(
         value =

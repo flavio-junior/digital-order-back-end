@@ -4,10 +4,14 @@ import br.com.dashboard.company.entities.order.Order
 import br.com.dashboard.company.entities.payment.Payment
 import br.com.dashboard.company.exceptions.ResourceNotFoundException
 import br.com.dashboard.company.repository.PaymentRepository
+import br.com.dashboard.company.utils.common.PaymentType
+import br.com.dashboard.company.utils.common.TypeOrder
 import br.com.dashboard.company.utils.others.ConverterUtils.parseObject
 import br.com.dashboard.company.vo.checkout.GeneralBalanceResponseVO
+import br.com.dashboard.company.vo.payment.AnalisePaymentVO
 import br.com.dashboard.company.vo.payment.PaymentRequestVO
 import br.com.dashboard.company.vo.payment.PaymentResponseVO
+import br.com.dashboard.company.vo.payment.PaymentSummaryDTO
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
@@ -40,7 +44,7 @@ class PaymentService {
         paymentResult.valueDiscount = payment.value
         paymentResult.total = total
         paymentResult.order = order
-       return paymentRepository.save(paymentResult)
+        return paymentRepository.save(paymentResult)
     }
 
     @Transactional(readOnly = true)
@@ -54,9 +58,22 @@ class PaymentService {
         } ?: throw ResourceNotFoundException(message = PAYMENT_NOT_FOUND)
     }
 
-    @Transactional
-    fun getGeneralBalance(): GeneralBalanceResponseVO {
-        return GeneralBalanceResponseVO(total = paymentRepository.getGeneralBalance())
+    fun getAnalysisDay(date: LocalDate): AnalisePaymentVO {
+        val paymentSummaries = paymentRepository.getAnalysisDay(date = date)
+            .map {
+                val typePayment = it[0] as PaymentType
+                val typeOrder = it[1] as TypeOrder
+                val count = it[2] as Long
+                val total = it[3] as Double
+                PaymentSummaryDTO(typeOrder = typeOrder, typePayment = typePayment, count = count, total = total)
+            }
+        val totalGeneral = paymentSummaries.sumOf { it.total }
+        val totalDiscounts = paymentRepository.getAnalysisDay(date).sumOf { it[4] as Long }
+        return AnalisePaymentVO(
+            analise = paymentSummaries,
+            total = totalGeneral,
+            discount = totalDiscounts
+        )
     }
 
     @Transactional
