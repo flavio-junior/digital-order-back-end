@@ -133,6 +133,47 @@ class OrderController {
         return orderService.findOrderById(user = user, orderId = id)
     }
 
+    @GetMapping(
+        value = ["/payment/by/code/{code}"],
+        produces = [APPLICATION_JSON]
+    )
+    @Operation(
+        summary = "Find Order By Id", description = "Find Order By Id",
+        tags = ["Order"],
+        responses = [
+            ApiResponse(
+                description = "Success", responseCode = "200", content = [
+                    Content(schema = Schema(implementation = OrderResponseVO::class))
+                ]
+            ),
+            ApiResponse(
+                description = "Bad Request", responseCode = "400", content = [
+                    Content(schema = Schema(implementation = Unit::class))
+                ]
+            ),
+            ApiResponse(
+                description = "Unauthorized", responseCode = "401", content = [
+                    Content(schema = Schema(implementation = Unit::class))
+                ]
+            ),
+            ApiResponse(
+                description = "Not Found", responseCode = "404", content = [
+                    Content(schema = Schema(implementation = Unit::class))
+                ]
+            ),
+            ApiResponse(
+                description = "Internal Error", responseCode = "500", content = [
+                    Content(schema = Schema(implementation = Unit::class))
+                ]
+            )
+        ]
+    )
+    fun findOrderByCodePayment(
+        @PathVariable(value = "code") code: Long
+    ): OrderResponseVO {
+        return orderService.findOrderByCodePayment(code = code)
+    }
+
     @PostMapping(
         consumes = [APPLICATION_JSON],
         produces = [APPLICATION_JSON]

@@ -78,6 +78,18 @@ class OrderService {
         return parseObject(order, OrderResponseVO::class.java)
     }
 
+    @Transactional(readOnly = true)
+    fun findOrderByCodePayment(
+        code: Long
+    ): OrderResponseVO {
+        val order: Order? = orderRepository.findOrderByCodePayment(code = code)
+        if (order != null) {
+            return parseObject(order, OrderResponseVO::class.java)
+        } else {
+            throw ResourceNotFoundException(message = ORDER_NOT_FOUND)
+        }
+    }
+
     private fun getOrder(
         userId: Long,
         orderId: Long

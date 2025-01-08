@@ -34,6 +34,11 @@ interface OrderRepository : JpaRepository<Order, Long> {
         @Param("orderId") orderId: Long
     ): Order?
 
+    @Query(value = "SELECT o FROM Order o WHERE o.payment.code = :code")
+    fun findOrderByCodePayment(
+        @Param("code") code: Long
+    ): Order?
+
     @Modifying
     @Query("UPDATE Order o SET o.quantity = o.quantity + :quantity WHERE o.id = :orderId")
     fun updateQuantityOrder(
