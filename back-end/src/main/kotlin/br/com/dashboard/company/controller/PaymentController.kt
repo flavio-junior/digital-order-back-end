@@ -4,7 +4,7 @@ import br.com.dashboard.company.entities.user.User
 import br.com.dashboard.company.service.PaymentService
 import br.com.dashboard.company.utils.others.MediaType.APPLICATION_JSON
 import br.com.dashboard.company.vo.checkout.GeneralBalanceResponseVO
-import br.com.dashboard.company.vo.payment.AnalisePaymentVO
+import br.com.dashboard.company.vo.payment.AnaliseDayVO
 import br.com.dashboard.company.vo.payment.PaymentResponseVO
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.media.ArraySchema
@@ -93,7 +93,7 @@ class PaymentController {
         tags = ["Payment"], responses = [
             ApiResponse(
                 description = "Success", responseCode = "200", content = [
-                    Content(array = ArraySchema(schema = Schema(implementation = AnalisePaymentVO::class)))
+                    Content(array = ArraySchema(schema = Schema(implementation = AnaliseDayVO::class)))
                 ]
             ),
             ApiResponse(
@@ -125,7 +125,7 @@ class PaymentController {
     )
     fun getAnalysisDay(
         @RequestParam(name = "date", required = false) date: String?
-    ): ResponseEntity<AnalisePaymentVO> {
+    ): ResponseEntity<AnaliseDayVO> {
         val parsedDate = try {
             if (date.isNullOrEmpty()) LocalDate.now() else LocalDate.parse(date)
         } catch (ex: Exception) {

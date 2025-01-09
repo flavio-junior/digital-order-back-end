@@ -8,10 +8,7 @@ import br.com.dashboard.company.utils.common.PaymentType
 import br.com.dashboard.company.utils.common.TypeOrder
 import br.com.dashboard.company.utils.others.ConverterUtils.parseObject
 import br.com.dashboard.company.vo.checkout.GeneralBalanceResponseVO
-import br.com.dashboard.company.vo.payment.AnalisePaymentVO
-import br.com.dashboard.company.vo.payment.PaymentRequestVO
-import br.com.dashboard.company.vo.payment.PaymentResponseVO
-import br.com.dashboard.company.vo.payment.PaymentSummaryDTO
+import br.com.dashboard.company.vo.payment.*
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
@@ -60,19 +57,49 @@ class PaymentService {
 
     fun getAnalysisDay(
         date: String
-    ): AnalisePaymentVO {
-        val paymentSummaries = paymentRepository.getAnalysisDay(date = LocalDate.parse(date))
-            .map {
-                val typePayment = it[0] as PaymentType
-                val typeOrder = it[1] as TypeOrder
-                val count = it[2] as Long
-                val total = it[3] as Double
-                PaymentSummaryDTO(typeOrder = typeOrder, typePayment = typePayment, count = count, total = total)
+    ): AnaliseDayVO {
+        val analiseDay = paymentRepository.getAnalysisDay(date = LocalDate.parse(date))
+        val filterWithTypesPayments = mutableMapOf<Pair<TypeOrder, PaymentType>, DescriptionPaymentVO>()
+        analiseDay.forEach {
+            val typePayment = it[0] as PaymentType
+            val typeOrder = it[1] as TypeOrder
+            val numberItems = it[2] as Long
+            val total = it[3] as Double
+            val discountsCount = it[4] as Long
+            val key = Pair(typeOrder, typePayment)
+            filterWithTypesPayments[key] = filterWithTypesPayments.getOrDefault(key, DescriptionPaymentVO(
+                typeOrder = typeOrder,
+                typePayment = typePayment,
+                numberItems = 0,
+                total = 0.0,
+                discount = 0
+            )).let { existing ->
+                existing.copy(
+                    numberItems = existing.numberItems + numberItems,
+                    total = existing.total + total,
+                    discount = existing.discount + discountsCount
+                )
             }
-        val totalGeneral = paymentSummaries.sumOf { it.total }
-        val totalDiscounts = paymentRepository.getAnalysisDay(LocalDate.parse(date)).sumOf { it[4] as Long }
-        return AnalisePaymentVO(
-            analise = paymentSummaries,
+        }
+        val groupedByTypeOrder = filterWithTypesPayments.values.groupBy { it.typeOrder }
+        val typePaymentVOs = groupedByTypeOrder.map { (typeOrder, summaries) ->
+            val totalOrders = summaries.sumOf { it.numberItems }
+            val totalAmount = summaries.sumOf { it.total }
+            val totalDiscounts = summaries.sumOf { it.discount }
+            TypePaymentVO(
+                typeOrder = typeOrder,
+                analise = summaries,
+                numberOrders = totalOrders,
+                total = totalAmount,
+                discount = totalDiscounts
+            )
+        }
+        val totalGeneral = typePaymentVOs.sumOf { it.total }
+        val totalOrders = typePaymentVOs.sumOf { it.numberOrders }
+        val totalDiscounts = typePaymentVOs.sumOf { it.discount }
+        return AnaliseDayVO(
+            content = typePaymentVOs,
+            numberOrders = totalOrders,
             total = totalGeneral,
             discount = totalDiscounts
         )
