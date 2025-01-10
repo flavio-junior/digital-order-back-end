@@ -117,6 +117,9 @@ class OrderService {
             val objectsSaved = objectService.saveObjects(userId = user.id, buy = true, objectsToSave = order.objects)
             orderResult.objects = objectsSaved.first
             total = objectsSaved.second
+            if (order.payment == null) {
+                throw InternalErrorClient(message = SELECT_PAYMENT_TO_CLOSE_ORDER)
+            }
         } else {
             orderResult.status = Status.OPEN
             val objectsSaved = objectService.saveObjects(userId = user.id, objectsToSave = order.objects)
@@ -406,6 +409,7 @@ class OrderService {
     companion object {
         const val ORDER_NOT_FOUND = "Order not found!"
         const val DELIVERY_ORDER_PENDING = "Delivery order pending"
+        const val SELECT_PAYMENT_TO_CLOSE_ORDER = "Select Payment to Close Order"
         const val ORDER_ALREADY_CLOSED = "Order already closed"
         const val SUBTRACT_ONE = 1
     }
