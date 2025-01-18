@@ -6,6 +6,7 @@ import jakarta.persistence.Enumerated
 
 data class ObjectRequestVO(
     var identifier: Long = 0,
+    var name: String = "",
     @Enumerated(EnumType.STRING)
     var type: TypeItem? = null,
     var quantity: Int = 0

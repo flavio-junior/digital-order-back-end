@@ -170,7 +170,7 @@ class OrderService {
     ) {
         val orderSaved = getOrder(orderId = orderId, userId = user.id)
         objects.map { objectAvailable ->
-            val objectFound = orderSaved.objects?.find { it.identifier == objectAvailable.identifier }
+            val objectFound = orderSaved.objects?.find { it.name == objectAvailable.name }
             if (objectFound != null) {
                 throw ObjectDuplicateException(message = OBJECT_ALREADY_EXISTS)
             }
