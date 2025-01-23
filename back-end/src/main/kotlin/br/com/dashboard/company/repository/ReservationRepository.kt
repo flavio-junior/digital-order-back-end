@@ -32,7 +32,7 @@ interface ReservationRepository : JpaRepository<Reservation, Long> {
     ): Page<Reservation>?
 
     @Query(
-        value = "SELECT r FROM Reservation r WHERE r.user.id = :userId AND LOWER(r.name) LIKE LOWER(CONCAT('%', :reservationName, '%'))"
+        value = "SELECT r FROM Reservation r WHERE r.user.id = :userId AND LOWER(r.name) LIKE LOWER(CONCAT('%', :reservationName, '%')) AND r.status = AVAILABLE"
     )
     fun findReservationByName(
         @Param("userId") userId: Long,
