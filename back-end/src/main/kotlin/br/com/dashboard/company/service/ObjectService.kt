@@ -2,11 +2,13 @@ package br.com.dashboard.company.service
 
 import br.com.dashboard.company.entities.`object`.Object
 import br.com.dashboard.company.entities.order.Order
+import br.com.dashboard.company.entities.user.User
 import br.com.dashboard.company.exceptions.ResourceNotFoundException
 import br.com.dashboard.company.repository.ObjectRepository
 import br.com.dashboard.company.utils.common.ObjectStatus
 import br.com.dashboard.company.utils.common.TypeItem
 import br.com.dashboard.company.vo.`object`.ObjectRequestVO
+import br.com.dashboard.company.vo.product.RestockProductRequestVO
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -137,12 +139,20 @@ class ObjectService {
 
     @Transactional
     fun removeOverview(
+        user: User,
         orderId: Long,
         objectId: Long,
         overviewId: Long
     ): Double {
         val objectSaved = getObject(orderId = orderId, objectId = objectId)
         val overviewSaved = overviewService.getOverview(objectId = objectId, overviewId = overviewId)
+        if (objectSaved.type == TypeItem.PRODUCT) {
+            productService.restockProduct(
+                user = user,
+                productId = objectSaved.identifier,
+                restockProduct = RestockProductRequestVO(quantity = objectSaved.quantity)
+            )
+        }
         val newQuantityToSave = (objectSaved.quantity - overviewSaved.quantity)
         val priceCalculated = (objectSaved.price * overviewSaved.quantity)
         decrementItemsObject(
@@ -183,9 +193,18 @@ class ObjectService {
 
     @Transactional
     fun deleteObject(
+        user: User,
         orderId: Long,
         objectId: Long
     ) {
+        val objectSaved = getObject(orderId = orderId, objectId = objectId)
+        if (objectSaved.type == TypeItem.PRODUCT) {
+            productService.restockProduct(
+                user = user,
+                productId = objectSaved.identifier,
+                restockProduct = RestockProductRequestVO(quantity = objectSaved.quantity)
+            )
+        }
         objectRepository.deleteObjectById(orderId = orderId, objectId = objectId)
     }
 

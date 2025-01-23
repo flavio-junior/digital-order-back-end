@@ -21,6 +21,7 @@ import br.com.dashboard.company.vo.order.OrderRequestVO
 import br.com.dashboard.company.vo.order.OrderResponseVO
 import br.com.dashboard.company.vo.order.UpdateStatusDeliveryRequestVO
 import br.com.dashboard.company.vo.payment.PaymentRequestVO
+import br.com.dashboard.company.vo.product.RestockProductRequestVO
 import br.com.dashboard.company.vo.reservation.ReservationResponseVO
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.data.domain.Page
@@ -56,6 +57,9 @@ class OrderService {
 
     @Autowired
     private lateinit var userService: UserService
+
+    @Autowired
+    private lateinit var productService: ProductService
 
     @Transactional(readOnly = true)
     fun findAllOrders(
@@ -228,6 +232,7 @@ class OrderService {
 
                 Action.REMOVE_OVERVIEW -> {
                     val overviewResult = objectService.removeOverview(
+                        user = user,
                         orderId = orderId,
                         objectId = objectId,
                         overviewId = objectActual.overview
@@ -248,7 +253,7 @@ class OrderService {
                 }
 
                 Action.REMOVE_OBJECT -> {
-                    objectService.deleteObject(orderId = orderSaved.id, objectId = objectSaved.id)
+                    objectService.deleteObject(user = user, orderId = orderSaved.id, objectId = objectSaved.id)
                     decrementDataOrder(
                         orderId = orderId,
                         quantity = SUBTRACT_ONE,
@@ -400,6 +405,19 @@ class OrderService {
         orderId: Long
     ) {
         val orderSaved: Order = getOrder(userId = user.id, orderId = orderId)
+        orderSaved.objects?.forEach { objectSaved ->
+            when (objectSaved.type) {
+                TypeItem.PRODUCT -> {
+                    productService.restockProduct(
+                        user = user,
+                        productId = objectSaved.identifier,
+                        RestockProductRequestVO(quantity = objectSaved.quantity)
+                    )
+                }
+
+                else -> {}
+            }
+        }
         orderSaved.reservations?.forEach { reservation ->
             reservation.status = ReservationStatus.AVAILABLE
         }
