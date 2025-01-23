@@ -146,6 +146,15 @@ class ProductService {
         return Pair(objectProductResult, total)
     }
 
+    fun decrementProduct(
+        user: User,
+        productId: Long,
+        quantity: Int
+    ) {
+        getProduct(userId = user.id, productId = productId)
+        productRepository.buyProduct(userId = user.id, productId = productId, quantity = quantity)
+    }
+
     fun checkBodyProduct(
         product: Product,
         quantityRequest: Int

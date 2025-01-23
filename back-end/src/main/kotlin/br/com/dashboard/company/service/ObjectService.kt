@@ -122,12 +122,17 @@ class ObjectService {
 
     @Transactional
     fun incrementMoreItemsObject(
+        user: User,
         orderId: Long,
         objectId: Long,
         quantity: Int,
         total: Double,
         objectResult: Object? = null
     ) {
+        val objectSaved = getObject(orderId = orderId, objectId = objectId)
+        if (objectSaved.type == TypeItem.PRODUCT) {
+            productService.decrementProduct(user = user, objectSaved.identifier, quantity = quantity)
+        }
         objectRepository.incrementMoreItemsObject(
             orderId = orderId,
             objectId = objectId,
@@ -150,7 +155,7 @@ class ObjectService {
             productService.restockProduct(
                 user = user,
                 productId = objectSaved.identifier,
-                restockProduct = RestockProductRequestVO(quantity = objectSaved.quantity)
+                restockProduct = RestockProductRequestVO(quantity = overviewSaved.quantity)
             )
         }
         val newQuantityToSave = (objectSaved.quantity - overviewSaved.quantity)

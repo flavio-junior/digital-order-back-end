@@ -218,6 +218,7 @@ class OrderService {
                         throw InternalErrorClient(message = ZERO_QUANTITY_ERROR)
                     }
                     objectService.incrementMoreItemsObject(
+                        user = user,
                         orderId = orderId,
                         objectId = objectId,
                         quantity = objectActual.quantity,
