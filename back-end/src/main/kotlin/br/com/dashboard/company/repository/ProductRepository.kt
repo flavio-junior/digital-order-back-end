@@ -38,7 +38,7 @@ interface ProductRepository : JpaRepository<Product, Long> {
     ): Product?
 
     @Query(
-        value = "SELECT p FROM Product p WHERE p.user.id = :userId AND LOWER(p.name) LIKE LOWER(CONCAT('%', :name, '%'))"
+        value = "SELECT p FROM Product p WHERE p.user.id = :userId AND LOWER(p.name) LIKE LOWER(CONCAT('%', :name, '%')) AND p.quantity > 0"
     )
     fun findProductByName(
         @Param("userId") userId: Long,
