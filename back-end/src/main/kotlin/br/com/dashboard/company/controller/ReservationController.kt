@@ -5,6 +5,7 @@ import br.com.dashboard.company.exceptions.ForbiddenActionRequestException
 import br.com.dashboard.company.service.ReservationService
 import br.com.dashboard.company.utils.others.ConstantsUtils.EMPTY_FIELDS
 import br.com.dashboard.company.utils.others.MediaType.APPLICATION_JSON
+import br.com.dashboard.company.vo.reservation.GenerateReservationsRequestVO
 import br.com.dashboard.company.vo.reservation.ReservationRequestVO
 import br.com.dashboard.company.vo.reservation.ReservationResponseVO
 import io.swagger.v3.oas.annotations.Operation
@@ -18,6 +19,7 @@ import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Pageable
 import org.springframework.data.domain.Sort
+import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.web.bind.annotation.DeleteMapping
@@ -229,10 +231,65 @@ class ReservationController {
         ) {
             throw ForbiddenActionRequestException(exception = EMPTY_FIELDS)
         }
-        val entity: ReservationResponseVO = reservationService.createNewReservation(user = user, reservation = reservation)
+        val entity: ReservationResponseVO =
+            reservationService.createNewReservation(user = user, reservation = reservation)
         val uri: URI = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}")
             .buildAndExpand(entity.id).toUri()
         return ResponseEntity.created(uri).body(entity)
+    }
+
+    @PostMapping(
+        value = ["/generate/reservations"],
+        consumes = [APPLICATION_JSON],
+        produces = [APPLICATION_JSON]
+    )
+    @Operation(
+        summary = "Generate Reservations", description = "Generate Reservations",
+        tags = ["Reservation"],
+        responses = [
+            ApiResponse(
+                description = "Created", responseCode = "201", content = [
+                    Content(schema = Schema(implementation = Unit::class))
+                ]
+            ),
+            ApiResponse(
+                description = "Bad Request", responseCode = "400", content = [
+                    Content(schema = Schema(implementation = Unit::class))
+                ]
+            ),
+            ApiResponse(
+                description = "Unauthorized", responseCode = "401", content = [
+                    Content(schema = Schema(implementation = Unit::class))
+                ]
+            ),
+            ApiResponse(
+                description = "Operation Unauthorized", responseCode = "403", content = [
+                    Content(schema = Schema(implementation = Unit::class))
+                ]
+            ),
+            ApiResponse(
+                description = "Conflict", responseCode = "409", content = [
+                    Content(schema = Schema(implementation = Unit::class))
+                ]
+            ),
+            ApiResponse(
+                description = "Internal Error", responseCode = "500", content = [
+                    Content(schema = Schema(implementation = Unit::class))
+                ]
+            )
+        ]
+    )
+    fun generateReservations(
+        @AuthenticationPrincipal user: User,
+        @RequestBody body: GenerateReservationsRequestVO
+    ): ResponseEntity<*> {
+        require(
+            value = body.prefix.isNotBlank() && body.prefix.isNotEmpty() && body.end > 0
+        ) {
+            throw ForbiddenActionRequestException(exception = EMPTY_FIELDS)
+        }
+        reservationService.generateReservations(user = user, body = body)
+        return ResponseEntity.status(HttpStatus.CREATED).build<Any>()
     }
 
     @PutMapping(

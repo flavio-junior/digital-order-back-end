@@ -7,6 +7,7 @@ import br.com.dashboard.company.exceptions.ResourceNotFoundException
 import br.com.dashboard.company.repository.ReservationRepository
 import br.com.dashboard.company.utils.common.ReservationStatus
 import br.com.dashboard.company.utils.others.ConverterUtils.parseObject
+import br.com.dashboard.company.vo.reservation.GenerateReservationsRequestVO
 import br.com.dashboard.company.vo.reservation.ReservationRequestVO
 import br.com.dashboard.company.vo.reservation.ReservationResponseVO
 import org.springframework.beans.factory.annotation.Autowired
@@ -55,7 +56,7 @@ class ReservationService {
         return parseObject(reservation, ReservationResponseVO::class.java)
     }
 
-   fun getReservation(
+    fun getReservation(
         userId: Long,
         reservationId: Long
     ): Reservation {
@@ -84,11 +85,24 @@ class ReservationService {
         }
     }
 
+    @Transactional
+    fun generateReservations(
+        user: User,
+        body: GenerateReservationsRequestVO
+    ): List<ReservationResponseVO> {
+        return (body.start..body.end).mapIndexed { index, number ->
+            createNewReservation(
+                user = user,
+                reservation = ReservationRequestVO(name = "${body.prefix} $number")
+            )
+        }
+    }
+
     fun validateReservationsToSave(
         userId: Long,
         reservations: MutableList<ReservationResponseVO>?,
         status: ReservationStatus
-    ):  MutableList<Reservation> {
+    ): MutableList<Reservation> {
         val reservationsToSave = mutableListOf<Reservation>()
         reservations?.forEach { reservationVO ->
             val reservationSave = getReservation(userId = userId, reservationId = reservationVO.id)
