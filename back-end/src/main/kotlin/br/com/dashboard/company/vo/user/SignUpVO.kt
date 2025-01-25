@@ -7,5 +7,5 @@ data class SignUpVO(
     var surname: String,
     val email: String,
     val password: String,
-    val type: TypeAccount? = null
+    var type: TypeAccount? = null
 )

@@ -58,6 +58,7 @@ class SecurityConfig {
                         "/v3/api-docs/**",
                         "/swagger-ui/**"
                     ).permitAll()
+                    .requestMatchers("/api/dashboard/company/employees/v1**").hasRole("ADMIN")
                     .requestMatchers("api/dashboard/company/categories/v1**").hasRole("ADMIN")
                     .requestMatchers("api/dashboard/company/foods/v1**").hasRole("ADMIN")
                     .requestMatchers("api/dashboard/company/items/v1**").hasRole("ADMIN")

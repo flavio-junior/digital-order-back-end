@@ -169,3 +169,16 @@ CREATE TABLE IF NOT EXISTS tb_object_overview (
     fk_object INT REFERENCES tb_object(id),
     PRIMARY KEY (fk_overview, fk_object)
 );
+
+CREATE TABLE IF NOT EXISTS tb_employee (
+    id SERIAL PRIMARY KEY,
+    created_at TIMESTAMP NOT NULL,
+    name VARCHAR(30) NOT NULL,
+    function varchar(30) check (function in ('WAITER'))
+);
+
+CREATE TABLE IF NOT EXISTS tb_user_employee (
+    fk_employee INT REFERENCES tb_employee(id),
+    fk_user INT REFERENCES tb_user(id),
+    PRIMARY KEY (fk_employee, fk_user)
+);
