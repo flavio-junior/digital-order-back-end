@@ -183,3 +183,15 @@ CREATE TABLE IF NOT EXISTS tb_user_employee (
     fk_user INT REFERENCES tb_user(id),
     PRIMARY KEY (fk_employee, fk_user)
 );
+
+CREATE TABLE IF NOT EXISTS tb_fee (
+    id SERIAL PRIMARY KEY,
+    price NUMERIC(10, 2) DEFAULT 0.0,
+    assigned varchar(30) check (assigned in ('WAITER'))
+);
+
+CREATE TABLE IF NOT EXISTS tb_user_fee (
+    fk_fee INT REFERENCES tb_fee(id),
+    fk_user INT REFERENCES tb_user(id),
+    PRIMARY KEY (fk_fee, fk_user)
+);
