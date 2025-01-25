@@ -182,11 +182,7 @@ class EmployeeController {
         return ResponseEntity.status(HttpStatus.CREATED).build<Any>()
     }
 
-    @PatchMapping(
-        value = ["/disabled/{id}"],
-        consumes = [APPLICATION_JSON],
-        produces = [APPLICATION_JSON]
-    )
+    @PatchMapping(value = ["/disabled/{id}"])
     @Operation(
         summary = "Disable Employee By Id", description = "Disable Employee By Id",
         tags = ["Employee"],
@@ -226,11 +222,7 @@ class EmployeeController {
         return ResponseEntity.noContent().build<Any>()
     }
 
-    @PatchMapping(
-        value = ["/enabled/{id}"],
-        consumes = [APPLICATION_JSON],
-        produces = [APPLICATION_JSON]
-    )
+    @PatchMapping(value = ["/enabled/{id}"])
     @Operation(
         summary = "Enabled Employee By Id", description = "Enabled Employee By Id",
         tags = ["Employee"],

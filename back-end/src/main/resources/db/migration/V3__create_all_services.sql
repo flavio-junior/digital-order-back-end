@@ -174,7 +174,8 @@ CREATE TABLE IF NOT EXISTS tb_employee (
     id SERIAL PRIMARY KEY,
     created_at TIMESTAMP NOT NULL,
     name VARCHAR(30) NOT NULL,
-    function varchar(30) check (function in ('WAITER'))
+    function varchar(30) check (function in ('ATTENDANT', 'BOX', 'WAITER')),
+    status varchar(30) check (status in ('ENABLED', 'DISABLED'))
 );
 
 CREATE TABLE IF NOT EXISTS tb_user_employee (

@@ -2,6 +2,7 @@ package br.com.dashboard.company.entities.employee
 
 import br.com.dashboard.company.entities.user.User
 import br.com.dashboard.company.utils.common.Function
+import br.com.dashboard.company.utils.common.StatusEmployee
 import jakarta.persistence.*
 import java.time.LocalDateTime
 
@@ -18,6 +19,9 @@ data class Employee(
     @Enumerated(EnumType.STRING)
     @Column(columnDefinition = "varying")
     var function: Function? = null,
+    @Enumerated(EnumType.STRING)
+    @Column(columnDefinition = "varying")
+    var status: StatusEmployee? = null,
     @ManyToOne(cascade = [CascadeType.ALL])
     @JoinTable(
         name = "tb_user_employee",

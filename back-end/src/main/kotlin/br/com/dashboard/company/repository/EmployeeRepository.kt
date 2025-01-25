@@ -1,6 +1,7 @@
 package br.com.dashboard.company.repository
 
 import br.com.dashboard.company.entities.employee.Employee
+import br.com.dashboard.company.utils.common.StatusEmployee
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.data.jpa.repository.JpaRepository
@@ -10,7 +11,7 @@ import org.springframework.data.repository.query.Param
 import org.springframework.stereotype.Repository
 
 @Repository
-interface EmployeeRepository: JpaRepository<Employee, Long> {
+interface EmployeeRepository : JpaRepository<Employee, Long> {
 
     @Query(
         value = """
@@ -30,6 +31,13 @@ interface EmployeeRepository: JpaRepository<Employee, Long> {
         @Param("userId") userId: Long,
         @Param("employeeId") employeeId: Long
     ): Employee?
+
+    @Modifying
+    @Query("UPDATE Employee e SET e.status =:status WHERE e.id = :employeeId")
+    fun changeStatusEmployee(
+        @Param("employeeId") employeeId: Long,
+        @Param("status") status: StatusEmployee
+    )
 
     @Modifying
     @Query(value = "DELETE FROM Employee e WHERE e.id = :employeeId AND e.user.id = :userId")

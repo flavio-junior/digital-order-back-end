@@ -2,8 +2,10 @@ package br.com.dashboard.company.service
 
 import br.com.dashboard.company.entities.employee.Employee
 import br.com.dashboard.company.entities.user.User
+import br.com.dashboard.company.exceptions.InternalErrorClient
 import br.com.dashboard.company.exceptions.ResourceNotFoundException
 import br.com.dashboard.company.repository.EmployeeRepository
+import br.com.dashboard.company.utils.common.StatusEmployee
 import br.com.dashboard.company.utils.common.TypeAccount
 import br.com.dashboard.company.utils.others.ConverterUtils.parseObject
 import br.com.dashboard.company.vo.employee.EmployeeResponseVO
@@ -71,6 +73,7 @@ class EmployeeService {
         createNewEmployee.createdAt = LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS)
         createNewEmployee.name = employee.name
         createNewEmployee.function = employee.function
+        createNewEmployee.status = StatusEmployee.ENABLED
         createNewEmployee.user = userService.findUserById(userId = user.id)
         employeeRepository.save(createNewEmployee)
         val createAccountToEmployee = SignUpVO(
@@ -89,6 +92,7 @@ class EmployeeService {
     ) {
         val employeeSaved = userService.findUserById(userId = employeeId)
         userService.disabledProfileEmployee(userId = employeeSaved?.id ?: 0, email = employeeSaved?.email ?: "")
+        changeStatusEmployee(employeeId = employeeId, boolean = false)
     }
 
     @Transactional
@@ -97,6 +101,18 @@ class EmployeeService {
     ) {
         val employeeSaved = userService.findUserById(userId = employeeId)
         userService.enabledProfileEmployee(userId = employeeSaved?.id ?: 0, email = employeeSaved?.email ?: "")
+        changeStatusEmployee(employeeId = employeeId, boolean = true)
+    }
+
+    @Transactional
+    fun changeStatusEmployee(
+        employeeId: Long,
+        boolean: Boolean
+    ) {
+        employeeRepository.changeStatusEmployee(
+            employeeId = employeeId,
+            status = if (boolean) StatusEmployee.ENABLED else StatusEmployee.DISABLED
+        )
     }
 
     @Transactional
@@ -105,11 +121,15 @@ class EmployeeService {
         employeeId: Long
     ) {
         val employeeSaved = getEmployee(userId = user.id, employeeId = employeeId)
+        if(employeeSaved.status == StatusEmployee.ENABLED) {
+            throw InternalErrorClient(message = EMPLOYEE_WITH_ACTIVE_PROFILE)
+        }
         employeeRepository.deleteEmployeeById(userId = user.id, employeeId = employeeId)
         userService.deleteMyAccount(userId = employeeSaved.id)
     }
 
     companion object {
         const val EMPLOYEE_NOT_FOUND = "Employee Not Found"
+        const val EMPLOYEE_WITH_ACTIVE_PROFILE = "Employee with active profile!"
     }
 }
