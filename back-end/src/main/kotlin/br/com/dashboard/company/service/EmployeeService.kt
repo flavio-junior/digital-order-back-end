@@ -7,6 +7,7 @@ import br.com.dashboard.company.exceptions.ResourceNotFoundException
 import br.com.dashboard.company.repository.EmployeeRepository
 import br.com.dashboard.company.utils.common.StatusEmployee
 import br.com.dashboard.company.utils.common.TypeAccount
+import br.com.dashboard.company.utils.others.ConverterUtils.parseListObjects
 import br.com.dashboard.company.utils.others.ConverterUtils.parseObject
 import br.com.dashboard.company.vo.employee.EmployeeResponseVO
 import br.com.dashboard.company.vo.employee.RegisterEmployeeRequestVO
@@ -50,6 +51,15 @@ class EmployeeService {
     ): EmployeeResponseVO {
         val employee = getEmployee(userId = user.id, employeeId = employeeId)
         return parseObject(employee, EmployeeResponseVO::class.java)
+    }
+
+    @Transactional(readOnly = true)
+    fun findEmployeeByName(
+        user: User,
+        name: String
+    ): List<EmployeeResponseVO> {
+        val employees = employeeRepository.findEmployeeByName(userId = user.id, name = name)
+        return parseListObjects(employees, EmployeeResponseVO::class.java)
     }
 
     fun getEmployee(

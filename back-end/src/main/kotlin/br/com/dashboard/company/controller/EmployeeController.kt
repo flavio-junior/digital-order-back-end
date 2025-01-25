@@ -124,6 +124,56 @@ class EmployeeController {
         return employeeService.findEmployeeById(user = user, employeeId = employeeId)
     }
 
+    @GetMapping(
+        value = ["/find/employee/by/{name}"],
+        produces = [APPLICATION_JSON]
+    )
+    @Operation(
+        summary = "Find Employee By Name With User Logged",
+        description = "Find Employee By Name With User Logged",
+        tags = ["Employee"],
+        responses = [
+            ApiResponse(
+                description = "Success", responseCode = "200", content = [
+                    Content(array = ArraySchema(schema = Schema(implementation = EmployeeResponseVO::class)))
+                ]
+            ),
+            ApiResponse(
+                description = "No Content", responseCode = "204", content = [
+                    Content(schema = Schema(implementation = Unit::class))
+                ]
+            ),
+            ApiResponse(
+                description = "Bad Request", responseCode = "400", content = [
+                    Content(schema = Schema(implementation = Unit::class))
+                ]
+            ),
+            ApiResponse(
+                description = "Unauthorized", responseCode = "401", content = [
+                    Content(schema = Schema(implementation = Unit::class))
+                ]
+            ),
+            ApiResponse(
+                description = "Not Found", responseCode = "404", content = [
+                    Content(schema = Schema(implementation = Unit::class))
+                ]
+            ),
+            ApiResponse(
+                description = "Internal Error", responseCode = "500", content = [
+                    Content(schema = Schema(implementation = Unit::class))
+                ]
+            )
+        ]
+    )
+    fun findEmployeeByName(
+        @AuthenticationPrincipal user: User,
+        @PathVariable(value = "name") name: String,
+    ): ResponseEntity<List<EmployeeResponseVO>> {
+        return ResponseEntity.ok(
+            employeeService.findEmployeeByName(user = user, name = name)
+        )
+    }
+
     @PostMapping(
         consumes = ["application/json"],
         produces = ["application/json"]
