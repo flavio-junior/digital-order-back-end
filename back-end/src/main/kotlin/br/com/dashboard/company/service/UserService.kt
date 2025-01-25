@@ -8,6 +8,7 @@ import org.springframework.security.core.userdetails.UserDetails
 import org.springframework.security.core.userdetails.UserDetailsService
 import org.springframework.security.core.userdetails.UsernameNotFoundException
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
 
 @Service
 class UserService : UserDetailsService {
@@ -26,6 +27,29 @@ class UserService : UserDetailsService {
         return userRepository.findById(userId).orElseThrow {
             throw ResourceNotFoundException(message = USER_NOT_FOUND)
         }
+    }
+
+    @Transactional
+    fun disabledProfileEmployee(
+        userId: Long,
+        email: String
+    ) {
+        userRepository.disabledProfileEmployee(userId = userId, email = email)
+    }
+
+    @Transactional
+    fun enabledProfileEmployee(
+        userId: Long,
+        email: String
+    ) {
+        userRepository.enabledProfileEmployee(userId = userId, email = email)
+    }
+
+    @Transactional
+    fun deleteMyAccount(
+        userId: Long
+    ) {
+        userRepository.deleteById(userId)
     }
 
     companion object {

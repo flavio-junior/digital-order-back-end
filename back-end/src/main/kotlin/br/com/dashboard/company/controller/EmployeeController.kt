@@ -182,6 +182,94 @@ class EmployeeController {
         return ResponseEntity.status(HttpStatus.CREATED).build<Any>()
     }
 
+    @PatchMapping(
+        value = ["/disabled/{id}"],
+        consumes = [APPLICATION_JSON],
+        produces = [APPLICATION_JSON]
+    )
+    @Operation(
+        summary = "Disable Employee By Id", description = "Disable Employee By Id",
+        tags = ["Employee"],
+        responses = [
+            ApiResponse(
+                description = "No Content", responseCode = "204", content = [
+                    Content(schema = Schema(implementation = Unit::class))
+                ]
+            ),
+            ApiResponse(
+                description = "Bad Request", responseCode = "400", content = [
+                    Content(schema = Schema(implementation = Unit::class))
+                ]
+            ),
+            ApiResponse(
+                description = "Unauthorized", responseCode = "401", content = [
+                    Content(schema = Schema(implementation = Unit::class))
+                ]
+            ),
+            ApiResponse(
+                description = "Not Found", responseCode = "404", content = [
+                    Content(schema = Schema(implementation = Unit::class))
+                ]
+            ),
+            ApiResponse(
+                description = "Internal Error", responseCode = "500", content = [
+                    Content(schema = Schema(implementation = Unit::class))
+                ]
+            )
+        ]
+    )
+    fun disabledProfileEmployee(
+        @AuthenticationPrincipal user: User,
+        @PathVariable(value = "id") employeeId: Long
+    ): ResponseEntity<*> {
+        employeeService.disabledProfileEmployee(employeeId = employeeId)
+        return ResponseEntity.noContent().build<Any>()
+    }
+
+    @PatchMapping(
+        value = ["/enabled/{id}"],
+        consumes = [APPLICATION_JSON],
+        produces = [APPLICATION_JSON]
+    )
+    @Operation(
+        summary = "Enabled Employee By Id", description = "Enabled Employee By Id",
+        tags = ["Employee"],
+        responses = [
+            ApiResponse(
+                description = "No Content", responseCode = "204", content = [
+                    Content(schema = Schema(implementation = Unit::class))
+                ]
+            ),
+            ApiResponse(
+                description = "Bad Request", responseCode = "400", content = [
+                    Content(schema = Schema(implementation = Unit::class))
+                ]
+            ),
+            ApiResponse(
+                description = "Unauthorized", responseCode = "401", content = [
+                    Content(schema = Schema(implementation = Unit::class))
+                ]
+            ),
+            ApiResponse(
+                description = "Not Found", responseCode = "404", content = [
+                    Content(schema = Schema(implementation = Unit::class))
+                ]
+            ),
+            ApiResponse(
+                description = "Internal Error", responseCode = "500", content = [
+                    Content(schema = Schema(implementation = Unit::class))
+                ]
+            )
+        ]
+    )
+    fun enabledProfileEmployee(
+        @AuthenticationPrincipal user: User,
+        @PathVariable(value = "id") employeeId: Long
+    ): ResponseEntity<*> {
+        employeeService.enabledProfileEmployee(employeeId = employeeId)
+        return ResponseEntity.noContent().build<Any>()
+    }
+
     @DeleteMapping(
         value = ["/{id}"],
         produces = [APPLICATION_JSON]

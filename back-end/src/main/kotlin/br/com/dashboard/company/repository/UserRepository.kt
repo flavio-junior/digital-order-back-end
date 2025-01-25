@@ -32,6 +32,20 @@ interface UserRepository : JpaRepository<User?, Long?> {
     )
 
     @Modifying
+    @Query("UPDATE User u SET u.enabled = false WHERE u.id =:id AND u.email =:email")
+    fun disabledProfileEmployee(
+        @Param("id") userId: Long,
+        @Param("email") email: String
+    )
+
+    @Modifying
+    @Query("UPDATE User u SET u.enabled = true WHERE u.id =:id AND u.email =:email")
+    fun enabledProfileEmployee(
+        @Param("id") userId: Long,
+        @Param("email") email: String
+    )
+
+    @Modifying
     @Query("UPDATE User u SET u.password =:password WHERE u.id =:id")
     fun changePasswordUserLogged(
         @Param("id") userId: Long,

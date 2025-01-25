@@ -84,12 +84,29 @@ class EmployeeService {
     }
 
     @Transactional
+    fun disabledProfileEmployee(
+        employeeId: Long
+    ) {
+        val employeeSaved = userService.findUserById(userId = employeeId)
+        userService.disabledProfileEmployee(userId = employeeSaved?.id ?: 0, email = employeeSaved?.email ?: "")
+    }
+
+    @Transactional
+    fun enabledProfileEmployee(
+        employeeId: Long
+    ) {
+        val employeeSaved = userService.findUserById(userId = employeeId)
+        userService.enabledProfileEmployee(userId = employeeSaved?.id ?: 0, email = employeeSaved?.email ?: "")
+    }
+
+    @Transactional
     fun deleteEmployee(
         user: User,
         employeeId: Long
     ) {
-        getEmployee(userId = user.id, employeeId = employeeId)
+        val employeeSaved = getEmployee(userId = user.id, employeeId = employeeId)
         employeeRepository.deleteEmployeeById(userId = user.id, employeeId = employeeId)
+        userService.deleteMyAccount(userId = employeeSaved.id)
     }
 
     companion object {
