@@ -272,4 +272,48 @@ class FeeController {
         feeService.deleteFee(user = user, feeId = feeId)
         return ResponseEntity.noContent().build<Any>()
     }
+
+    @DeleteMapping(
+        value = ["/fee/{feeId}/{dayId}"],
+        produces = [APPLICATION_JSON]
+    )
+    @Operation(
+        summary = "Delete Day Fee By Id", description = "Delete Day Fee By Id",
+        tags = ["Fee"],
+        responses = [
+            ApiResponse(
+                description = "No Content", responseCode = "204", content = [
+                    Content(schema = Schema(implementation = Unit::class))
+                ]
+            ),
+            ApiResponse(
+                description = "Bad Request", responseCode = "400", content = [
+                    Content(schema = Schema(implementation = Unit::class))
+                ]
+            ),
+            ApiResponse(
+                description = "Unauthorized", responseCode = "401", content = [
+                    Content(schema = Schema(implementation = Unit::class))
+                ]
+            ),
+            ApiResponse(
+                description = "Not Found", responseCode = "404", content = [
+                    Content(schema = Schema(implementation = Unit::class))
+                ]
+            ),
+            ApiResponse(
+                description = "Internal Error", responseCode = "500", content = [
+                    Content(schema = Schema(implementation = Unit::class))
+                ]
+            )
+        ]
+    )
+    fun deleteFee(
+        @AuthenticationPrincipal user: User,
+        @PathVariable(value = "feeId") feeId: Long,
+        @PathVariable(value = "dayId") dayId: Long
+    ): ResponseEntity<*> {
+        feeService.deleteDayFee(user = user, feeId = feeId, dayId = dayId)
+        return ResponseEntity.noContent().build<Any>()
+    }
 }

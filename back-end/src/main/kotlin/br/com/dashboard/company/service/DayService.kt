@@ -5,7 +5,6 @@ import br.com.dashboard.company.entities.fee.Fee
 import br.com.dashboard.company.exceptions.ObjectDuplicateException
 import br.com.dashboard.company.exceptions.ResourceNotFoundException
 import br.com.dashboard.company.repository.DayRepository
-import br.com.dashboard.company.service.FeeService.Companion.FEE_NOT_FOUND
 import br.com.dashboard.company.utils.common.DayOfWeek
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
@@ -25,7 +24,7 @@ class DayService {
         if (feeSaved != null) {
             return feeSaved
         } else {
-            throw ResourceNotFoundException(message = FEE_NOT_FOUND)
+            throw ResourceNotFoundException(message = DAY_NOT_FOUND)
         }
     }
 
@@ -60,5 +59,6 @@ class DayService {
 
     companion object {
         const val DUPLICATE_DAY = "Day duplicate"
+        const val DAY_NOT_FOUND = "Day not found"
     }
 }

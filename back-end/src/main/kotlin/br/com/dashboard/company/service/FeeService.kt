@@ -126,6 +126,27 @@ class FeeService {
         feeRepository.deleteFeeById(userId = user.id, feeId = feeId)
     }
 
+    @Transactional
+    fun deleteDayFee(
+        user: User,
+        feeId: Long,
+        dayId: Long
+    ) {
+        val feeSaved = getFee(userId = user.id, feeId = feeId)
+        val check = feeSaved.days?.filter { day ->
+            if (day.id == dayId) {
+                return@filter true
+            } else {
+                false
+            }
+        }
+        if (check != null) {
+            dayService.deleteDay(feeId = feeId, dayId = dayId)
+        } else {
+            throw ResourceNotFoundException(message = DUPLICATE_NAME_FEE)
+        }
+    }
+
     companion object {
         const val DUPLICATE_NAME_FEE = "The fee already exists"
         const val FEE_NOT_FOUND = "Fee not found"
