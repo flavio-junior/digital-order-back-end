@@ -34,15 +34,11 @@ class AuthorService {
 
     @Transactional
     fun deleteAuthor(
-        authorId: Long? = null,
+        authorId: Long,
         feeId: Long
     ) {
-        if (authorId != null) {
-            val authorSaved = getAuthor(authorId = authorId, feeId = feeId)
-            authorSaved.fee = null
-            authorRepository.save(authorSaved)
-            authorRepository.deleteFeeById(authorId = authorId, feeId = feeId)
-        }
+        val authorSaved = getAuthor(authorId = authorId, feeId = feeId)
+        authorRepository.deleteFeeById(authorId = authorSaved.id, feeId = authorSaved.fee?.id ?: 0)
     }
 
     companion object {

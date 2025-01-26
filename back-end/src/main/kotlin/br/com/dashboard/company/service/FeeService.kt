@@ -24,9 +24,6 @@ class FeeService {
     @Autowired
     private lateinit var userService: UserService
 
-    @Autowired
-    private lateinit var authorService: AuthorService
-
     @Transactional(readOnly = true)
     fun findAllFees(
         user: User
@@ -98,8 +95,7 @@ class FeeService {
         user: User,
         feeId: Long
     ) {
-        val feeSaved = getFee(userId = user.id, feeId = feeId)
-        authorService.deleteAuthor(authorId = feeSaved.author?.id, feeId = feeSaved.id)
+        getFee(userId = user.id, feeId = feeId)
         feeRepository.deleteFeeById(userId = user.id, feeId = feeId)
     }
 

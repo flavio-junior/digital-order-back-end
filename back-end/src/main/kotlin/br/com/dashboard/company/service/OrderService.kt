@@ -426,6 +426,13 @@ class OrderService {
         orderId: Long
     ) {
         val orderSaved: Order = getOrder(userId = user.id, orderId = orderId)
+        when (orderSaved.type) {
+            TypeOrder.RESERVATION -> {
+                authorService.deleteAuthor(authorId = orderSaved.fee?.author?.id ?: 0, feeId = orderSaved.fee?.id ?: 0)
+            }
+
+            else -> {}
+        }
         orderSaved.objects?.forEach { objectSaved ->
             when (objectSaved.type) {
                 TypeItem.PRODUCT -> {
