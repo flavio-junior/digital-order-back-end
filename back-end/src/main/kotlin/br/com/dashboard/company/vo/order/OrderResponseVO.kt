@@ -3,6 +3,7 @@ package br.com.dashboard.company.vo.order
 import br.com.dashboard.company.utils.common.Status
 import br.com.dashboard.company.utils.common.TypeOrder
 import br.com.dashboard.company.vo.address.AddressResponseVO
+import br.com.dashboard.company.vo.fee.FeeResponseOrderVO
 import br.com.dashboard.company.vo.`object`.ObjectResponseVO
 import br.com.dashboard.company.vo.payment.PaymentResponseVO
 import br.com.dashboard.company.vo.reservation.ReservationResponseVO
@@ -18,6 +19,7 @@ data class OrderResponseVO(
     var type: TypeOrder? = null,
     var status: Status? = null,
     var reservations: MutableList<ReservationResponseVO>? = null,
+    var fee: FeeResponseOrderVO? = null,
     var address: AddressResponseVO? = null,
     var objects: MutableList<ObjectResponseVO>? = null,
     var quantity: Int = 0,

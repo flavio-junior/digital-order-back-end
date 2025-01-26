@@ -24,12 +24,27 @@ class FeeService {
     @Autowired
     private lateinit var userService: UserService
 
+    @Autowired
+    private lateinit var authorService: AuthorService
+
     @Transactional(readOnly = true)
     fun findAllFees(
         user: User
     ): List<FeeResponseVO> {
         val fees = feeRepository.findAllFees(userId = user.id)
         return parseListObjects(fees, FeeResponseVO::class.java)
+    }
+
+    fun getFeeByType(
+        userId: Long,
+        assigned: Function
+    ): Fee {
+        val feeSaved: Fee? = feeRepository.findFeeByAssigned(userId = userId, assigned = assigned)
+        if (feeSaved != null) {
+            return feeSaved
+        } else {
+            throw ResourceNotFoundException(message = FEE_NOT_FOUND)
+        }
     }
 
     fun getFee(
@@ -83,7 +98,8 @@ class FeeService {
         user: User,
         feeId: Long
     ) {
-        getFee(userId = user.id, feeId = feeId)
+        val feeSaved = getFee(userId = user.id, feeId = feeId)
+        authorService.deleteAuthor(authorId = feeSaved.author?.id, feeId = feeSaved.id)
         feeRepository.deleteFeeById(userId = user.id, feeId = feeId)
     }
 

@@ -1,6 +1,7 @@
 package br.com.dashboard.company.entities.order
 
 import br.com.dashboard.company.entities.address.Address
+import br.com.dashboard.company.entities.fee.Fee
 import br.com.dashboard.company.entities.`object`.Object
 import br.com.dashboard.company.entities.payment.Payment
 import br.com.dashboard.company.entities.reservation.Reservation
@@ -42,6 +43,13 @@ data class Order(
         inverseJoinColumns = [JoinColumn(name = "fk_reservation", referencedColumnName = "id")]
     )
     var reservations: MutableList<Reservation>? = null,
+    @OneToOne(cascade = [CascadeType.ALL], orphanRemoval = true)
+    @JoinTable(
+        name = "tb_order_fee",
+        joinColumns = [JoinColumn(name = "fk_order", referencedColumnName = "id")],
+        inverseJoinColumns = [JoinColumn(name = "fk_fee", referencedColumnName = "id")]
+    )
+    var fee: Fee? = null,
     @OneToOne(cascade = [CascadeType.ALL], orphanRemoval = true)
     @JoinTable(
         name = "tb_order_address",

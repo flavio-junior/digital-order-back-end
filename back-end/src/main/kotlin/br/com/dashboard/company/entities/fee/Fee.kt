@@ -14,6 +14,13 @@ data class Fee(
     @Enumerated(EnumType.STRING)
     @Column(columnDefinition = "varying")
     var assigned: Function? = null,
+    @OneToOne(cascade = [CascadeType.ALL], orphanRemoval = true)
+    @JoinTable(
+        name = "tb_fee_author",
+        joinColumns = [JoinColumn(name = "fk_fee", referencedColumnName = "id")],
+        inverseJoinColumns = [JoinColumn(name = "fk_author", referencedColumnName = "id")]
+    )
+    var author: Author? = null,
     @ManyToOne(cascade = [CascadeType.ALL])
     @JoinTable(
         name = "tb_user_fee",

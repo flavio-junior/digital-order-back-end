@@ -22,6 +22,12 @@ interface FeeRepository : JpaRepository<Fee, Long> {
         @Param("feeId") feeId: Long
     ): Fee?
 
+    @Query(value = "SELECT f FROM Fee f WHERE f.user.id = :userId AND f.assigned = :assigned")
+    fun findFeeByAssigned(
+        @Param("userId") userId: Long,
+        @Param("assigned") assigned: Function
+    ): Fee?
+
     @Query("SELECT f FROM Fee f WHERE f.user.id = :userId AND f.assigned = :assigned")
     fun checkFeeAlreadyExists(
         @Param("userId") userId: Long,

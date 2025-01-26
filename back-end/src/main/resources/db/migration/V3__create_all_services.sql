@@ -195,3 +195,21 @@ CREATE TABLE IF NOT EXISTS tb_user_fee (
     fk_user INT REFERENCES tb_user(id),
     PRIMARY KEY (fk_fee, fk_user)
 );
+
+CREATE TABLE IF NOT EXISTS tb_order_fee (
+    fk_fee INT REFERENCES tb_fee(id),
+    fk_order INT REFERENCES tb_order(id),
+    PRIMARY KEY (fk_fee, fk_order)
+);
+
+CREATE TABLE IF NOT EXISTS tb_author (
+    id SERIAL PRIMARY KEY,
+    author VARCHAR(30) NOT NULL,
+    assigned VARCHAR(30) NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS tb_fee_author (
+    fk_fee INT REFERENCES tb_fee(id),
+    fk_author INT REFERENCES tb_author(id),
+    PRIMARY KEY (fk_fee, fk_author)
+);

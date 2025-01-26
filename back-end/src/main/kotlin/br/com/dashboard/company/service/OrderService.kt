@@ -1,5 +1,6 @@
 package br.com.dashboard.company.service
 
+import br.com.dashboard.company.entities.fee.Author
 import br.com.dashboard.company.entities.order.Order
 import br.com.dashboard.company.entities.payment.Payment
 import br.com.dashboard.company.entities.user.User
@@ -12,6 +13,7 @@ import br.com.dashboard.company.service.ObjectService.Companion.OBJECT_NOT_FOUND
 import br.com.dashboard.company.service.ObjectService.Companion.OBJECT_WITH_PENDING_DELIVERY
 import br.com.dashboard.company.service.ReservationService.Companion.RESERVATION_NOT_FOUND
 import br.com.dashboard.company.utils.common.*
+import br.com.dashboard.company.utils.common.Function
 import br.com.dashboard.company.utils.others.ConstantsUtils.ZERO_QUANTITY_ERROR
 import br.com.dashboard.company.utils.others.ConverterUtils.parseObject
 import br.com.dashboard.company.vo.address.UpdateAddressRequestVO
@@ -60,6 +62,12 @@ class OrderService {
 
     @Autowired
     private lateinit var productService: ProductService
+
+    @Autowired
+    private lateinit var feeService: FeeService
+
+    @Autowired
+    private lateinit var authorService: AuthorService
 
     @Transactional(readOnly = true)
     fun findAllOrders(
@@ -129,6 +137,17 @@ class OrderService {
             val objectsSaved = objectService.saveObjects(userId = user.id, objectsToSave = order.objects)
             orderResult.objects = objectsSaved.first
             total = objectsSaved.second
+        }
+        if (order.type == TypeOrder.RESERVATION) {
+            val fee = feeService.getFeeByType(userId = user.id, assigned = Function.WAITER)
+            fee.author = authorService.saveAuthor(
+                author = Author(
+                    author = userAuthenticated?.name,
+                    assigned = order.fee?.assigned ?: userAuthenticated?.name
+                )
+            )
+            fee.user = userAuthenticated
+            orderResult.fee = fee
         }
         orderResult.reservations = reservationService.validateReservationsToSave(
             userId = user.id,
@@ -354,6 +373,7 @@ class OrderService {
                     throw InternalErrorClient(message = OBJECT_WITH_PENDING_DELIVERY)
                 }
             }
+            feeService.deleteFee(user = user, feeId = orderResult.fee?.id ?: 0)
             updateStatusOrder(userId = user.id, orderId = idOrder, status = Status.CLOSED)
             orderResult.status = Status.CLOSED
             orderResult.payment = paymentService.updatePayment(payment = payment, order = orderResult)
