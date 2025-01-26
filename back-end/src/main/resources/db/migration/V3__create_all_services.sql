@@ -213,3 +213,14 @@ CREATE TABLE IF NOT EXISTS tb_fee_author (
     fk_author INT REFERENCES tb_author(id),
     PRIMARY KEY (fk_fee, fk_author)
 );
+
+CREATE TABLE IF NOT EXISTS tb_day (
+    id SERIAL PRIMARY KEY,
+    day varchar(30) check (day in ('ALL', 'SUNDAY', 'MONDAY', 'TUESDAY', 'WEDNESDAY', 'THURSDAY', 'FRIDAY', 'SATURDAY'))
+);
+
+CREATE TABLE IF NOT EXISTS tb_fee_day (
+    fk_fee INT REFERENCES tb_fee(id),
+    fk_day INT REFERENCES tb_day(id),
+    PRIMARY KEY (fk_fee, fk_day)
+);

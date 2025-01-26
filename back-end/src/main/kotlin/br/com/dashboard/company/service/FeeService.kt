@@ -5,10 +5,12 @@ import br.com.dashboard.company.entities.user.User
 import br.com.dashboard.company.exceptions.ObjectDuplicateException
 import br.com.dashboard.company.exceptions.ResourceNotFoundException
 import br.com.dashboard.company.repository.FeeRepository
+import br.com.dashboard.company.utils.common.DayOfWeek
 import br.com.dashboard.company.utils.common.Function
 import br.com.dashboard.company.utils.common.PriceRequestVO
 import br.com.dashboard.company.utils.others.ConverterUtils.parseListObjects
 import br.com.dashboard.company.utils.others.ConverterUtils.parseObject
+import br.com.dashboard.company.vo.day.DaysRequestVO
 import br.com.dashboard.company.vo.fee.FeeRequestVO
 import br.com.dashboard.company.vo.fee.FeeResponseVO
 import org.springframework.beans.factory.annotation.Autowired
@@ -23,6 +25,9 @@ class FeeService {
 
     @Autowired
     private lateinit var userService: UserService
+
+    @Autowired
+    private lateinit var dayService: DayService
 
     @Transactional(readOnly = true)
     fun findAllFees(
@@ -81,6 +86,25 @@ class FeeService {
     }
 
     @Transactional
+    fun addDaysFee(
+        user: User,
+        feeId: Long,
+        days: DaysRequestVO
+    ) {
+        val feeSaved = getFee(userId = user.id, feeId = feeId)
+        val validDays = days.days?.let { daysInstanced ->
+            if (DayOfWeek.ALL in daysInstanced) {
+                listOf(DayOfWeek.ALL)
+            } else {
+                daysInstanced
+            }
+        } ?: emptyList()
+        validDays.forEach { day ->
+            dayService.saveDay(fee = feeSaved, day = day)
+        }
+    }
+
+    @Transactional
     fun updatePriceFee(
         user: User,
         feeId: Long,
@@ -95,7 +119,10 @@ class FeeService {
         user: User,
         feeId: Long
     ) {
-        getFee(userId = user.id, feeId = feeId)
+        val feeSaved = getFee(userId = user.id, feeId = feeId)
+        feeSaved.days?.forEach { day ->
+            dayService.deleteDay(feeId = feeId, dayId = day.id)
+        }
         feeRepository.deleteFeeById(userId = user.id, feeId = feeId)
     }
 

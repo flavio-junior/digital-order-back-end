@@ -6,6 +6,7 @@ import br.com.dashboard.company.service.FeeService
 import br.com.dashboard.company.utils.common.PriceRequestVO
 import br.com.dashboard.company.utils.others.ConstantsUtils.EMPTY_FIELDS
 import br.com.dashboard.company.utils.others.MediaType.APPLICATION_JSON
+import br.com.dashboard.company.vo.day.DaysRequestVO
 import br.com.dashboard.company.vo.fee.FeeRequestVO
 import br.com.dashboard.company.vo.fee.FeeResponseVO
 import io.swagger.v3.oas.annotations.Operation
@@ -118,6 +119,59 @@ class FeeController {
             throw ForbiddenActionRequestException(exception = EMPTY_FIELDS)
         }
         feeService.createNewFee(user, fee)
+        return ResponseEntity.status(HttpStatus.CREATED).build<Any>()
+    }
+
+    @PostMapping(
+        value = ["add/days/fee/{id}"],
+        consumes = ["application/json"],
+        produces = ["application/json"]
+    )
+    @Operation(
+        summary = "Add Days New Fee", description = "Add Days New Fee",
+        tags = ["Fee"],
+        responses = [
+            ApiResponse(
+                description = "Created", responseCode = "201", content = [
+                    Content(schema = Schema(implementation = Unit::class))
+                ]
+            ),
+            ApiResponse(
+                description = "Bad Request", responseCode = "400", content = [
+                    Content(schema = Schema(implementation = Unit::class))
+                ]
+            ),
+            ApiResponse(
+                description = "Unauthorized", responseCode = "401", content = [
+                    Content(schema = Schema(implementation = Unit::class))
+                ]
+            ),
+            ApiResponse(
+                description = "Operation Unauthorized", responseCode = "403", content = [
+                    Content(schema = Schema(implementation = Unit::class))
+                ]
+            ),
+            ApiResponse(
+                description = "Conflict", responseCode = "409", content = [
+                    Content(schema = Schema(implementation = Unit::class))
+                ]
+            ),
+            ApiResponse(
+                description = "Internal Error", responseCode = "500", content = [
+                    Content(schema = Schema(implementation = Unit::class))
+                ]
+            )
+        ]
+    )
+    fun addDaysFee(
+        @AuthenticationPrincipal user: User,
+        @PathVariable(value = "id") feeId: Long,
+        @RequestBody days: DaysRequestVO
+    ): ResponseEntity<*> {
+        require(value = days.days != null) {
+            throw ForbiddenActionRequestException(exception = EMPTY_FIELDS)
+        }
+        feeService.addDaysFee(user = user, feeId = feeId, days = days)
         return ResponseEntity.status(HttpStatus.CREATED).build<Any>()
     }
 

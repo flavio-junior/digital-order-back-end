@@ -1,5 +1,6 @@
 package br.com.dashboard.company.entities.fee
 
+import br.com.dashboard.company.entities.day.Day
 import br.com.dashboard.company.entities.user.User
 import br.com.dashboard.company.utils.common.Function
 import jakarta.persistence.*
@@ -14,6 +15,13 @@ data class Fee(
     @Enumerated(EnumType.STRING)
     @Column(columnDefinition = "varying")
     var assigned: Function? = null,
+    @OneToMany(cascade = [CascadeType.ALL], orphanRemoval = true)
+    @JoinTable(
+        name = "tb_fee_day",
+        joinColumns = [JoinColumn(name = "fk_fee", referencedColumnName = "id")],
+        inverseJoinColumns = [JoinColumn(name = "fk_day", referencedColumnName = "id")]
+    )
+    var days: MutableList<Day>? = null,
     @OneToOne(cascade = [CascadeType.ALL], orphanRemoval = true)
     @JoinTable(
         name = "tb_fee_author",
