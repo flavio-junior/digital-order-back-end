@@ -3,7 +3,6 @@ package br.com.dashboard.company.vo.payment
 import br.com.dashboard.company.utils.common.PaymentType
 import br.com.dashboard.company.utils.common.TypeOrder
 import com.fasterxml.jackson.annotation.JsonProperty
-import jakarta.persistence.Column
 
 data class PaymentResponseVO(
     var id: Long = 0,
@@ -17,5 +16,7 @@ data class PaymentResponseVO(
     var discount: Boolean? = null,
     @JsonProperty(value = "value_discount")
     var valueDiscount: Double? = null,
+    var fee: Boolean? = null,
+    var valueFee: Double? = null,
     var total: Double = 0.0
 )

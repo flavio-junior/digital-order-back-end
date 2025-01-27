@@ -134,6 +134,8 @@ CREATE TABLE IF NOT EXISTS tb_payment (
     type_payment varchar(30) check (type_payment in ('CREDIT_CAD', 'DEBIT_CAD', 'MONEY', 'PIX')),
     discount BOOLEAN DEFAULT FALSE,
     value_discount NUMERIC(10, 2) DEFAULT 0.0,
+    fee BOOLEAN DEFAULT FALSE,
+    value_fee NUMERIC(10, 2) DEFAULT 0.0,
     total NUMERIC(10, 2) DEFAULT 0.0
 );
 

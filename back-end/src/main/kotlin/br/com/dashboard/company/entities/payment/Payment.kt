@@ -25,6 +25,9 @@ data class Payment(
     var discount: Boolean? = null,
     @Column(name = "value_discount", nullable = true)
     var valueDiscount: Double? = null,
+    var fee: Boolean? = null,
+    @Column(name = "value_fee", nullable = true)
+    var valueFee: Double? = null,
     var total: Double = 0.0,
     @OneToOne(cascade = [CascadeType.ALL], orphanRemoval = true)
     @JoinTable(

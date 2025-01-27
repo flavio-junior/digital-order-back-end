@@ -393,11 +393,17 @@ class OrderService {
             }
             updateStatusOrder(userId = user.id, orderId = idOrder, status = Status.CLOSED)
             orderResult.status = Status.CLOSED
-            orderResult.payment = paymentService.updatePayment(payment = payment, order = orderResult)
+            orderResult.payment = paymentService.savePayment(
+                order = orderResult,
+                payment = payment,
+                fee = orderResult.fee != null,
+                valueFee = orderResult.fee?.price
+            )
             val orderResponse = parseObject(orderResult, OrderResponseVO::class.java)
             val qrCodeBytes =
                 qrCodeService.generateQRCodeImage(value = orderResponse.payment?.code.toString(), 300, 300)
             orderResponse.qrCode = Base64.getEncoder().encodeToString(qrCodeBytes)
+            orderResponse.fee = null
             return orderResponse
         }
     }

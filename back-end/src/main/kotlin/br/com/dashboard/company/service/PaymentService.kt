@@ -23,9 +23,11 @@ class PaymentService {
     @Autowired
     private lateinit var paymentRepository: PaymentRepository
 
-    fun updatePayment(
+    fun savePayment(
+        order: Order,
         payment: PaymentRequestVO,
-        order: Order
+        fee: Boolean,
+        valueFee: Double?
     ): Payment {
         val paymentResult: Payment = parseObject(payment, Payment::class.java)
         var total: Double = order.total
@@ -39,6 +41,8 @@ class PaymentService {
         }
         paymentResult.discount = payment.discount
         paymentResult.valueDiscount = payment.value
+        paymentResult.fee = fee
+        paymentResult.valueFee = valueFee
         paymentResult.total = total
         paymentResult.order = order
         return paymentRepository.save(paymentResult)
@@ -67,13 +71,15 @@ class PaymentService {
             val total = it[3] as Double
             val discountsCount = it[4] as Long
             val key = Pair(typeOrder, typePayment)
-            filterWithTypesPayments[key] = filterWithTypesPayments.getOrDefault(key, DescriptionPaymentVO(
-                typeOrder = typeOrder,
-                typePayment = typePayment,
-                numberItems = 0,
-                total = 0.0,
-                discount = 0
-            )).let { existing ->
+            filterWithTypesPayments[key] = filterWithTypesPayments.getOrDefault(
+                key, DescriptionPaymentVO(
+                    typeOrder = typeOrder,
+                    typePayment = typePayment,
+                    numberItems = 0,
+                    total = 0.0,
+                    discount = 0
+                )
+            ).let { existing ->
                 existing.copy(
                     numberItems = existing.numberItems + numberItems,
                     total = existing.total + total,
