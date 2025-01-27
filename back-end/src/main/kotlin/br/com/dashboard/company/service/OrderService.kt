@@ -16,6 +16,7 @@ import br.com.dashboard.company.utils.common.*
 import br.com.dashboard.company.utils.common.Function
 import br.com.dashboard.company.utils.others.ConstantsUtils.ZERO_QUANTITY_ERROR
 import br.com.dashboard.company.utils.others.ConverterUtils.parseObject
+import br.com.dashboard.company.utils.others.ValidDayFeeUtils
 import br.com.dashboard.company.vo.address.UpdateAddressRequestVO
 import br.com.dashboard.company.vo.`object`.ObjectRequestVO
 import br.com.dashboard.company.vo.`object`.UpdateObjectRequestVO
@@ -68,6 +69,8 @@ class OrderService {
 
     @Autowired
     private lateinit var authorService: AuthorService
+
+    private val validDays = ValidDayFeeUtils()
 
     @Transactional(readOnly = true)
     fun findAllOrders(
@@ -140,14 +143,27 @@ class OrderService {
         }
         if (order.type == TypeOrder.RESERVATION) {
             val fee = feeService.getFeeByType(userId = user.id, assigned = Function.WAITER)
-            fee.author = authorService.saveAuthor(
-                author = Author(
-                    author = userAuthenticated?.name,
-                    assigned = order.fee?.assigned ?: userAuthenticated?.name
+            if (fee != null) {
+                val saveFee = {
+                    fee.author = authorService.saveAuthor(
+                        author = Author(
+                            author = userAuthenticated?.name,
+                            assigned = order.fee?.assigned ?: userAuthenticated?.name
+                        )
+                    )
+                    fee.user = userAuthenticated
+                    orderResult.fee = fee
+                }
+                validDays.getDays(
+                    days = fee.days,
+                    addFeeWithBaseDayOfWeek = {
+                        saveFee()
+                    },
+                    addFeeAllDays = {
+                        saveFee()
+                    }
                 )
-            )
-            fee.user = userAuthenticated
-            orderResult.fee = fee
+            }
         }
         orderResult.reservations = reservationService.validateReservationsToSave(
             userId = user.id,
@@ -428,7 +444,12 @@ class OrderService {
         val orderSaved: Order = getOrder(userId = user.id, orderId = orderId)
         when (orderSaved.type) {
             TypeOrder.RESERVATION -> {
-                authorService.deleteAuthor(authorId = orderSaved.fee?.author?.id ?: 0, feeId = orderSaved.fee?.id ?: 0)
+                if (orderSaved.fee?.author?.id != null) {
+                    authorService.deleteAuthor(
+                        authorId = orderSaved.fee?.author?.id ?: 0,
+                        feeId = orderSaved.fee?.id ?: 0
+                    )
+                }
             }
 
             else -> {}

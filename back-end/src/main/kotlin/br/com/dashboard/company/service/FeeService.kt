@@ -41,13 +41,8 @@ class FeeService {
     fun getFeeByType(
         userId: Long,
         assigned: Function
-    ): Fee {
-        val feeSaved: Fee? = feeRepository.findFeeByAssigned(userId = userId, assigned = assigned)
-        if (feeSaved != null) {
-            return feeSaved
-        } else {
-            throw ResourceNotFoundException(message = FEE_NOT_FOUND)
-        }
+    ): Fee? {
+        return feeRepository.findFeeByAssigned(userId = userId, assigned = assigned)
     }
 
     fun getFee(
