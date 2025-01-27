@@ -5,6 +5,7 @@ import br.com.dashboard.company.entities.user.User
 import br.com.dashboard.company.exceptions.ObjectDuplicateException
 import br.com.dashboard.company.exceptions.ResourceNotFoundException
 import br.com.dashboard.company.repository.FeeRepository
+import br.com.dashboard.company.service.DayService.Companion.DUPLICATE_DAY
 import br.com.dashboard.company.utils.common.DayOfWeek
 import br.com.dashboard.company.utils.common.Function
 import br.com.dashboard.company.utils.common.PriceRequestVO
@@ -92,8 +93,18 @@ class FeeService {
         days: DaysRequestVO
     ) {
         val feeSaved = getFee(userId = user.id, feeId = feeId)
+        feeSaved.days?.filter { day ->
+            if (day.day == DayOfWeek.ALL) {
+                throw ObjectDuplicateException(message = DUPLICATE_DAY)
+            } else {
+                false
+            }
+        }
         val validDays = days.days?.let { daysInstanced ->
             if (DayOfWeek.ALL in daysInstanced) {
+                feeSaved.days?.forEach { day ->
+                    deleteDayFee(user = user, feeId = feeId, dayId = day.id)
+                }
                 listOf(DayOfWeek.ALL)
             } else {
                 daysInstanced
@@ -143,7 +154,7 @@ class FeeService {
         if (check != null) {
             dayService.deleteDay(feeId = feeId, dayId = dayId)
         } else {
-            throw ResourceNotFoundException(message = DUPLICATE_NAME_FEE)
+            throw ResourceNotFoundException(message = FEE_NOT_FOUND)
         }
     }
 

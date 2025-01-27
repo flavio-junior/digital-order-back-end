@@ -58,7 +58,7 @@ class DayService {
     }
 
     companion object {
-        const val DUPLICATE_DAY = "Day duplicate"
-        const val DAY_NOT_FOUND = "Day not found"
+        const val DUPLICATE_DAY = "The ay already exists!"
+        const val DAY_NOT_FOUND = "Day not found!"
     }
 }
