@@ -124,7 +124,7 @@ class OrderService {
     ): OrderResponseVO {
         val userAuthenticated = userService.findUserById(userId = user.id)
         val orderResult: Order = parseObject(order, Order::class.java)
-        val total: Double
+        var total: Double
         var qrCode = false
         orderResult.createdAt = LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS)
         if (order.type == TypeOrder.SHOPPING_CART) {
@@ -154,6 +154,7 @@ class OrderService {
                     )
                     fee.user = userAuthenticated
                     orderResult.fee = fee
+                    total += fee.price
                 }
                 validDays.getDays(
                     days = fee.days,
