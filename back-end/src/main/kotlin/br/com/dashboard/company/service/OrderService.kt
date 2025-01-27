@@ -389,7 +389,6 @@ class OrderService {
                     throw InternalErrorClient(message = OBJECT_WITH_PENDING_DELIVERY)
                 }
             }
-            feeService.deleteFee(user = user, feeId = orderResult.fee?.id ?: 0)
             updateStatusOrder(userId = user.id, orderId = idOrder, status = Status.CLOSED)
             orderResult.status = Status.CLOSED
             orderResult.payment = paymentService.updatePayment(payment = payment, order = orderResult)
