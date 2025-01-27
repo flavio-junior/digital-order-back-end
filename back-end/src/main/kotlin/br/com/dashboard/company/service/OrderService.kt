@@ -146,6 +146,7 @@ class OrderService {
             if (fee != null) {
                 val saveFee = {
                     fee.author = authorService.saveAuthor(
+                        user = user,
                         author = Author(
                             author = userAuthenticated?.name,
                             assigned = order.fee?.assigned ?: userAuthenticated?.name
