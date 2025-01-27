@@ -81,7 +81,7 @@ class PaymentController {
         val sortDirection: Sort.Direction =
             if ("desc".equals(sort, ignoreCase = true)) Sort.Direction.DESC else Sort.Direction.ASC
         val pageable: Pageable = PageRequest.of(page, size, Sort.by(sortDirection, "date"))
-        return ResponseEntity.ok(paymentService.getAllPaymentsDay(pageable = pageable))
+        return ResponseEntity.ok(paymentService.getAllPaymentsDay(user = user, pageable = pageable))
     }
 
     @GetMapping(
@@ -124,6 +124,7 @@ class PaymentController {
         ]
     )
     fun getAnalysisDay(
+        @AuthenticationPrincipal user: User,
         @RequestParam(name = "date", required = false) date: String?
     ): ResponseEntity<AnaliseDayVO> {
         val parsedDate = try {
@@ -131,7 +132,7 @@ class PaymentController {
         } catch (ex: Exception) {
             LocalDate.now()
         }
-        val result = paymentService.getAnalysisDay(date = parsedDate.toString())
+        val result = paymentService.getAnalysisDay(user = user, date = parsedDate.toString())
         return ResponseEntity.ok(result)
     }
 

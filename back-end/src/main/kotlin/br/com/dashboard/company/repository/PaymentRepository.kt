@@ -12,9 +12,10 @@ import java.time.LocalDate
 @Repository
 interface PaymentRepository : JpaRepository<Payment, Long> {
 
-    @Query(value = "SELECT p FROM Payment p WHERE p.date = :date")
+    @Query(value = "SELECT p FROM Payment p WHERE p.date = :date AND p.user.id = :userId")
     fun getAllPaymentsDay(
         @Param("date") date: LocalDate = LocalDate.now(),
+        @Param("userId") userId: Long,
         pageable: Pageable
     ): Page<Payment>?
 
@@ -27,11 +28,14 @@ interface PaymentRepository : JpaRepository<Payment, Long> {
                     SUM(p.total), 
                     SUM(CASE WHEN p.discount = true THEN 1 ELSE 0 END)
                 FROM Payment p
-                WHERE p.date = :date
+                WHERE p.date = :date AND p.user.id = :userId
                 GROUP BY p.typePayment, p.typeOrder
         """
     )
-    fun getAnalysisDay(@Param("date") date: LocalDate): List<Array<Any>>
+    fun getAnalysisDay(
+        @Param("date") date: LocalDate,
+        @Param("userId") userId: Long
+    ): List<Array<Any>>
 
     @Query(
         value =

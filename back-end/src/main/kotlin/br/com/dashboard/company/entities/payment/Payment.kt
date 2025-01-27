@@ -1,6 +1,7 @@
 package br.com.dashboard.company.entities.payment
 
 import br.com.dashboard.company.entities.order.Order
+import br.com.dashboard.company.entities.user.User
 import br.com.dashboard.company.utils.common.PaymentType
 import br.com.dashboard.company.utils.common.TypeOrder
 import jakarta.persistence.*
@@ -31,9 +32,23 @@ data class Payment(
     var total: Double = 0.0,
     @OneToOne(cascade = [CascadeType.ALL], orphanRemoval = true)
     @JoinTable(
+        name = "tb_payment_details_payment",
+        joinColumns = [JoinColumn(name = "fk_payment", referencedColumnName = "id")],
+        inverseJoinColumns = [JoinColumn(name = "fk_details", referencedColumnName = "id")]
+    )
+    var details: DetailsPayment? = null,
+    @OneToOne(cascade = [CascadeType.ALL], orphanRemoval = true)
+    @JoinTable(
         name = "tb_order_payment",
         joinColumns = [JoinColumn(name = "fk_payment", referencedColumnName = "id")],
         inverseJoinColumns = [JoinColumn(name = "fk_order", referencedColumnName = "id")]
     )
-    var order: Order? = null
+    var order: Order? = null,
+    @OneToOne(cascade = [CascadeType.ALL], orphanRemoval = true)
+    @JoinTable(
+        name = "tb_payment_user",
+        joinColumns = [JoinColumn(name = "fk_payment", referencedColumnName = "id")],
+        inverseJoinColumns = [JoinColumn(name = "fk_user", referencedColumnName = "id")]
+    )
+    var user: User? = null
 )

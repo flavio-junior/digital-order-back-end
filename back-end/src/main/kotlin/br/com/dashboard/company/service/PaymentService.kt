@@ -1,7 +1,9 @@
 package br.com.dashboard.company.service
 
 import br.com.dashboard.company.entities.order.Order
+import br.com.dashboard.company.entities.payment.DetailsPayment
 import br.com.dashboard.company.entities.payment.Payment
+import br.com.dashboard.company.entities.user.User
 import br.com.dashboard.company.exceptions.ResourceNotFoundException
 import br.com.dashboard.company.repository.PaymentRepository
 import br.com.dashboard.company.utils.common.PaymentType
@@ -24,10 +26,14 @@ class PaymentService {
     private lateinit var paymentRepository: PaymentRepository
 
     fun savePayment(
+        user: User? = null,
         order: Order,
         payment: PaymentRequestVO,
         fee: Boolean,
-        valueFee: Double?
+        valueFee: Double?,
+        author: String,
+        assigned: String,
+        identifier: Long
     ): Payment {
         val paymentResult: Payment = parseObject(payment, Payment::class.java)
         var total: Double = order.total
@@ -44,25 +50,36 @@ class PaymentService {
         paymentResult.fee = fee
         paymentResult.valueFee = valueFee
         paymentResult.total = total
+        paymentResult.details = DetailsPayment(
+            author = author,
+            assigned = assigned,
+            date = LocalDate.now(),
+            hour = LocalTime.now().withNano(0),
+            value = paymentResult.total,
+            identifier = identifier
+        )
         paymentResult.order = order
+        paymentResult.user = user
         return paymentRepository.save(paymentResult)
     }
 
     @Transactional(readOnly = true)
     fun getAllPaymentsDay(
+        user: User,
         pageable: Pageable
     ): Page<PaymentResponseVO> {
         val payments: Page<Payment>? =
-            paymentRepository.getAllPaymentsDay(pageable = pageable)
+            paymentRepository.getAllPaymentsDay(userId = user.id, pageable = pageable)
         return payments?.map { payment ->
             parseObject(payment, PaymentResponseVO()::class.java)
         } ?: throw ResourceNotFoundException(message = PAYMENT_NOT_FOUND)
     }
 
     fun getAnalysisDay(
+        user: User,
         date: String
     ): AnaliseDayVO {
-        val analiseDay = paymentRepository.getAnalysisDay(date = LocalDate.parse(date))
+        val analiseDay = paymentRepository.getAnalysisDay(userId = user.id, date = LocalDate.parse(date))
         val filterWithTypesPayments = mutableMapOf<Pair<TypeOrder, PaymentType>, DescriptionPaymentVO>()
         analiseDay.forEach {
             val typePayment = it[0] as PaymentType
