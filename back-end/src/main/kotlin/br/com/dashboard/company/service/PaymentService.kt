@@ -28,7 +28,7 @@ class PaymentService {
     fun savePayment(
         user: User? = null,
         order: Order,
-        payment: PaymentRequestVO,
+        payment: PaymentRequestVO? = null,
         fee: Boolean,
         valueFee: Double?,
         author: String,
@@ -41,12 +41,12 @@ class PaymentService {
         paymentResult.hour = LocalTime.now().withNano(0)
         paymentResult.code = System.currentTimeMillis()
         paymentResult.typeOrder = order.type
-        paymentResult.typePayment = payment.type
-        if (payment.discount == true) {
+        paymentResult.typePayment = payment?.type
+        if (payment?.discount == true) {
             total -= payment.value ?: 0.0
         }
-        paymentResult.discount = payment.discount
-        paymentResult.valueDiscount = payment.value
+        paymentResult.discount = payment?.discount
+        paymentResult.valueDiscount = payment?.value
         paymentResult.fee = fee
         paymentResult.valueFee = valueFee
         paymentResult.total = total

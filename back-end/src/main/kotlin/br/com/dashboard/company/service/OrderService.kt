@@ -180,15 +180,15 @@ class OrderService {
             if (order.payment?.discount == true) {
                 applyDiscount -= order.payment?.value ?: 0.0
             }
-            orderResult.payment = Payment(
-                date = LocalDate.now(),
-                hour = LocalTime.now().withNano(0),
-                code = System.currentTimeMillis(),
-                typeOrder = order.type,
-                typePayment = order.payment?.type,
-                discount = order.payment?.discount,
-                valueDiscount = order.payment?.value,
-                total = applyDiscount
+            orderResult.payment = paymentService.savePayment(
+                user = userService.findUserById(userId = user.id),
+                order = orderResult,
+                payment = order.payment,
+                fee = orderResult.fee != null,
+                valueFee = orderResult.fee?.price,
+                author = orderResult.fee?.author?.author ?: user.name,
+                assigned = orderResult.fee?.author?.assigned ?: user.name,
+                identifier = orderResult.id
             )
             qrCode = true
         }
