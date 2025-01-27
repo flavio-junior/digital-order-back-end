@@ -2,7 +2,6 @@ package br.com.dashboard.company.service
 
 import br.com.dashboard.company.entities.fee.Author
 import br.com.dashboard.company.entities.order.Order
-import br.com.dashboard.company.entities.payment.Payment
 import br.com.dashboard.company.entities.user.User
 import br.com.dashboard.company.exceptions.InternalErrorClient
 import br.com.dashboard.company.exceptions.ObjectDuplicateException
@@ -31,9 +30,7 @@ import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Repository
 import org.springframework.transaction.annotation.Transactional
-import java.time.LocalDate
 import java.time.LocalDateTime
-import java.time.LocalTime
 import java.time.temporal.ChronoUnit
 import java.util.*
 
