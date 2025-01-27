@@ -56,7 +56,8 @@ class PaymentService {
             date = LocalDate.now(),
             hour = LocalTime.now().withNano(0),
             value = paymentResult.total,
-            identifier = identifier
+            identifier = identifier,
+            user = user
         )
         paymentResult.order = order
         paymentResult.user = user

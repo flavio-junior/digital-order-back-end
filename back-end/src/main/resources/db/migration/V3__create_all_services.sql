@@ -167,6 +167,12 @@ CREATE TABLE IF NOT EXISTS tb_payment_user (
     PRIMARY KEY (fk_user, fk_payment)
 );
 
+CREATE TABLE IF NOT EXISTS tb_user_details_payment (
+    fk_user INT REFERENCES tb_user(id),
+    fk_details_payment INT REFERENCES tb_details_payment(id),
+    PRIMARY KEY (fk_user, fk_details_payment)
+);
+
 CREATE TABLE IF NOT EXISTS tb_report (
     id SERIAL PRIMARY KEY,
     date DATE NOT NULL,
