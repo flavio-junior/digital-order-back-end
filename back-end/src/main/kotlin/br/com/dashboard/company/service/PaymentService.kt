@@ -29,11 +29,10 @@ class PaymentService {
         user: User? = null,
         order: Order,
         payment: PaymentRequestVO? = null,
-        fee: Boolean,
-        valueFee: Double?,
+        fee: Boolean = false,
+        valueFee: Double? = 0.0,
         author: String,
-        assigned: String,
-        identifier: Long
+        assigned: String
     ): Payment {
         val paymentResult: Payment = parseObject(payment, Payment::class.java)
         var total: Double = order.total
@@ -56,7 +55,7 @@ class PaymentService {
             date = LocalDate.now(),
             hour = LocalTime.now().withNano(0),
             value = paymentResult.total,
-            identifier = identifier,
+            identifier = order.id,
             user = user
         )
         paymentResult.order = order

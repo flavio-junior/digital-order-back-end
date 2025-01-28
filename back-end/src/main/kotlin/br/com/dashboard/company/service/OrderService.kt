@@ -123,6 +123,7 @@ class OrderService {
         val orderResult: Order = parseObject(order, Order::class.java)
         var total: Double
         var qrCode = false
+        var savePayment = false
         orderResult.createdAt = LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS)
         if (order.type == TypeOrder.SHOPPING_CART) {
             orderResult.status = Status.CLOSED
@@ -163,6 +164,8 @@ class OrderService {
                     }
                 )
             }
+        } else {
+            orderResult.fee = null
         }
         orderResult.reservations = reservationService.validateReservationsToSave(
             userId = user.id,
@@ -177,21 +180,23 @@ class OrderService {
             if (order.payment?.discount == true) {
                 applyDiscount -= order.payment?.value ?: 0.0
             }
-            orderResult.payment = paymentService.savePayment(
-                user = userService.findUserById(userId = user.id),
-                order = orderResult,
-                payment = order.payment,
-                fee = orderResult.fee != null,
-                valueFee = orderResult.fee?.price,
-                author = orderResult.fee?.author?.author ?: user.name,
-                assigned = orderResult.fee?.author?.assigned ?: user.name,
-                identifier = orderResult.id
-            )
+            savePayment = true
             qrCode = true
         }
         orderResult.total = total
         orderResult.user = userAuthenticated
-        val orderResponse = parseObject(orderRepository.save(orderResult), OrderResponseVO::class.java)
+        orderResult.payment = null
+        val orderSaved = orderRepository.save(orderResult)
+        if (savePayment) {
+            orderSaved.payment = paymentService.savePayment(
+                user = userService.findUserById(userId = user.id),
+                order = orderSaved,
+                payment = order.payment,
+                author = orderSaved.fee?.author?.author ?: user.name,
+                assigned = orderSaved.fee?.author?.assigned ?: user.name,
+            )
+        }
+        val orderResponse = parseObject(orderRepository.save(orderSaved), OrderResponseVO::class.java)
         if (qrCode) {
             val qrCodeBytes =
                 qrCodeService.generateQRCodeImage(value = orderResponse.payment?.code.toString(), 300, 300)
@@ -397,8 +402,7 @@ class OrderService {
                 fee = orderResult.fee != null,
                 valueFee = orderResult.fee?.price,
                 author = orderResult.fee?.author?.author ?: user.name,
-                assigned = orderResult.fee?.author?.assigned ?: user.name,
-                identifier = orderResult.id
+                assigned = orderResult.fee?.author?.assigned ?: user.name
             )
             val orderResponse = parseObject(orderResult, OrderResponseVO::class.java)
             val qrCodeBytes =
