@@ -92,9 +92,10 @@ class ReservationService {
     ): List<ReservationResponseVO?> {
         return (body.start..body.end).mapIndexed { index, number ->
             try {
+                val formattedNumber = number.toString().padStart(length = 2, padChar = '0')
                 createNewReservation(
                     user = user,
-                    reservation = ReservationRequestVO(name = "${body.prefix} $number")
+                    reservation = ReservationRequestVO(name = "${body.prefix} $formattedNumber")
                 )
             } catch (ex: ObjectDuplicateException) {
                 null
