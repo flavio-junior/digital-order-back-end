@@ -89,12 +89,16 @@ class ReservationService {
     fun generateReservations(
         user: User,
         body: GenerateReservationsRequestVO
-    ): List<ReservationResponseVO> {
+    ): List<ReservationResponseVO?> {
         return (body.start..body.end).mapIndexed { index, number ->
-            createNewReservation(
-                user = user,
-                reservation = ReservationRequestVO(name = "${body.prefix} $number")
-            )
+            try {
+                createNewReservation(
+                    user = user,
+                    reservation = ReservationRequestVO(name = "${body.prefix} $number")
+                )
+            } catch (ex: ObjectDuplicateException) {
+                null
+            }
         }
     }
 
