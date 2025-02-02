@@ -246,11 +246,7 @@ class OrderService {
                             throw InternalErrorClient(message = OBJECT_WITH_PENDING_DELIVERY)
                         }
                     }
-                    objectService.updateStatusObject(
-                        orderId = orderId,
-                        objectId = objectId,
-                        status = objectActual.status
-                    )
+                    objectService.updateStatusObject(orderId = orderId, objectId = objectId)
                 }
 
                 Action.INCREMENT_OVERVIEW -> {

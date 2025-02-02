@@ -110,14 +110,23 @@ class ObjectService {
     @Transactional
     fun updateStatusObject(
         orderId: Long,
-        objectId: Long,
-        status: ObjectStatus? = null
+        objectId: Long
     ) {
-        objectRepository.updateStatusObject(
-            orderId = orderId,
-            objectId = objectId,
-            status = status
-        )
+        val updatedObject = getObject(orderId = orderId, objectId = objectId)
+        val allDelivered = updatedObject.overview?.all { it.status == ObjectStatus.DELIVERED } ?: false
+        if (allDelivered) {
+            objectRepository.updateStatusObject(
+                orderId = orderId,
+                objectId = objectId,
+                status = ObjectStatus.DELIVERED
+            )
+        } else {
+            objectRepository.updateStatusObject(
+                orderId = orderId,
+                objectId = objectId,
+                status = ObjectStatus.PENDING
+            )
+        }
     }
 
     @Transactional
@@ -140,6 +149,7 @@ class ObjectService {
             total = total
         )
         overviewService.saveOverview(status = ObjectStatus.PENDING, quantity = quantity, objectResult = objectResult)
+        updateStatusObject(orderId = orderId, objectId = objectId)
     }
 
     @Transactional
@@ -167,6 +177,7 @@ class ObjectService {
             total = priceCalculated
         )
         overviewService.deleteOverview(objectId = objectId, overviewId = overviewId)
+        updateStatusObject(orderId = orderId, objectId = objectId)
         return priceCalculated
     }
 
@@ -194,6 +205,7 @@ class ObjectService {
     ) {
         getObject(orderId = orderId, objectId = objectId)
         overviewService.updateStatusOverview(objectId = objectId, overviewId = overviewId, status = status)
+        updateStatusObject(orderId = orderId, objectId = objectId)
     }
 
     @Transactional
