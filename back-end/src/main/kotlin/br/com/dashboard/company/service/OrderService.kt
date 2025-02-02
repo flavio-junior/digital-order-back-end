@@ -152,7 +152,7 @@ class OrderService {
                     )
                     fee.user = userAuthenticated
                     orderResult.fee = fee
-                    val feeValue = (orderResult.total * (fee.percentage / 100.0))
+                    val feeValue = (total * fee.percentage) / 100.0
                     total += feeValue
                 }
                 validDays.getDays(
