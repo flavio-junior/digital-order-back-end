@@ -396,14 +396,15 @@ class OrderService {
             }
             updateStatusOrder(userId = user.id, orderId = idOrder, status = Status.CLOSED)
             orderResult.status = Status.CLOSED
+            val valueFee = orderResult.fee?.percentage?.let { percentage ->
+                (orderResult.total * percentage) / (100 + percentage)
+            } ?: 0.0
             orderResult.payment = paymentService.savePayment(
                 user = userService.findUserById(userId = user.id),
                 order = orderResult,
                 payment = payment,
                 fee = orderResult.fee != null,
-                valueFee = orderResult.fee?.percentage?.let { percentage ->
-                    (percentage / 100.0) * orderResult.total
-                } ?: 0.0,
+                valueFee = valueFee,
                 author = orderResult.fee?.author?.author ?: user.name,
                 assigned = orderResult.fee?.author?.assigned ?: user.name
             )
