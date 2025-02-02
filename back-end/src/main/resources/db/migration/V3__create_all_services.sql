@@ -216,7 +216,7 @@ CREATE TABLE IF NOT EXISTS tb_user_employee (
 
 CREATE TABLE IF NOT EXISTS tb_fee (
     id SERIAL PRIMARY KEY,
-    price NUMERIC(10, 2) DEFAULT 0.0,
+    percentage INT NOT NULL,
     assigned varchar(30) check (assigned in ('WAITER'))
 );
 

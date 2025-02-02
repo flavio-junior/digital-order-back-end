@@ -8,7 +8,7 @@ import br.com.dashboard.company.repository.FeeRepository
 import br.com.dashboard.company.service.DayService.Companion.DUPLICATE_DAY
 import br.com.dashboard.company.utils.common.DayOfWeek
 import br.com.dashboard.company.utils.common.Function
-import br.com.dashboard.company.utils.common.PriceRequestVO
+import br.com.dashboard.company.utils.common.PercentageRequestVO
 import br.com.dashboard.company.utils.others.ConverterUtils.parseListObjects
 import br.com.dashboard.company.utils.others.ConverterUtils.parseObject
 import br.com.dashboard.company.vo.day.DaysRequestVO
@@ -114,10 +114,10 @@ class FeeService {
     fun updatePriceFee(
         user: User,
         feeId: Long,
-        price: PriceRequestVO
+        percentage: PercentageRequestVO
     ) {
         getFee(userId = user.id, feeId = feeId)
-        feeRepository.updatePriceFee(userId = user.id, feeId = feeId, price = price.price)
+        feeRepository.updatePriceFee(userId = user.id, feeId = feeId, percentage = percentage.percentage)
     }
 
     @Transactional

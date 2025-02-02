@@ -35,11 +35,11 @@ interface FeeRepository : JpaRepository<Fee, Long> {
     ): Fee?
 
     @Modifying
-    @Query("UPDATE Fee f SET f.price =:price WHERE f.user.id = :userId AND f.id = :feeId")
+    @Query("UPDATE Fee f SET f.percentage =:percentage WHERE f.user.id = :userId AND f.id = :feeId")
     fun updatePriceFee(
         @Param("userId") userId: Long,
         @Param("feeId") feeId: Long,
-        @Param("price") price: Double
+        @Param("percentage") percentage: Int
     )
 
     @Modifying

@@ -3,7 +3,7 @@ package br.com.dashboard.company.controller
 import br.com.dashboard.company.entities.user.User
 import br.com.dashboard.company.exceptions.ForbiddenActionRequestException
 import br.com.dashboard.company.service.FeeService
-import br.com.dashboard.company.utils.common.PriceRequestVO
+import br.com.dashboard.company.utils.common.PercentageRequestVO
 import br.com.dashboard.company.utils.others.ConstantsUtils.EMPTY_FIELDS
 import br.com.dashboard.company.utils.others.MediaType.APPLICATION_JSON
 import br.com.dashboard.company.vo.day.DaysRequestVO
@@ -115,7 +115,7 @@ class FeeController {
         @AuthenticationPrincipal user: User,
         @RequestBody fee: FeeRequestVO
     ): ResponseEntity<*> {
-        require(value = fee.price > 0.0 && fee.assigned != null) {
+        require(value = fee.percentage > 0 && fee.assigned != null) {
             throw ForbiddenActionRequestException(exception = EMPTY_FIELDS)
         }
         feeService.createNewFee(user, fee)
@@ -224,9 +224,9 @@ class FeeController {
     fun updatePriceFee(
         @AuthenticationPrincipal user: User,
         @PathVariable(value = "id") feeId: Long,
-        @RequestBody price: PriceRequestVO
+        @RequestBody percentage: PercentageRequestVO
     ): ResponseEntity<*> {
-        feeService.updatePriceFee(user = user, feeId = feeId, price = price)
+        feeService.updatePriceFee(user = user, feeId = feeId, percentage = percentage)
         return ResponseEntity.noContent().build<Any>()
     }
 

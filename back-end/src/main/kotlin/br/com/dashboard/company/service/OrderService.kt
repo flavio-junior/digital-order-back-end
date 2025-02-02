@@ -152,7 +152,7 @@ class OrderService {
                     )
                     fee.user = userAuthenticated
                     orderResult.fee = fee
-                    total += fee.price
+                    total += fee.percentage
                 }
                 validDays.getDays(
                     days = fee.days,
@@ -400,7 +400,9 @@ class OrderService {
                 order = orderResult,
                 payment = payment,
                 fee = orderResult.fee != null,
-                valueFee = orderResult.fee?.price,
+                valueFee = orderResult.fee?.percentage?.let { percentage ->
+                    (percentage / 100.0) * orderResult.total
+                } ?: 0.0,
                 author = orderResult.fee?.author?.author ?: user.name,
                 assigned = orderResult.fee?.author?.assigned ?: user.name
             )

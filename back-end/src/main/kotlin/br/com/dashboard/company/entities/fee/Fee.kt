@@ -11,7 +11,7 @@ data class Fee(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     var id: Long = 0,
-    var price: Double = 0.0,
+    var percentage: Int = 0,
     @Enumerated(EnumType.STRING)
     @Column(columnDefinition = "varying")
     var assigned: Function? = null,
