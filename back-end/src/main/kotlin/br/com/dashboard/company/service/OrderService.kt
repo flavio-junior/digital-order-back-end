@@ -240,15 +240,6 @@ class OrderService {
             val objectSaved = objectService.getObject(orderId = orderSaved.id, objectId = objectId)
             val priceCalculated = (objectSaved.price * objectActual.quantity)
             when (objectActual.action) {
-                Action.UPDATE_STATUS_OBJECT -> {
-                    objectSaved.overview?.forEach { overview ->
-                        if (overview.status == ObjectStatus.PENDING) {
-                            throw InternalErrorClient(message = OBJECT_WITH_PENDING_DELIVERY)
-                        }
-                    }
-                    objectService.updateStatusObject(orderId = orderId, objectId = objectId)
-                }
-
                 Action.INCREMENT_OVERVIEW -> {
                     if (objectActual.quantity == 0) {
                         throw InternalErrorClient(message = ZERO_QUANTITY_ERROR)
