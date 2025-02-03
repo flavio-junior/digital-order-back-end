@@ -22,6 +22,7 @@ import org.springframework.data.domain.Sort
 import org.springframework.http.ResponseEntity
 import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.web.bind.annotation.GetMapping
+import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestParam
@@ -141,7 +142,7 @@ class PaymentController {
         return ResponseEntity.ok(detailsPaymentService.getAllDetailsPaymentsDay(user = user, pageable = pageable))
     }
 
-    @GetMapping(
+    @PostMapping(
         value = ["/details/analysis"],
         produces = [APPLICATION_JSON]
     )
