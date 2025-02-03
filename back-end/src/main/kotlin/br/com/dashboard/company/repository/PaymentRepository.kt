@@ -12,9 +12,14 @@ import java.time.LocalDate
 @Repository
 interface PaymentRepository : JpaRepository<Payment, Long> {
 
-    @Query(value = "SELECT p FROM Payment p WHERE p.date = :date AND p.user.id = :userId")
+    @Query(
+        value = """
+        SELECT p FROM Payment p WHERE p.date = :date AND p.user.id = :userId
+        AND (:code IS NULL OR p.code = :code)
+        """)
     fun getAllPaymentsDay(
         @Param("date") date: LocalDate = LocalDate.now(),
+        @Param("code") code: Long?,
         @Param("userId") userId: Long,
         pageable: Pageable
     ): Page<Payment>?

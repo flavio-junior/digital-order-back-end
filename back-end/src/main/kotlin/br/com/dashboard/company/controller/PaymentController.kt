@@ -71,6 +71,7 @@ class PaymentController {
     )
     fun getAllPaymentsDay(
         @AuthenticationPrincipal user: User,
+        @RequestParam(required = false) code: Long?,
         @RequestParam(value = "page", defaultValue = "0") page: Int,
         @RequestParam(value = "size", defaultValue = "12") size: Int,
         @RequestParam(value = "sort", defaultValue = "asc") sort: String
@@ -78,7 +79,7 @@ class PaymentController {
         val sortDirection: Sort.Direction =
             if ("desc".equals(sort, ignoreCase = true)) Sort.Direction.DESC else Sort.Direction.ASC
         val pageable: Pageable = PageRequest.of(page, size, Sort.by(sortDirection, "date"))
-        return ResponseEntity.ok(paymentService.getAllPaymentsDay(user = user, pageable = pageable))
+        return ResponseEntity.ok(paymentService.getAllPaymentsDay(user = user, code = code, pageable = pageable))
     }
 
     @PostMapping(

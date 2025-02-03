@@ -58,10 +58,11 @@ class PaymentService {
     @Transactional(readOnly = true)
     fun getAllPaymentsDay(
         user: User,
+        code: Long?,
         pageable: Pageable
     ): Page<PaymentResponseVO> {
         val payments: Page<Payment>? =
-            paymentRepository.getAllPaymentsDay(userId = user.id, pageable = pageable)
+            paymentRepository.getAllPaymentsDay(userId = user.id, code = code, pageable = pageable)
         return payments?.map { payment ->
             parseObject(payment, PaymentResponseVO()::class.java)
         } ?: throw ResourceNotFoundException(message = PAYMENT_NOT_FOUND)
