@@ -1,13 +1,11 @@
 package br.com.dashboard.company.controller
 
 import br.com.dashboard.company.entities.user.User
-import br.com.dashboard.company.service.DetailsPaymentService
 import br.com.dashboard.company.service.PaymentService
 import br.com.dashboard.company.utils.others.MediaType.APPLICATION_JSON
-import br.com.dashboard.company.vo.payment.TypeAnalysisRequestVO
 import br.com.dashboard.company.vo.payment.AnaliseDayVO
-import br.com.dashboard.company.vo.payment.DetailsPaymentResponseVO
 import br.com.dashboard.company.vo.payment.PaymentResponseVO
+import br.com.dashboard.company.vo.payment.TypeAnalysisRequestVO
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.media.ArraySchema
 import io.swagger.v3.oas.annotations.media.Content
@@ -21,12 +19,7 @@ import org.springframework.data.domain.Pageable
 import org.springframework.data.domain.Sort
 import org.springframework.http.ResponseEntity
 import org.springframework.security.core.annotation.AuthenticationPrincipal
-import org.springframework.web.bind.annotation.GetMapping
-import org.springframework.web.bind.annotation.PostMapping
-import org.springframework.web.bind.annotation.RequestBody
-import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.bind.annotation.RequestParam
-import org.springframework.web.bind.annotation.RestController
+import org.springframework.web.bind.annotation.*
 import java.time.LocalDate
 
 @RestController
@@ -36,9 +29,6 @@ class PaymentController {
 
     @Autowired
     private lateinit var paymentService: PaymentService
-
-    @Autowired
-    private lateinit var detailsPaymentService: DetailsPaymentService
 
     @GetMapping(
         value = ["/details/all"],
@@ -89,57 +79,6 @@ class PaymentController {
             if ("desc".equals(sort, ignoreCase = true)) Sort.Direction.DESC else Sort.Direction.ASC
         val pageable: Pageable = PageRequest.of(page, size, Sort.by(sortDirection, "date"))
         return ResponseEntity.ok(paymentService.getAllPaymentsDay(user = user, pageable = pageable))
-    }
-
-    @GetMapping(
-        value = ["/details/payments"],
-        produces = [APPLICATION_JSON]
-    )
-    @Operation(
-        summary = "Find All Details of Payments", description = "Find All Details of Payments",
-        tags = ["Payment"], responses = [
-            ApiResponse(
-                description = "Success", responseCode = "200", content = [
-                    Content(array = ArraySchema(schema = Schema(implementation = DetailsPaymentResponseVO::class)))
-                ]
-            ),
-            ApiResponse(
-                description = "Bad Request", responseCode = "400", content = [
-                    Content(schema = Schema(implementation = Unit::class))
-                ]
-            ),
-            ApiResponse(
-                description = "Unauthorized", responseCode = "401", content = [
-                    Content(schema = Schema(implementation = Unit::class))
-                ]
-            ),
-            ApiResponse(
-                description = "Operation Unauthorized", responseCode = "403", content = [
-                    Content(schema = Schema(implementation = Unit::class))
-                ]
-            ),
-            ApiResponse(
-                description = "Not Found", responseCode = "404", content = [
-                    Content(schema = Schema(implementation = Unit::class))
-                ]
-            ),
-            ApiResponse(
-                description = "Internal Error", responseCode = "500", content = [
-                    Content(schema = Schema(implementation = Unit::class))
-                ]
-            )
-        ]
-    )
-    fun getAllDetailsPaymentsDay(
-        @AuthenticationPrincipal user: User,
-        @RequestParam(value = "page", defaultValue = "0") page: Int,
-        @RequestParam(value = "size", defaultValue = "12") size: Int,
-        @RequestParam(value = "sort", defaultValue = "asc") sort: String
-    ): ResponseEntity<Page<DetailsPaymentResponseVO>> {
-        val sortDirection: Sort.Direction =
-            if ("desc".equals(sort, ignoreCase = true)) Sort.Direction.DESC else Sort.Direction.ASC
-        val pageable: Pageable = PageRequest.of(page, size, Sort.by(sortDirection, "hour"))
-        return ResponseEntity.ok(detailsPaymentService.getAllDetailsPaymentsDay(user = user, pageable = pageable))
     }
 
     @PostMapping(

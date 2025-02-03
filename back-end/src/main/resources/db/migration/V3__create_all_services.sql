@@ -130,6 +130,8 @@ CREATE TABLE IF NOT EXISTS tb_payment (
     date DATE NOT NULL,
     hour TIME NOT NULL,
     code BIGINT NOT NULL,
+    author VARCHAR(30) NOT NULL,
+    assigned VARCHAR(30) NOT NULL,
     type_order varchar(30) check (type_order in ('DELIVERY', 'ORDER', 'RESERVATION', 'SHOPPING_CART')),
     type_payment varchar(30) check (type_payment in ('CREDIT_CAD', 'DEBIT_CAD', 'MONEY', 'PIX')),
     discount BOOLEAN DEFAULT FALSE,

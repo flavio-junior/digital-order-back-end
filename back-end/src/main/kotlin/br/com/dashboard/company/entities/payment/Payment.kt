@@ -17,6 +17,8 @@ data class Payment(
     var date: LocalDate? = null,
     var hour: LocalTime? = null,
     var code: Long? = null,
+    var author: String? = "",
+    var assigned: String? = "",
     @Column(name = "type_order", nullable = false)
     @Enumerated(EnumType.STRING)
     var typeOrder: TypeOrder? = null,
@@ -30,13 +32,6 @@ data class Payment(
     @Column(name = "value_fee", nullable = true)
     var valueFee: Double? = null,
     var total: Double = 0.0,
-    @OneToOne(cascade = [CascadeType.ALL], orphanRemoval = true)
-    @JoinTable(
-        name = "tb_payment_details_payment",
-        joinColumns = [JoinColumn(name = "fk_payment", referencedColumnName = "id")],
-        inverseJoinColumns = [JoinColumn(name = "fk_details", referencedColumnName = "id")]
-    )
-    var details: DetailsPayment? = null,
     @OneToOne(cascade = [CascadeType.ALL], orphanRemoval = true)
     @JoinTable(
         name = "tb_order_payment",

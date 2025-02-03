@@ -1,7 +1,6 @@
 package br.com.dashboard.company.service
 
 import br.com.dashboard.company.entities.order.Order
-import br.com.dashboard.company.entities.payment.DetailsPayment
 import br.com.dashboard.company.entities.payment.Payment
 import br.com.dashboard.company.entities.user.User
 import br.com.dashboard.company.exceptions.ResourceNotFoundException
@@ -39,6 +38,8 @@ class PaymentService {
         paymentResult.date = LocalDate.now()
         paymentResult.hour = LocalTime.now().withNano(0)
         paymentResult.code = System.currentTimeMillis()
+        paymentResult.author = author
+        paymentResult.assigned = assigned
         paymentResult.typeOrder = order.type
         paymentResult.typePayment = payment?.type
         if (payment?.discount == true) {
@@ -49,15 +50,6 @@ class PaymentService {
         paymentResult.fee = fee
         paymentResult.valueFee = valueFee
         paymentResult.total = total
-        paymentResult.details = DetailsPayment(
-            author = author,
-            assigned = assigned,
-            date = LocalDate.now(),
-            hour = LocalTime.now().withNano(0),
-            value = paymentResult.total,
-            identifier = order.id,
-            user = user
-        )
         paymentResult.order = order
         paymentResult.user = user
         return paymentRepository.save(paymentResult)
