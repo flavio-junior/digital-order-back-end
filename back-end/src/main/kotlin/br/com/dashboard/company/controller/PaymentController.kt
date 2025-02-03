@@ -4,7 +4,7 @@ import br.com.dashboard.company.entities.user.User
 import br.com.dashboard.company.service.DetailsPaymentService
 import br.com.dashboard.company.service.PaymentService
 import br.com.dashboard.company.utils.others.MediaType.APPLICATION_JSON
-import br.com.dashboard.company.vo.checkout.GeneralBalanceResponseVO
+import br.com.dashboard.company.vo.payment.TypeAnalysisRequestVO
 import br.com.dashboard.company.vo.payment.AnaliseDayVO
 import br.com.dashboard.company.vo.payment.DetailsPaymentResponseVO
 import br.com.dashboard.company.vo.payment.PaymentResponseVO
@@ -22,6 +22,7 @@ import org.springframework.data.domain.Sort
 import org.springframework.http.ResponseEntity
 import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.web.bind.annotation.GetMapping
+import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
@@ -39,7 +40,7 @@ class PaymentController {
     private lateinit var detailsPaymentService: DetailsPaymentService
 
     @GetMapping(
-        value = ["/find/all"],
+        value = ["/details/all"],
         produces = [APPLICATION_JSON]
     )
     @Operation(
@@ -141,11 +142,11 @@ class PaymentController {
     }
 
     @GetMapping(
-        value = ["/types"],
+        value = ["/details/analysis"],
         produces = [APPLICATION_JSON]
     )
     @Operation(
-        summary = "Get General Balance", description = "Get General Balance",
+        summary = "Get Details of Analysis", description = "Get Details of Analysis",
         tags = ["Payment"], responses = [
             ApiResponse(
                 description = "Success", responseCode = "200", content = [
@@ -179,145 +180,22 @@ class PaymentController {
             )
         ]
     )
-    fun getAnalysisDay(
+    fun getDetailsAnalysis(
         @AuthenticationPrincipal user: User,
-        @RequestParam(name = "date", required = false) date: String?
+        @RequestParam(name = "date", required = false) date: String?,
+        @RequestBody type: TypeAnalysisRequestVO
     ): ResponseEntity<AnaliseDayVO> {
         val parsedDate = try {
             if (date.isNullOrEmpty()) LocalDate.now() else LocalDate.parse(date)
         } catch (ex: Exception) {
             LocalDate.now()
         }
-        val result = paymentService.getAnalysisDay(user = user, date = parsedDate.toString())
-        return ResponseEntity.ok(result)
-    }
-
-    @GetMapping(
-        value = ["/balance/last/7/days"],
-        produces = [APPLICATION_JSON]
-    )
-    @Operation(
-        summary = "Get Balance Last 7 Days", description = "Get Balance Last 7 Days",
-        tags = ["Payment"], responses = [
-            ApiResponse(
-                description = "Success", responseCode = "200", content = [
-                    Content(array = ArraySchema(schema = Schema(implementation = GeneralBalanceResponseVO::class)))
-                ]
-            ),
-            ApiResponse(
-                description = "Bad Request", responseCode = "400", content = [
-                    Content(schema = Schema(implementation = Unit::class))
-                ]
-            ),
-            ApiResponse(
-                description = "Unauthorized", responseCode = "401", content = [
-                    Content(schema = Schema(implementation = Unit::class))
-                ]
-            ),
-            ApiResponse(
-                description = "Operation Unauthorized", responseCode = "403", content = [
-                    Content(schema = Schema(implementation = Unit::class))
-                ]
-            ),
-            ApiResponse(
-                description = "Not Found", responseCode = "404", content = [
-                    Content(schema = Schema(implementation = Unit::class))
-                ]
-            ),
-            ApiResponse(
-                description = "Internal Error", responseCode = "500", content = [
-                    Content(schema = Schema(implementation = Unit::class))
-                ]
+        return ResponseEntity.ok(
+            paymentService.getDetailsAnalysis(
+                user = user,
+                date = parsedDate.toString(),
+                type = type.type
             )
-        ]
-    )
-    fun getBalanceLast7Days(): GeneralBalanceResponseVO {
-        return paymentService.getBalanceLast7Days()
-    }
-
-    @GetMapping(
-        value = ["/balance/current/month"],
-        produces = [APPLICATION_JSON]
-    )
-    @Operation(
-        summary = "Get Balance Current Month", description = "Get Balance Current Month",
-        tags = ["Payment"], responses = [
-            ApiResponse(
-                description = "Success", responseCode = "200", content = [
-                    Content(array = ArraySchema(schema = Schema(implementation = GeneralBalanceResponseVO::class)))
-                ]
-            ),
-            ApiResponse(
-                description = "Bad Request", responseCode = "400", content = [
-                    Content(schema = Schema(implementation = Unit::class))
-                ]
-            ),
-            ApiResponse(
-                description = "Unauthorized", responseCode = "401", content = [
-                    Content(schema = Schema(implementation = Unit::class))
-                ]
-            ),
-            ApiResponse(
-                description = "Operation Unauthorized", responseCode = "403", content = [
-                    Content(schema = Schema(implementation = Unit::class))
-                ]
-            ),
-            ApiResponse(
-                description = "Not Found", responseCode = "404", content = [
-                    Content(schema = Schema(implementation = Unit::class))
-                ]
-            ),
-            ApiResponse(
-                description = "Internal Error", responseCode = "500", content = [
-                    Content(schema = Schema(implementation = Unit::class))
-                ]
-            )
-        ]
-    )
-    fun getBalanceCurrentMonth(): GeneralBalanceResponseVO {
-        return paymentService.getBalanceCurrentMonth()
-    }
-
-    @GetMapping(
-        value = ["/balance/current/year"],
-        produces = [APPLICATION_JSON]
-    )
-    @Operation(
-        summary = "Get Balance Current Year", description = "Get Balance Current Year",
-        tags = ["Payment"], responses = [
-            ApiResponse(
-                description = "Success", responseCode = "200", content = [
-                    Content(array = ArraySchema(schema = Schema(implementation = GeneralBalanceResponseVO::class)))
-                ]
-            ),
-            ApiResponse(
-                description = "Bad Request", responseCode = "400", content = [
-                    Content(schema = Schema(implementation = Unit::class))
-                ]
-            ),
-            ApiResponse(
-                description = "Unauthorized", responseCode = "401", content = [
-                    Content(schema = Schema(implementation = Unit::class))
-                ]
-            ),
-            ApiResponse(
-                description = "Operation Unauthorized", responseCode = "403", content = [
-                    Content(schema = Schema(implementation = Unit::class))
-                ]
-            ),
-            ApiResponse(
-                description = "Not Found", responseCode = "404", content = [
-                    Content(schema = Schema(implementation = Unit::class))
-                ]
-            ),
-            ApiResponse(
-                description = "Internal Error", responseCode = "500", content = [
-                    Content(schema = Schema(implementation = Unit::class))
-                ]
-            )
-        ]
-    )
-    fun getBalanceCurrentYear(): GeneralBalanceResponseVO {
-        return paymentService.getBalanceCurrentYear()
+        )
     }
 }

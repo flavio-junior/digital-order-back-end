@@ -38,46 +38,60 @@ interface PaymentRepository : JpaRepository<Payment, Long> {
     ): List<Array<Any>>
 
     @Query(
-        value =
-            """
-            SELECT
-                SUM(p.total) 
-            FROM
-                tb_payment p
-            WHERE
-                p.date >= CURRENT_DATE - INTERVAL '7 days'
-        """,
-        nativeQuery = true
+        value = """
+        SELECT 
+            p.typePayment, 
+            p.typeOrder, 
+            COUNT(p), 
+            SUM(p.total), 
+            SUM(CASE WHEN p.discount = true THEN 1 ELSE 0 END)
+        FROM Payment p
+        WHERE p.date >= :startDate 
+        AND p.date <= :endDate
+        AND p.user.id = :userId
+        GROUP BY p.typePayment, p.typeOrder
+    """
     )
-    fun findBalanceLast7DaysNative(): Double?
+    fun getAnalysisOfWeek(
+        @Param("startDate") startDate: LocalDate,
+        @Param("endDate") endDate: LocalDate,
+        @Param("userId") userId: Long
+    ): List<Array<Any>>
 
     @Query(
-        value =
-            """
-            SELECT
-                SUM(p.total) 
-            FROM
-                tb_payment p 
-            WHERE
-                EXTRACT(YEAR FROM p.date) = EXTRACT(YEAR FROM CURRENT_DATE)
-            AND
-                EXTRACT(MONTH FROM p.date) = EXTRACT(MONTH FROM CURRENT_DATE)
-        """,
-        nativeQuery = true
+        value = """
+        SELECT 
+            p.typePayment, 
+            p.typeOrder, 
+            COUNT(p), 
+            SUM(p.total), 
+            SUM(CASE WHEN p.discount = true THEN 1 ELSE 0 END)
+        FROM Payment p
+        WHERE EXTRACT(YEAR FROM p.date) = EXTRACT(YEAR FROM CURRENT_DATE)
+        AND EXTRACT(MONTH FROM p.date) = EXTRACT(MONTH FROM CURRENT_DATE)
+        AND p.user.id = :userId
+        GROUP BY p.typePayment, p.typeOrder
+    """
     )
-    fun findBalanceCurrentMonthNative(): Double?
+    fun getAnalysisMonth(
+        @Param("userId") userId: Long
+    ): List<Array<Any>>
 
     @Query(
-        value =
-            """
-            SELECT
-                SUM(p.total) 
-            FROM
-                tb_payment p
-            WHERE
-            EXTRACT(YEAR FROM p.date) = EXTRACT(YEAR FROM CURRENT_DATE)
-        """,
-        nativeQuery = true
+        value = """
+        SELECT 
+            p.typePayment, 
+            p.typeOrder, 
+            COUNT(p), 
+            SUM(p.total), 
+            SUM(CASE WHEN p.discount = true THEN 1 ELSE 0 END)
+        FROM Payment p
+        WHERE EXTRACT(YEAR FROM p.date) = EXTRACT(YEAR FROM CURRENT_DATE)
+        AND p.user.id = :userId
+        GROUP BY p.typePayment, p.typeOrder
+    """
     )
-    fun findBalanceCurrentYearNative(): Double?
+    fun getAnalysisYear(
+        @Param("userId") userId: Long
+    ): List<Array<Any>>
 }

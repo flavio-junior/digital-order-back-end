@@ -477,7 +477,7 @@ class OrderController {
     )
     @Operation(
         summary = "Close Order", description = "Close Order",
-        tags = ["ORDER", "PAYMENT"],
+        tags = ["ORDER"],
         responses = [
             ApiResponse(
                 description = "Success", responseCode = "200", content = [
@@ -521,7 +521,7 @@ class OrderController {
     )
     @Operation(
         summary = "Update Order", description = "Close Order",
-        tags = ["ORDER", "OBJECT"],
+        tags = ["ORDER"],
         responses = [
             ApiResponse(
                 description = "Success", responseCode = "200", content = [
