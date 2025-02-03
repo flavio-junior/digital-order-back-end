@@ -1,6 +1,7 @@
 package br.com.dashboard.company.entities.fee
 
 import br.com.dashboard.company.entities.day.Day
+import br.com.dashboard.company.entities.order.Order
 import br.com.dashboard.company.entities.user.User
 import br.com.dashboard.company.utils.common.Function
 import jakarta.persistence.*
@@ -29,6 +30,13 @@ data class Fee(
         inverseJoinColumns = [JoinColumn(name = "fk_author", referencedColumnName = "id")]
     )
     var author: Author? = null,
+    @ManyToOne(cascade = [CascadeType.ALL])
+    @JoinTable(
+        name = "tb_order_fee",
+        joinColumns = [JoinColumn(name = "fk_fee", referencedColumnName = "id")],
+        inverseJoinColumns = [JoinColumn(name = "fk_order", referencedColumnName = "id")]
+    )
+    var order: Order? = null,
     @ManyToOne(cascade = [CascadeType.ALL])
     @JoinTable(
         name = "tb_user_fee",
