@@ -141,22 +141,6 @@ CREATE TABLE IF NOT EXISTS tb_payment (
     total NUMERIC(10, 2) DEFAULT 0.0
 );
 
-CREATE TABLE IF NOT EXISTS tb_details_payment (
-    id SERIAL PRIMARY KEY,
-    author VARCHAR(30) NOT NULL,
-    assigned VARCHAR(30) NOT NULL,
-    date DATE NOT NULL,
-    hour TIME NOT NULL,
-    value NUMERIC(10, 2) DEFAULT 0.0,
-    identifier INT NULL
-);
-
-CREATE TABLE IF NOT EXISTS tb_payment_details_payment (
-    fk_details INT REFERENCES tb_details_payment(id),
-    fk_payment INT REFERENCES tb_payment(id),
-    PRIMARY KEY (fk_details, fk_payment)
-);
-
 CREATE TABLE IF NOT EXISTS tb_order_payment (
     fk_order INT REFERENCES tb_order(id),
     fk_payment INT REFERENCES tb_payment(id),
@@ -167,12 +151,6 @@ CREATE TABLE IF NOT EXISTS tb_payment_user (
     fk_user INT REFERENCES tb_user(id),
     fk_payment INT REFERENCES tb_payment(id),
     PRIMARY KEY (fk_user, fk_payment)
-);
-
-CREATE TABLE IF NOT EXISTS tb_user_details_payment (
-    fk_user INT REFERENCES tb_user(id),
-    fk_details_payment INT REFERENCES tb_details_payment(id),
-    PRIMARY KEY (fk_user, fk_details_payment)
 );
 
 CREATE TABLE IF NOT EXISTS tb_report (
