@@ -349,10 +349,11 @@ class OrderService {
     @Transactional
     fun closeOrder(
         user: User,
-        idOrder: Long,
+        orderId: Long,
+        force: Boolean = false,
         payment: PaymentRequestVO
     ): OrderResponseVO {
-        val orderResult = getOrder(userId = user.id, orderId = idOrder)
+        val orderResult = getOrder(userId = user.id, orderId = orderId)
         if (orderResult.status == Status.CLOSED) {
             throw ObjectDuplicateException(message = ORDER_ALREADY_CLOSED)
         } else {
@@ -371,17 +372,32 @@ class OrderService {
 
                 else -> {}
             }
-            orderResult.objects?.map { objectResponse ->
-                objectResponse.overview?.forEach { overviewResponse ->
-                    if (overviewResponse.status == ObjectStatus.PENDING) {
+            if (force) {
+                orderResult.objects?.map { objectSaved ->
+                    objectSaved.overview?.map { overviewSaved ->
+                        if (overviewSaved.status == ObjectStatus.PENDING) {
+                            objectService.updateStatusOverview(
+                                orderId = orderId,
+                                objectId = objectSaved.id,
+                                overviewId = overviewSaved.id,
+                                status = ObjectStatus.DELIVERED
+                            )
+                        }
+                    }
+                }
+            } else {
+                orderResult.objects?.map { objectSaved ->
+                    objectSaved.overview?.forEach { overviewSaved ->
+                        if (overviewSaved.status == ObjectStatus.PENDING) {
+                            throw InternalErrorClient(message = OBJECT_WITH_PENDING_DELIVERY)
+                        }
+                    }
+                    if (objectSaved.status == ObjectStatus.PENDING) {
                         throw InternalErrorClient(message = OBJECT_WITH_PENDING_DELIVERY)
                     }
                 }
-                if (objectResponse.status == ObjectStatus.PENDING) {
-                    throw InternalErrorClient(message = OBJECT_WITH_PENDING_DELIVERY)
-                }
             }
-            updateStatusOrder(userId = user.id, orderId = idOrder, status = Status.CLOSED)
+            updateStatusOrder(userId = user.id, orderId = orderId, status = Status.CLOSED)
             orderResult.status = Status.CLOSED
             val valueFee = orderResult.fee?.percentage?.let { percentage ->
                 (orderResult.total * percentage) / (100 + percentage)

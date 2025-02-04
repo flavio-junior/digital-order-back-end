@@ -508,10 +508,18 @@ class OrderController {
     )
     fun closeOrder(
         @AuthenticationPrincipal user: User,
-        @PathVariable(value = "id") idOrder: Long,
+        @PathVariable(value = "id") orderId: Long,
+        @RequestParam(value = "force", required = false, defaultValue = "false") force: Boolean,
         @RequestBody payment: PaymentRequestVO
     ): ResponseEntity<OrderResponseVO> {
-        return ResponseEntity.ok(orderService.closeOrder(user = user, idOrder = idOrder, payment = payment))
+        return ResponseEntity.ok(
+            orderService.closeOrder(
+                user = user,
+                orderId = orderId,
+                force = force,
+                payment = payment
+            )
+        )
     }
 
     @PutMapping(
