@@ -47,9 +47,18 @@ class PaymentService {
         }
         paymentResult.discount = payment?.discount
         paymentResult.valueDiscount = payment?.value
-        paymentResult.fee = fee
-        paymentResult.valueFee = valueFee
-        paymentResult.total = total
+        if (payment?.remove == true) {
+            paymentResult.fee = false
+            paymentResult.valueFee = 0.0
+            if (valueFee != null) {
+                val newTotalCalculated: Double = total - valueFee
+                paymentResult.total = newTotalCalculated
+            }
+        } else {
+            paymentResult.fee = fee
+            paymentResult.valueFee = valueFee
+            paymentResult.total = total
+        }
         paymentResult.order = order
         paymentResult.user = user
         return paymentRepository.save(paymentResult)
@@ -74,7 +83,7 @@ class PaymentService {
         date: String,
         type: TypeAnalysis
     ): AnaliseDayVO {
-       return when (type) {
+        return when (type) {
             TypeAnalysis.DAY -> {
                 getAnalysisDay(user = user, date = date)
             }
