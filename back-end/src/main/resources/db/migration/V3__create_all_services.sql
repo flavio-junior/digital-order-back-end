@@ -23,7 +23,7 @@ CREATE TABLE IF NOT EXISTS tb_user_reservation (
 
 CREATE TABLE IF NOT EXISTS tb_item(
     id SERIAL PRIMARY KEY,
-    name VARCHAR(60),
+    name VARCHAR(100),
     price NUMERIC(10, 2) DEFAULT 0.0
 );
 
@@ -36,7 +36,7 @@ CREATE TABLE IF NOT EXISTS tb_user_item (
 CREATE TABLE IF NOT EXISTS tb_food (
     id SERIAL PRIMARY KEY,
     created_at TIMESTAMP NOT NULL,
-    name VARCHAR(60) NOT NULL,
+    name VARCHAR(100) NOT NULL,
     price NUMERIC(10, 2) DEFAULT 0.0
 );
 
@@ -49,7 +49,7 @@ CREATE TABLE IF NOT EXISTS tb_user_food (
 CREATE TABLE IF NOT EXISTS tb_product (
     id SERIAL PRIMARY KEY,
     created_at TIMESTAMP NOT NULL,
-    name VARCHAR(60) NOT NULL,
+    name VARCHAR(100) NOT NULL,
     price NUMERIC(10, 2) DEFAULT 0.0,
     stock_quantity INT NOT NULL
 );
