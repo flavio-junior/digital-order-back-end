@@ -68,6 +68,7 @@ class SecurityConfig {
                     .requestMatchers("api/dashboard/company/shopping/cart/v1**").hasRole("ADMIN")
                     .requestMatchers("/api/dashboard/company/payment/v1**").hasRole("ADMIN")
                     .requestMatchers("/api/dashboard/company/report/v1**").hasRole("ADMIN")
+                    .requestMatchers("/api/settings/v1**").authenticated()
                     .anyRequest().authenticated()
             }
             .addFilterBefore(securityFilter, UsernamePasswordAuthenticationFilter::class.java)

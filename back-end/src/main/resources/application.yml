@@ -1,3 +1,9 @@
+aws:
+  access_key_id: ${AWS_KEY:empty}
+  secret_access_key: ${AWS_SECRET:empty}
+s3:
+  bucket: ${BUCKET_NAME:empty}
+  region: ${BUCKET_REGION:empty}
 security:
   jwt:
     token:
@@ -12,6 +18,10 @@ spring:
     time-zone: ${TIME_ZONE}
   profiles:
     active: ${APP_PROFILE:prod}
+  servlet:
+    multipart:
+      max-file-size: ${MAX_FILE_SIZE:200MB}
+      max-request-size: ${MAX_FILE_SIZE:200MB}
 spring-doc:
   paths-to-match:
     - /api/**/v1/**
