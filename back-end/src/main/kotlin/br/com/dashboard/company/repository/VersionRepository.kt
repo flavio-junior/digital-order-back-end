@@ -13,7 +13,7 @@ interface VersionRepository : JpaRepository<Version, Long> {
     @Query("SELECT v FROM Version v WHERE v.version =:version")
     fun findByVersion(
         @Param("version") version: String
-    ): Boolean?
+    ): Version?
 
     @Modifying
     @Query("UPDATE Version v SET v.version =:version, v.url =:url WHERE v.id =:versionId")

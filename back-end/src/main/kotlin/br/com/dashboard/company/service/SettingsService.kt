@@ -27,8 +27,8 @@ class SettingsService {
 
     @Transactional(readOnly = true)
     fun checkActualVersion(version: String): VersionResponseVO {
-        val versionSaved: Boolean? = versionRepository.findByVersion(version = version)
-        return if (versionSaved != null && versionSaved) {
+        val versionSaved: Version? = versionRepository.findByVersion(version = version)
+        return if (versionSaved != null) {
             VersionResponseVO(status = true)
         } else {
             val versionsSaved = findAllVersions()
