@@ -358,12 +358,6 @@ class OrderService {
             throw ObjectDuplicateException(message = ORDER_ALREADY_CLOSED)
         } else {
             when (orderResult.type) {
-                TypeOrder.DELIVERY -> {
-                    if (orderResult.address?.status != AddressStatus.DELIVERED) {
-                        throw InternalErrorClient(message = DELIVERY_ORDER_PENDING)
-                    }
-                }
-
                 TypeOrder.RESERVATION -> {
                     orderResult.reservations?.forEach { reservation ->
                         reservation.status = ReservationStatus.AVAILABLE
