@@ -48,7 +48,7 @@ class SettingsService {
         file: MultipartFile,
         version: String
     ): VersionResponseVO {
-        val imageMainSavedUrl: URL = s3Service.uploadFile(file = file)
+        val imageMainSavedUrl: URL = s3Service.uploadFile(file = file, path = PATH_UPDATE)
         val versionSaved = versionRepository.save(
             Version(
                 version = version,
@@ -67,11 +67,12 @@ class SettingsService {
     ) {
         val version: Version = versionRepository.findById(versionId)
             .orElseThrow { ResourceNotFoundException(NOT_FOUND_VERSION) }
-       val urlSaved = s3Service.updateFile(url = version.url, multipartFile = file)
+       val urlSaved = s3Service.updateFile(url = version.url, multipartFile = file, path = PATH_UPDATE)
         versionRepository.updateUrlVersion(versionId = versionId, version = newVersion, url =  urlSaved.toExternalForm())
     }
 
     companion object {
         const val NOT_FOUND_VERSION = "Version Not Found!"
+        const val PATH_UPDATE = "downloads/updates/"
     }
 }

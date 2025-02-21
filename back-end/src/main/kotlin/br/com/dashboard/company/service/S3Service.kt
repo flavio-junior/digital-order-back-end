@@ -6,6 +6,7 @@ import com.amazonaws.AmazonServiceException
 import com.amazonaws.services.s3.AmazonS3
 import com.amazonaws.services.s3.model.ObjectMetadata
 import com.amazonaws.services.s3.model.DeleteObjectRequest
+import org.apache.maven.surefire.shared.io.FilenameUtils
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Service
@@ -14,6 +15,7 @@ import java.io.IOException
 import java.io.InputStream
 import java.net.URI
 import java.net.URL
+import java.time.Instant
 
 @Service
 class S3Service {
@@ -24,12 +26,24 @@ class S3Service {
     @Value("\${s3.bucket}")
     private val bucketName: String? = null
 
-    fun uploadFile(file: MultipartFile): URL {
+    fun uploadFile(
+        file: MultipartFile,
+        path: String,
+        changeNameFile: Boolean = false
+    ): URL {
         try {
+            val originalName = file.originalFilename
+                ?: throw ForbiddenActionRequestException(exception = NAME_IMAGE_NOT_EMPTY)
+            val fileName = if (changeNameFile) {
+                val extension = FilenameUtils.getExtension(originalName)
+                "${Instant.now().toEpochMilli()}.$extension"
+            } else {
+                originalName
+            }
+            val s3Path = "$path$fileName"
             return processFile(
                 inputStream = file.inputStream,
-                fileName = file.originalFilename
-                    ?: throw ForbiddenActionRequestException(exception = NAME_IMAGE_NOT_EMPTY),
+                fileName = s3Path,
                 contentType = file.contentType,
                 contentLength = file.size
             )
@@ -55,14 +69,19 @@ class S3Service {
         return s3client.getUrl(bucketName, fileName)
     }
 
-    fun updateFile(url: String, multipartFile: MultipartFile): URL {
+    fun updateFile(
+        url: String,
+        multipartFile: MultipartFile,
+        path: String,
+        changeNameFile: Boolean = false
+    ): URL {
         try {
             val uri = URI(url)
             val bucketNameFind = uri.host.split(".")[0]
             val nativeImage = uri.path.substring(1)
             if (s3client.doesObjectExist(bucketNameFind, nativeImage)) {
                 deleteFile(url)
-                return uploadFile(multipartFile)
+                return uploadFile(file = multipartFile, path = path, changeNameFile = changeNameFile)
             } else {
                 throw ResourceNotFoundException(message = FILE_NOT_FOUND)
             }

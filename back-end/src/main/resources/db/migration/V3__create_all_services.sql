@@ -1,3 +1,18 @@
+CREATE TABLE IF NOT EXISTS tb_company(
+    id SERIAL PRIMARY KEY,
+    identifier INT NULL,
+    date DATE NOT NULL,
+    hour TIME NOT NULL,
+    name VARCHAR(60) NOT NULL,
+    main_image VARCHAR(300)
+);
+
+CREATE TABLE IF NOT EXISTS tb_user_company (
+    fk_user INT REFERENCES tb_user(id),
+    fk_company INT REFERENCES tb_company(id),
+    PRIMARY KEY (fk_user, fk_company)
+);
+
 CREATE TABLE IF NOT EXISTS tb_category(
     id SERIAL PRIMARY KEY,
     name VARCHAR(60)
