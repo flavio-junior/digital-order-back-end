@@ -124,6 +124,8 @@ class PaymentController {
     fun getDetailsAnalysis(
         @AuthenticationPrincipal user: User,
         @RequestParam(name = "date", required = false) date: String?,
+        @RequestParam(name = "start", required = false) start: String?,
+        @RequestParam(name = "end", required = false) end: String?,
         @RequestBody type: TypeAnalysisRequestVO
     ): ResponseEntity<AnaliseDayVO> {
         val parsedDate = try {
@@ -131,10 +133,22 @@ class PaymentController {
         } catch (ex: Exception) {
             LocalDate.now()
         }
+        val parsedStart = try {
+            start?.let { LocalDate.parse(it) }
+        } catch (ex: Exception) {
+            null
+        }
+        val parsedEnd = try {
+            end?.let { LocalDate.parse(it) }
+        } catch (ex: Exception) {
+            null
+        }
         return ResponseEntity.ok(
             paymentService.getDetailsAnalysis(
                 user = user,
-                date = parsedDate.toString(),
+                date = parsedDate,
+                start = parsedStart,
+                end = parsedEnd,
                 type = type.type
             )
         )

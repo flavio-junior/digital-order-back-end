@@ -38,7 +38,26 @@ interface PaymentRepository : JpaRepository<Payment, Long> {
         """
     )
     fun getAnalysisDay(
-        @Param("date") date: LocalDate,
+        @Param("date") date: LocalDate? = null,
+        @Param("userId") userId: Long
+    ): List<Array<Any>>
+
+    @Query(
+        value = """
+            SELECT 
+                p.typePayment, 
+                p.typeOrder, 
+                COUNT(p), 
+                SUM(p.total), 
+                SUM(CASE WHEN p.discount = true THEN 1 ELSE 0 END)
+            FROM Payment p
+            WHERE p.date BETWEEN :start AND :end AND p.user.id = :userId
+            GROUP BY p.typePayment, p.typeOrder
+    """
+    )
+    fun getAnalysisDayBetweenDays(
+        @Param("start") start: LocalDate,
+        @Param("end") end: LocalDate,
         @Param("userId") userId: Long
     ): List<Array<Any>>
 

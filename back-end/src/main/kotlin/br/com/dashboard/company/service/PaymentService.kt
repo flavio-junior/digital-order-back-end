@@ -80,36 +80,48 @@ class PaymentService {
     @Transactional
     fun getDetailsAnalysis(
         user: User,
-        date: String,
+        date: LocalDate?,
+        start: LocalDate?,
+        end: LocalDate?,
         type: TypeAnalysis
     ): AnaliseDayVO {
         return when (type) {
             TypeAnalysis.DAY -> {
-                getAnalysisDay(user = user, date = date)
+                if (start != null && end != null) {
+                    getAnalysisDayBetweenDays(user = user, start = start, end = end)
+                } else {
+                    getAnalysisDay(user = user, date = date)
+                }
             }
 
-            TypeAnalysis.WEEK -> {
-                getAnalysisOfWeek(user = user)
-            }
-
-            TypeAnalysis.MONTH -> {
-                getAnalysisMonth(user = user)
-            }
-
-            TypeAnalysis.YEAR -> {
-                getAnalysisYear(user = user)
-            }
+            TypeAnalysis.WEEK -> getAnalysisOfWeek(user = user)
+            TypeAnalysis.MONTH -> getAnalysisMonth(user = user)
+            TypeAnalysis.YEAR -> getAnalysisYear(user = user)
         }
     }
 
     private fun getAnalysisDay(
         user: User,
-        date: String
+        date: LocalDate? = null
     ): AnaliseDayVO {
         return converterAnaliseDay(
             analiseDay = paymentRepository.getAnalysisDay(
                 userId = user.id,
-                date = LocalDate.parse(date)
+                date = date
+            )
+        )
+    }
+
+    private fun getAnalysisDayBetweenDays(
+        user: User,
+        start: LocalDate,
+        end: LocalDate
+    ): AnaliseDayVO {
+        return converterAnaliseDay(
+            analiseDay = paymentRepository.getAnalysisDayBetweenDays(
+                userId = user.id,
+                start = start,
+                end = end
             )
         )
     }
