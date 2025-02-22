@@ -13,5 +13,6 @@ data class OrderRequestVO(
     var fee: RequestFeeVO? = null,
     var address: AddressRequestVO? = null,
     var objects: MutableList<ObjectRequestVO>? = null,
+    var observation: String? = null,
     var payment: PaymentRequestVO? = null
 )

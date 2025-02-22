@@ -93,6 +93,7 @@ CREATE TABLE IF NOT EXISTS tb_order (
     type varchar(30) check (type in ('DELIVERY', 'ORDER', 'RESERVATION', 'SHOPPING_CART')),
     status varchar(30) check (status in ('OPEN', 'CLOSED')),
     quantity INT NOT NULL,
+    observation VARCHAR(300) NULL,
     total NUMERIC(10, 2) DEFAULT 0.0
 );
 
