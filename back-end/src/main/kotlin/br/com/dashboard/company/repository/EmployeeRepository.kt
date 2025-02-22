@@ -16,33 +16,33 @@ interface EmployeeRepository : JpaRepository<Employee, Long> {
     @Query(
         value = """
         SELECT e FROM Employee e
-            WHERE e.user.id = :userId
+            WHERE e.company.id = :companyId
         AND (:name IS NULL OR LOWER(e.name) LIKE LOWER(CONCAT('%', :name, '%')))
     """
     )
     fun findAllEmployees(
-        @Param("userId") userId: Long,
+        @Param("companyId") companyId: Long? = null,
         @Param("name") name: String?,
         pageable: Pageable
     ): Page<Employee>?
 
-    @Query(value = "SELECT e FROM Employee e WHERE e.user.id = :userId AND e.id = :employeeId")
+    @Query(value = "SELECT e FROM Employee e WHERE e.company.id = :companyId AND e.id = :employeeId")
     fun findEmployeeById(
-        @Param("userId") userId: Long,
+        @Param("companyId") companyId: Long? = null,
         @Param("employeeId") employeeId: Long
     ): Employee?
 
     @Query(
-        value = "SELECT e FROM Employee e WHERE e.user.id = :userId AND LOWER(e.name) LIKE LOWER(CONCAT('%', :name, '%'))"
+        value = "SELECT e FROM Employee e WHERE e.company.id = :companyId AND LOWER(e.name) LIKE LOWER(CONCAT('%', :name, '%'))"
     )
     fun findEmployeeByName(
-        @Param("userId") userId: Long,
+        @Param("companyId") companyId: Long? = null,
         @Param("name") name: String?
     ): List<Employee>
 
-    @Query(value = "SELECT e FROM Employee e WHERE e.user.id = :userId AND e.name = :name")
+    @Query(value = "SELECT e FROM Employee e WHERE e.company.id = :companyId AND e.name = :name")
     fun checkEmployeeAlreadyExists(
-        @Param("userId") userId: Long,
+        @Param("companyId") companyId: Long? = null,
         @Param("name") name: String?
     ): Employee?
 
@@ -54,9 +54,9 @@ interface EmployeeRepository : JpaRepository<Employee, Long> {
     )
 
     @Modifying
-    @Query(value = "DELETE FROM Employee e WHERE e.id = :employeeId AND e.user.id = :userId")
+    @Query(value = "DELETE FROM Employee e WHERE e.id = :employeeId AND e.company.id = :companyId")
     fun deleteEmployeeById(
-        @Param("userId") userId: Long,
+        @Param("companyId") companyId: Long? = null,
         @Param("employeeId") employeeId: Long
     ): Int
 }

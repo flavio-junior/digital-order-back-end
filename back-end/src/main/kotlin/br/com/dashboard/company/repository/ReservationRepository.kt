@@ -13,50 +13,50 @@ import org.springframework.stereotype.Repository
 @Repository
 interface ReservationRepository : JpaRepository<Reservation, Long> {
 
-    @Query(value = "SELECT r FROM Reservation r WHERE r.user.id = :userId AND r.name = :name")
+    @Query(value = "SELECT r FROM Reservation r WHERE r.company.id = :companyId AND r.name = :name")
     fun checkNameReservationAlreadyExists(
-        @Param("userId") userId: Long,
+        @Param("companyId") companyId: Long? = null,
         @Param("name") name: String
     ): Reservation?
 
     @Query(
         value = """
         SELECT r FROM Reservation r
-            WHERE r.user.id = :userId
+            WHERE r.company.id = :companyId
         AND (:name IS NULL OR LOWER(r.name) LIKE LOWER(CONCAT('%', :name, '%')))
     """
     )
     fun findAllReservations(
-        @Param("userId") userId: Long,
+        @Param("companyId") companyId: Long? = null,
         @Param("name") name: String?, pageable: Pageable
     ): Page<Reservation>?
 
     @Query(
-        value = "SELECT r FROM Reservation r WHERE r.user.id = :userId AND LOWER(r.name) LIKE LOWER(CONCAT('%', :reservationName, '%')) AND r.status = AVAILABLE"
+        value = "SELECT r FROM Reservation r WHERE r.company.id = :companyId AND LOWER(r.name) LIKE LOWER(CONCAT('%', :reservationName, '%')) AND r.status = AVAILABLE"
     )
     fun findReservationByName(
-        @Param("userId") userId: Long,
+        @Param("companyId") companyId: Long? = null,
         @Param("reservationName") reservationName: String
     ): List<Reservation>
 
-    @Query(value = "SELECT r FROM Reservation r WHERE r.user.id = :userId AND r.id = :idReservation")
+    @Query(value = "SELECT r FROM Reservation r WHERE r.company.id = :companyId AND r.id = :idReservation")
     fun findReservationById(
-        @Param("userId") userId: Long,
+        @Param("companyId") companyId: Long? = null,
         @Param("idReservation") reservationId: Long
     ): Reservation?
 
     @Modifying
-    @Query(value = "UPDATE Reservation r SET r.status =:status WHERE r.user.id = :userId AND r.id = :reservationId")
+    @Query(value = "UPDATE Reservation r SET r.status =:status WHERE r.company.id = :companyId AND r.id = :reservationId")
     fun updateStatusReservation(
-        @Param("userId") userId: Long,
+        @Param("companyId") companyId: Long? = null,
         @Param("reservationId") reservationId: Long,
         @Param("status") status: ReservationStatus
     )
 
     @Modifying
     @Query(
+        nativeQuery = true,
         value = "DELETE FROM tb_order_reservation WHERE fk_order = :orderId AND fk_reservation = :reservationId",
-        nativeQuery = true
     )
     fun deleteRelationBetweenReservationAndByIdOrderById(
         @Param("orderId") orderId: Long,
@@ -64,9 +64,9 @@ interface ReservationRepository : JpaRepository<Reservation, Long> {
     ): Int
 
     @Modifying
-    @Query(value = "DELETE FROM Reservation r WHERE r.id = :reservationId AND r.user.id = :userId")
+    @Query(value = "DELETE FROM Reservation r WHERE r.id = :reservationId AND r.company.id = :companyId")
     fun deleteReservationById(
-        @Param("userId") userId: Long,
+        @Param("companyId") companyId: Long? = null,
         @Param("reservationId") reservationId: Long
     ): Int
 }

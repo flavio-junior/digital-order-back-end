@@ -1,7 +1,7 @@
 package br.com.dashboard.company.entities.product
 
 import br.com.dashboard.company.entities.category.Category
-import br.com.dashboard.company.entities.user.User
+import br.com.dashboard.company.entities.company.Company
 import jakarta.persistence.CascadeType
 import jakarta.persistence.Column
 import jakarta.persistence.Entity
@@ -41,5 +41,5 @@ data class Product(
         joinColumns = [JoinColumn(name = "fk_product", referencedColumnName = "id")],
         inverseJoinColumns = [JoinColumn(name = "fk_company", referencedColumnName = "id")]
     )
-    var user: User? = null
+    var company: Company? = null
 )

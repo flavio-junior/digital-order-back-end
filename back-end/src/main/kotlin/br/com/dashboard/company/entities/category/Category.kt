@@ -1,6 +1,6 @@
 package br.com.dashboard.company.entities.category
 
-import br.com.dashboard.company.entities.user.User
+import br.com.dashboard.company.entities.company.Company
 import jakarta.persistence.CascadeType
 import jakarta.persistence.Column
 import jakarta.persistence.Entity
@@ -26,5 +26,5 @@ data class Category(
         joinColumns = [JoinColumn(name = "fk_category", referencedColumnName = "id")],
         inverseJoinColumns = [JoinColumn(name = "fk_company", referencedColumnName = "id")]
     )
-    var user: User? = null
+    var company: Company? = null
 )

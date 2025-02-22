@@ -23,7 +23,7 @@ class ReservationService {
     private lateinit var reservationRepository: ReservationRepository
 
     @Autowired
-    private lateinit var userService: UserService
+    private lateinit var companyService: CompanyService
 
     @Transactional(readOnly = true)
     fun findAllReservations(
@@ -31,8 +31,9 @@ class ReservationService {
         name: String?,
         pageable: Pageable
     ): Page<ReservationResponseVO> {
+        val companySaved = companyService.getCompanyByUserLogged(userLoggedId = user.id)
         val reservations: Page<Reservation>? =
-            reservationRepository.findAllReservations(userId = user.id, name = name, pageable = pageable)
+            reservationRepository.findAllReservations(companyId = companySaved.id, name = name, pageable = pageable)
         return reservations?.map { reservation -> parseObject(reservation, ReservationResponseVO::class.java) }
             ?: throw ResourceNotFoundException(message = RESERVATION_NOT_FOUND)
     }
@@ -42,8 +43,9 @@ class ReservationService {
         user: User,
         name: String
     ): List<ReservationResponseVO> {
+        val companySaved = companyService.getCompanyByUserLogged(userLoggedId = user.id)
         val reservations: List<Reservation> =
-            reservationRepository.findReservationByName(userId = user.id, reservationName = name)
+            reservationRepository.findReservationByName(companyId = companySaved.id, reservationName = name)
         return reservations.map { reservation -> parseObject(reservation, ReservationResponseVO::class.java) }
     }
 
@@ -60,8 +62,9 @@ class ReservationService {
         userId: Long,
         reservationId: Long
     ): Reservation {
+        val companySaved = companyService.getCompanyByUserLogged(userLoggedId = userId)
         val reservationSaved: Reservation? =
-            reservationRepository.findReservationById(userId = userId, reservationId = reservationId)
+            reservationRepository.findReservationById(companyId = companySaved.id, reservationId = reservationId)
         if (reservationSaved != null) {
             return reservationSaved
         } else {
@@ -75,10 +78,9 @@ class ReservationService {
         reservation: ReservationRequestVO
     ): ReservationResponseVO {
         if (!checkNameReservationAlreadyExists(userId = user.id, name = reservation.name)) {
-            val userAuthenticated = userService.findUserById(userId = user.id)
             val reservationResult: Reservation = parseObject(reservation, Reservation::class.java)
             reservationResult.status = ReservationStatus.AVAILABLE
-            reservationResult.user = userAuthenticated
+            reservationResult.company = companyService.getCompanyByUserLogged(userLoggedId = user.id)
             return parseObject(reservationRepository.save(reservationResult), ReservationResponseVO::class.java)
         } else {
             throw ObjectDuplicateException(message = DUPLICATE_NAME_RESERVATION)
@@ -124,7 +126,9 @@ class ReservationService {
         userId: Long,
         name: String
     ): Boolean {
-        val reservationResult = reservationRepository.checkNameReservationAlreadyExists(userId = userId, name = name)
+        val companySaved = companyService.getCompanyByUserLogged(userLoggedId = userId)
+        val reservationResult =
+            reservationRepository.checkNameReservationAlreadyExists(companyId = companySaved.id, name = name)
         return reservationResult != null
     }
 
@@ -148,8 +152,9 @@ class ReservationService {
         reservationId: Long,
         status: ReservationStatus
     ) {
+        val companySaved = companyService.getCompanyByUserLogged(userLoggedId = userId)
         reservationRepository.updateStatusReservation(
-            userId = userId,
+            companyId = companySaved.id,
             reservationId = reservationId,
             status = status
         )
@@ -169,7 +174,10 @@ class ReservationService {
         reservationId: Long
     ) {
         val reservationSaved: Reservation = getReservation(userId = userId, reservationId = reservationId)
-        reservationRepository.deleteReservationById(userId = userId, reservationId = reservationSaved.id)
+        reservationRepository.deleteReservationById(
+            companyId = reservationSaved.company?.id,
+            reservationId = reservationSaved.id
+        )
     }
 
     companion object {

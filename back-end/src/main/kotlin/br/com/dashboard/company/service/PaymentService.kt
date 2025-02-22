@@ -1,5 +1,6 @@
 package br.com.dashboard.company.service
 
+import br.com.dashboard.company.entities.company.Company
 import br.com.dashboard.company.entities.order.Order
 import br.com.dashboard.company.entities.payment.Payment
 import br.com.dashboard.company.entities.user.User
@@ -24,8 +25,11 @@ class PaymentService {
     @Autowired
     private lateinit var paymentRepository: PaymentRepository
 
+    @Autowired
+    private lateinit var companyService: CompanyService
+
     fun savePayment(
-        user: User? = null,
+        company: Company? = null,
         order: Order,
         payment: PaymentRequestVO? = null,
         fee: Boolean = false,
@@ -60,7 +64,7 @@ class PaymentService {
             paymentResult.total = total
         }
         paymentResult.order = order
-        paymentResult.user = user
+        paymentResult.company = company
         return paymentRepository.save(paymentResult)
     }
 
@@ -70,8 +74,9 @@ class PaymentService {
         code: Long?,
         pageable: Pageable
     ): Page<PaymentResponseVO> {
+        val companySaved = companyService.getCompanyByUserLogged(userLoggedId = user.id)
         val payments: Page<Payment>? =
-            paymentRepository.getAllPaymentsDay(userId = user.id, code = code, pageable = pageable)
+            paymentRepository.getAllPaymentsDay(companyId = companySaved.id, code = code, pageable = pageable)
         return payments?.map { payment ->
             parseObject(payment, PaymentResponseVO()::class.java)
         } ?: throw ResourceNotFoundException(message = PAYMENT_NOT_FOUND)
@@ -85,18 +90,19 @@ class PaymentService {
         end: LocalDate?,
         type: TypeAnalysis
     ): AnaliseDayVO {
+        val companySaved = companyService.getCompanyByUserLogged(userLoggedId = user.id)
         return when (type) {
             TypeAnalysis.DAY -> {
                 if (start != null && end != null) {
-                    getAnalysisDayBetweenDays(user = user, start = start, end = end)
+                    getAnalysisDayBetweenDays(companyId = companySaved.id, start = start, end = end)
                 } else {
                     getAnalysisDay(user = user, date = date)
                 }
             }
 
-            TypeAnalysis.WEEK -> getAnalysisOfWeek(user = user)
-            TypeAnalysis.MONTH -> getAnalysisMonth(user = user)
-            TypeAnalysis.YEAR -> getAnalysisYear(user = user)
+            TypeAnalysis.WEEK -> getAnalysisOfWeek(companyId = companySaved.id)
+            TypeAnalysis.MONTH -> getAnalysisMonth(companyId = companySaved.id)
+            TypeAnalysis.YEAR -> getAnalysisYear(companyId = companySaved.id)
         }
     }
 
@@ -106,20 +112,20 @@ class PaymentService {
     ): AnaliseDayVO {
         return converterAnaliseDay(
             analiseDay = paymentRepository.getAnalysisDay(
-                userId = user.id,
+                companyId = user.id,
                 date = date
             )
         )
     }
 
     private fun getAnalysisDayBetweenDays(
-        user: User,
+        companyId: Long? = null,
         start: LocalDate,
         end: LocalDate
     ): AnaliseDayVO {
         return converterAnaliseDay(
             analiseDay = paymentRepository.getAnalysisDayBetweenDays(
-                userId = user.id,
+                companyId = companyId,
                 start = start,
                 end = end
             )
@@ -128,13 +134,13 @@ class PaymentService {
 
     @Transactional
     fun getAnalysisOfWeek(
-        user: User
+        companyId: Long? = null
     ): AnaliseDayVO {
         val startDate = LocalDate.now().minusDays(7)
         val endDate = LocalDate.now()
         return converterAnaliseDay(
             analiseDay = paymentRepository.getAnalysisOfWeek(
-                userId = user.id,
+                companyId = companyId,
                 startDate = startDate,
                 endDate = endDate
             )
@@ -143,16 +149,16 @@ class PaymentService {
 
     @Transactional
     fun getAnalysisMonth(
-        user: User
+        companyId: Long? = null
     ): AnaliseDayVO {
-        return converterAnaliseDay(analiseDay = paymentRepository.getAnalysisMonth(userId = user.id))
+        return converterAnaliseDay(analiseDay = paymentRepository.getAnalysisMonth(companyId = companyId))
     }
 
     @Transactional
     fun getAnalysisYear(
-        user: User
+        companyId: Long? = null
     ): AnaliseDayVO {
-        return converterAnaliseDay(analiseDay = paymentRepository.getAnalysisYear(userId = user.id))
+        return converterAnaliseDay(analiseDay = paymentRepository.getAnalysisYear(companyId = companyId))
     }
 
     private fun converterAnaliseDay(

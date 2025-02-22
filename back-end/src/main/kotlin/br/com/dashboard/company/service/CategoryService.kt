@@ -20,7 +20,8 @@ class CategoryService {
     private lateinit var categoryRepository: CategoryRepository
 
     @Autowired
-    private lateinit var userService: UserService
+    private lateinit var companyService: CompanyService
+
 
     @Transactional(readOnly = true)
     fun findAllCategories(
@@ -28,8 +29,9 @@ class CategoryService {
         name: String?,
         pageable: Pageable
     ): Page<CategoryResponseVO> {
+        val companySaved = companyService.getCompanyByUserLogged(userLoggedId = user.id)
         val categories: Page<Category> =
-            categoryRepository.findAllCategories(userId = user.id, name = name, pageable = pageable)
+            categoryRepository.findAllCategories(companyId = companySaved.id, name = name, pageable = pageable)
         return categories.map { category -> parseObject(category, CategoryResponseVO::class.java) }
     }
 
@@ -38,7 +40,8 @@ class CategoryService {
         user: User,
         name: String
     ): List<CategoryResponseVO> {
-        val products: List<Category> = categoryRepository.findCategoryByName(userId = user.id, name = name)
+        val companySaved = companyService.getCompanyByUserLogged(userLoggedId = user.id)
+        val products: List<Category> = categoryRepository.findCategoryByName(companyId = companySaved.id, name = name)
         return products.map { product -> parseObject(product, CategoryResponseVO::class.java) }
     }
 
@@ -55,7 +58,9 @@ class CategoryService {
         userId: Long,
         categoryId: Long
     ): Category {
-        val categorySaved: Category? = categoryRepository.findCategoryById(userId = userId, categoryId = categoryId)
+        val companySaved = companyService.getCompanyByUserLogged(userLoggedId = userId)
+        val categorySaved: Category? =
+            categoryRepository.findCategoryById(companyId = companySaved.id, categoryId = categoryId)
         if (categorySaved != null) {
             return categorySaved
         } else {
@@ -78,10 +83,10 @@ class CategoryService {
         user: User,
         category: CategoryResponseVO
     ): CategoryResponseVO {
-        if (!checkNameCategoryAlreadyExists(id = user.id, name = category.name)) {
-            val userAuthenticated = userService.findUserById(userId = user.id)
+        val companySaved = companyService.getCompanyByUserLogged(userLoggedId = user.id)
+        if (!checkNameCategoryAlreadyExists(companyId = companySaved.id, name = category.name)) {
             val categoryResult: Category = parseObject(category, Category::class.java)
-            categoryResult.user = userAuthenticated
+            categoryResult.company = companySaved
             return parseObject(categoryRepository.save(categoryResult), CategoryResponseVO::class.java)
         } else {
             throw ObjectDuplicateException(message = DUPLICATE_NAME_CATEGORY)
@@ -89,10 +94,10 @@ class CategoryService {
     }
 
     private fun checkNameCategoryAlreadyExists(
-        id: Long,
+        companyId: Long? = null,
         name: String
     ): Boolean {
-        val categoryResult = categoryRepository.checkNameCategoryAlreadyExists(userId = id, name = name)
+        val categoryResult = categoryRepository.checkNameCategoryAlreadyExists(companyId = companyId, name = name)
         return categoryResult != null
     }
 
@@ -100,7 +105,8 @@ class CategoryService {
         user: User,
         category: CategoryResponseVO
     ): CategoryResponseVO {
-        if (!checkNameCategoryAlreadyExists(id = user.id, name = category.name)) {
+        val companySaved = companyService.getCompanyByUserLogged(userLoggedId = user.id)
+        if (!checkNameCategoryAlreadyExists(companyId = companySaved.id, name = category.name)) {
             val categoryResult: Category = getCategory(userId = user.id, categoryId = category.id)
             categoryResult.name = category.name
             return parseObject(categoryRepository.save(categoryResult), CategoryResponseVO::class.java)
@@ -115,8 +121,9 @@ class CategoryService {
         userId: Long,
         categoryId: Long
     ) {
+        val companySaved = companyService.getCompanyByUserLogged(userLoggedId = userId)
         val category = getCategory(userId = userId, categoryId = categoryId)
-        categoryRepository.deleteCategoryById(categoryId = category.id, userId = userId)
+        categoryRepository.deleteCategoryById(categoryId = category.id, companyId = companySaved.id)
     }
 
     companion object {

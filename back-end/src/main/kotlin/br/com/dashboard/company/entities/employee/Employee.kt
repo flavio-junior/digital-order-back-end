@@ -1,6 +1,6 @@
 package br.com.dashboard.company.entities.employee
 
-import br.com.dashboard.company.entities.user.User
+import br.com.dashboard.company.entities.company.Company
 import br.com.dashboard.company.utils.common.Function
 import br.com.dashboard.company.utils.common.StatusEmployee
 import jakarta.persistence.*
@@ -28,5 +28,5 @@ data class Employee(
         joinColumns = [JoinColumn(name = "fk_employee", referencedColumnName = "id")],
         inverseJoinColumns = [JoinColumn(name = "fk_company", referencedColumnName = "id")]
     )
-    var user: User? = null
+    var company: Company? = null
 )

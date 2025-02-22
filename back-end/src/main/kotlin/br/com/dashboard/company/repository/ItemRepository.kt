@@ -12,9 +12,9 @@ import org.springframework.stereotype.Repository
 @Repository
 interface ItemRepository : JpaRepository<Item, Long> {
 
-    @Query(value = "SELECT i FROM Item i WHERE i.user.id = :userId AND i.name = :name")
+    @Query(value = "SELECT i FROM Item i WHERE i.company.id = :companyId AND i.name = :name")
     fun checkNameItemAlreadyExists(
-        @Param("userId") userId: Long,
+        @Param("companyId") companyId: Long? = null,
         @Param("name") name: String
     ): Item?
 
@@ -22,41 +22,41 @@ interface ItemRepository : JpaRepository<Item, Long> {
         value =
             """
             SELECT i FROM Item i
-                WHERE i.user.id = :userId
+                WHERE i.company.id = :companyId
             AND (:name IS NULL OR LOWER(i.name) LIKE LOWER(CONCAT('%', :name, '%')))
             """
     )
     fun findAllItems(
-        @Param("userId") userId: Long,
+        @Param("companyId") companyId: Long? = null,
         @Param("name") name: String?, pageable: Pageable
     ): Page<Item>?
 
-    @Query(value = "SELECT i FROM Item i WHERE i.user.id = :userId AND i.id = :idItem")
+    @Query(value = "SELECT i FROM Item i WHERE i.company.id = :companyId AND i.id = :idItem")
     fun findItemById(
-        @Param("userId") userId: Long,
+        @Param("companyId") companyId: Long? = null,
         @Param("idItem") itemId: Long
     ): Item?
 
     @Query(
-        value = "SELECT i FROM Item i WHERE i.user.id = :userId AND LOWER(i.name) LIKE LOWER(CONCAT('%', :name, '%'))"
+        value = "SELECT i FROM Item i WHERE i.company.id = :companyId AND LOWER(i.name) LIKE LOWER(CONCAT('%', :name, '%'))"
     )
     fun findItemByName(
-        @Param("userId") userId: Long,
+        @Param("companyId") companyId: Long? = null,
         @Param("name") name: String?
     ): List<Item>
 
     @Modifying
-    @Query(value = "UPDATE Item i SET i.price =:price WHERE i.user.id = :userId AND i.id =:idItem")
+    @Query(value = "UPDATE Item i SET i.price =:price WHERE i.company.id = :companyId AND i.id =:idItem")
     fun updateItemPrice(
-        @Param("userId") userId: Long,
+        @Param("companyId") companyId: Long? = null,
         @Param("idItem") idItem: Long,
         @Param("price") price: Double
     )
 
     @Modifying
-    @Query(value = "DELETE FROM Item i WHERE i.id = :itemId AND i.user.id = :userId")
+    @Query(value = "DELETE FROM Item i WHERE i.id = :itemId AND i.company.id = :companyId")
     fun deleteItemById(
-        @Param("userId") userId: Long,
+        @Param("companyId") companyId: Long? = null,
         @Param("itemId") itemId: Long
     ): Int
 }

@@ -21,7 +21,7 @@ import java.time.temporal.ChronoUnit
 class ReportService {
 
     @Autowired
-    private lateinit var userService: UserService
+    private lateinit var companyService: CompanyService
 
     @Autowired
     private lateinit var reportRepository: ReportRepository
@@ -31,7 +31,8 @@ class ReportService {
         user: User,
         pageable: Pageable
     ): Page<ReportResponseVO> {
-        val reports: Page<Report> = reportRepository.findAllReports(userId = user.id, pageable = pageable)
+        val companySaved = companyService.getCompanyByUserLogged(userLoggedId = user.id)
+        val reports: Page<Report> = reportRepository.findAllReports(companyId = companySaved.id, pageable = pageable)
         return reports.map { report -> parseObject(report, ReportResponseVO::class.java) }
     }
 
@@ -41,7 +42,9 @@ class ReportService {
         date: String,
         pageable: Pageable
     ): Page<ReportResponseVO> {
-        val reports: Page<Report> = reportRepository.findReportsByDate(userId = user.id, date = date, pageable = pageable)
+        val companySaved = companyService.getCompanyByUserLogged(userLoggedId = user.id)
+        val reports: Page<Report> =
+            reportRepository.findReportsByDate(companyId = companySaved.id, date = date, pageable = pageable)
         return reports.map { report -> parseObject(report, ReportResponseVO::class.java) }
     }
 
@@ -49,7 +52,8 @@ class ReportService {
         userId: Long,
         reportId: Long
     ): Report {
-        val reportSaved: Report? = reportRepository.findReportById(userId = userId, reportId = reportId)
+        val companySaved = companyService.getCompanyByUserLogged(userLoggedId = userId)
+        val reportSaved: Report? = reportRepository.findReportById(companyId = companySaved.id, reportId = reportId)
         if (reportSaved != null) {
             return reportSaved
         } else {
@@ -62,11 +66,10 @@ class ReportService {
         user: User,
         report: ReportRequestVO
     ): ReportResponseVO {
-        val userAuthenticated = userService.findUserById(userId = user.id)
         val reportResult: Report = parseObject(report, Report::class.java)
         reportResult.date = LocalDate.now()
         reportResult.hour = LocalTime.now().withNano(0)
-        reportResult.user = userAuthenticated
+        reportResult.company = companyService.getCompanyByUserLogged(userLoggedId = user.id)
         return parseObject(reportRepository.save(reportResult), ReportResponseVO::class.java)
     }
 
@@ -76,13 +79,13 @@ class ReportService {
         reportId: Long
     ) {
         val actualDate = LocalDate.now()
-        val report = getReport(userId = userId, reportId = reportId)
-        if (report.date != null) {
-            val daysDifference = ChronoUnit.DAYS.between(actualDate, report.date)
+        val reportSaved = getReport(userId = userId, reportId = reportId)
+        if (reportSaved.date != null) {
+            val daysDifference = ChronoUnit.DAYS.between(actualDate, reportSaved.date)
             if (daysDifference > 7) {
                 throw InternalErrorClient(message = REPORT_EXPIRATION_DATE_EXPIRED)
             } else {
-                reportRepository.deleteReportById(reportId = report.id, userId = userId)
+                reportRepository.deleteReportById(companyId = reportSaved.company?.id, reportId = reportSaved.id)
             }
         }
     }

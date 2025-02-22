@@ -2,6 +2,7 @@ package br.com.dashboard.company.service
 
 import br.com.dashboard.company.entities.company.Company
 import br.com.dashboard.company.entities.user.User
+import br.com.dashboard.company.exceptions.OperationUnauthorizedException
 import br.com.dashboard.company.repository.CompanyRepository
 import br.com.dashboard.company.utils.others.ConverterUtils.parseObject
 import br.com.dashboard.company.vo.company.CompanyResponseVO
@@ -43,6 +44,14 @@ class CompanyService {
             )
         )
         return parseObject(origin = companySaved, destination = CompanyResponseVO::class.java)
+    }
+
+    @Transactional(readOnly = true)
+    fun getCompanyByUserLogged(
+        userLoggedId: Long
+    ): Company {
+        return companyRepository.getCompanyByUserLogged(userLoggedId = userLoggedId)
+            ?: throw OperationUnauthorizedException()
     }
 
     companion object {

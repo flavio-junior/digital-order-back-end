@@ -1,7 +1,7 @@
 package br.com.dashboard.company.entities.reservation
 
+import br.com.dashboard.company.entities.company.Company
 import br.com.dashboard.company.entities.order.Order
-import br.com.dashboard.company.entities.user.User
 import br.com.dashboard.company.utils.common.ReservationStatus
 import jakarta.persistence.*
 
@@ -28,5 +28,5 @@ data class Reservation(
         joinColumns = [JoinColumn(name = "fk_reservation", referencedColumnName = "id")],
         inverseJoinColumns = [JoinColumn(name = "fk_company", referencedColumnName = "id")]
     )
-    var user: User? = null
+    var company: Company? = null
 )

@@ -1,8 +1,8 @@
 package br.com.dashboard.company.entities.fee
 
+import br.com.dashboard.company.entities.company.Company
 import br.com.dashboard.company.entities.day.Day
 import br.com.dashboard.company.entities.order.Order
-import br.com.dashboard.company.entities.user.User
 import br.com.dashboard.company.utils.common.Function
 import jakarta.persistence.*
 
@@ -43,5 +43,5 @@ data class Fee(
         joinColumns = [JoinColumn(name = "fk_fee", referencedColumnName = "id")],
         inverseJoinColumns = [JoinColumn(name = "fk_company", referencedColumnName = "id")]
     )
-    var user: User? = null
+    var company: Company? = null
 )

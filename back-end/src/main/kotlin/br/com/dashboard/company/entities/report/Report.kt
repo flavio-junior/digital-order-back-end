@@ -1,6 +1,6 @@
 package br.com.dashboard.company.entities.report
 
-import br.com.dashboard.company.entities.user.User
+import br.com.dashboard.company.entities.company.Company
 import jakarta.persistence.*
 import java.time.LocalDate
 import java.time.LocalTime
@@ -22,5 +22,5 @@ data class Report(
         joinColumns = [JoinColumn(name = "fk_report", referencedColumnName = "id")],
         inverseJoinColumns = [JoinColumn(name = "fk_company", referencedColumnName = "id")]
     )
-    var user: User? = null
+    var company: Company? = null
 )

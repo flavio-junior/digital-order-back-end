@@ -12,29 +12,29 @@ import org.springframework.stereotype.Repository
 @Repository
 interface ReportRepository : JpaRepository<Report, Long> {
 
-    @Query(value = "SELECT r FROM Report r WHERE r.user.id = :userId")
+    @Query(value = "SELECT r FROM Report r WHERE r.company.id = :companyId")
     fun findAllReports(
-        @Param("userId") userId: Long,
+        @Param("companyId") companyId: Long? = null,
         pageable: Pageable
     ): Page<Report>
 
-    @Query(value = "SELECT r FROM Report r WHERE r.user.id = :userId AND (:date IS NULL OR r.date = CAST(:date AS date))")
+    @Query(value = "SELECT r FROM Report r WHERE r.company.id = :companyId AND (:date IS NULL OR r.date = CAST(:date AS date))")
     fun findReportsByDate(
-        @Param("userId") userId: Long,
+        @Param("companyId") companyId: Long? = null,
         @Param("date") date: String,
         pageable: Pageable
     ): Page<Report>
 
-    @Query(value = "SELECT r FROM Report r WHERE r.user.id = :userId AND r.id = :reportId")
+    @Query(value = "SELECT r FROM Report r WHERE r.company.id = :companyId AND r.id = :reportId")
     fun findReportById(
-        @Param("userId") userId: Long,
+        @Param("companyId") companyId: Long? = null,
         @Param("reportId") reportId: Long
     ): Report?
 
     @Modifying
-    @Query(value = "DELETE FROM Report r WHERE r.id = :reportId AND r.user.id = :userId")
+    @Query(value = "DELETE FROM Report r WHERE r.id = :reportId AND r.company.id = :companyId")
     fun deleteReportById(
-        @Param("userId") userId: Long,
+        @Param("companyId") companyId: Long? = null,
         @Param("reportId") reportId: Long
     ): Int
 }

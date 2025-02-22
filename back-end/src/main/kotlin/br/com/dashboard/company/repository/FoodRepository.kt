@@ -12,51 +12,51 @@ import org.springframework.stereotype.Repository
 @Repository
 interface FoodRepository : JpaRepository<Food, Long> {
 
-    @Query("SELECT f FROM Food f WHERE f.user.id = :userId AND f.name = :foodName")
+    @Query("SELECT f FROM Food f WHERE f.company.id = :companyId AND f.name = :foodName")
     fun checkNameFoodAlreadyExists(
-        @Param("userId") userId: Long,
+        @Param("companyId") companyId: Long? = null,
         @Param("foodName") foodName: String
     ): Food?
 
     @Query(
         value = """
         SELECT f FROM Food f
-            WHERE f.user.id = :userId
+            WHERE f.company.id = :companyId
         AND (:foodName IS NULL OR LOWER(f.name) LIKE LOWER(CONCAT('%', :foodName, '%')))
     """
     )
     fun findAllFoods(
-        @Param("userId") userId: Long,
+        @Param("companyId") companyId: Long? = null,
         @Param("foodName") foodName: String?,
         pageable: Pageable
     ): Page<Food>?
 
-    @Query(value = "SELECT f FROM Food f WHERE f.user.id = :userId AND f.id = :foodId")
+    @Query(value = "SELECT f FROM Food f WHERE f.company.id = :companyId AND f.id = :foodId")
     fun findFoodById(
-        @Param("userId") userId: Long,
+        @Param("companyId") companyId: Long? = null,
         @Param("foodId") foodId: Long
     ): Food?
 
     @Query(
-        value = "SELECT f FROM Food f WHERE f.user.id = :userId AND LOWER(f.name) LIKE LOWER(CONCAT('%', :foodName, '%'))"
+        value = "SELECT f FROM Food f WHERE f.company.id = :companyId AND LOWER(f.name) LIKE LOWER(CONCAT('%', :foodName, '%'))"
     )
     fun findFoodByName(
-        @Param("userId") userId: Long,
+        @Param("companyId") companyId: Long? = null,
         @Param("foodName") foodName: String
     ): List<Food>
 
     @Modifying
-    @Query("UPDATE Food f SET f.price =:price WHERE f.user.id = :userId AND f.id =:id")
+    @Query("UPDATE Food f SET f.price =:price WHERE f.company.id = :companyId AND f.id =:id")
     fun updatePriceFood(
-        @Param("userId") userId: Long,
+        @Param("companyId") companyId: Long? = null,
         @Param("id") idFood: Long,
         @Param("price") price: Double
     )
 
     @Modifying
-    @Query(value = "DELETE FROM Food f WHERE f.id = :foodId AND f.user.id = :userId")
+    @Query(value = "DELETE FROM Food f WHERE f.id = :foodId AND f.company.id = :companyId")
     fun deleteFoodById(
-        @Param("userId") userId: Long,
+        @Param("companyId") companyId: Long? = null,
         @Param("foodId") foodId: Long
     ): Int
 }

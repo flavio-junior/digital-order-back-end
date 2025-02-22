@@ -11,41 +11,41 @@ import org.springframework.stereotype.Repository
 @Repository
 interface FeeRepository : JpaRepository<Fee, Long> {
 
-    @Query(value = "SELECT f FROM Fee f WHERE f.user.id = :userId")
+    @Query(value = "SELECT f FROM Fee f WHERE f.company.id = :companyId")
     fun findAllFees(
-        @Param("userId") userId: Long
+        @Param("companyId") companyId: Long? = null
     ): List<Fee>
 
-    @Query(value = "SELECT f FROM Fee f WHERE f.user.id = :userId AND f.id = :feeId")
+    @Query(value = "SELECT f FROM Fee f WHERE f.company.id = :companyId AND f.id = :feeId")
     fun findFeeById(
-        @Param("userId") userId: Long,
+        @Param("companyId") companyId: Long? = null,
         @Param("feeId") feeId: Long
     ): Fee?
 
-    @Query(value = "SELECT f FROM Fee f WHERE f.user.id = :userId AND f.assigned = :assigned")
+    @Query(value = "SELECT f FROM Fee f WHERE f.company.id = :companyId AND f.assigned = :assigned")
     fun findFeeByAssigned(
-        @Param("userId") userId: Long,
+        @Param("companyId") companyId: Long? = null,
         @Param("assigned") assigned: Function
     ): Fee?
 
-    @Query("SELECT f FROM Fee f WHERE f.user.id = :userId AND f.assigned = :assigned")
+    @Query("SELECT f FROM Fee f WHERE f.company.id = :companyId AND f.assigned = :assigned")
     fun checkFeeAlreadyExists(
-        @Param("userId") userId: Long,
+        @Param("companyId") companyId: Long? = null,
         @Param("assigned") assigned: Function
     ): Fee?
 
     @Modifying
-    @Query("UPDATE Fee f SET f.percentage =:percentage WHERE f.user.id = :userId AND f.id = :feeId")
+    @Query("UPDATE Fee f SET f.percentage =:percentage WHERE f.company.id = :companyId AND f.id = :feeId")
     fun updatePriceFee(
-        @Param("userId") userId: Long,
+        @Param("companyId") companyId: Long? = null,
         @Param("feeId") feeId: Long,
         @Param("percentage") percentage: Int
     )
 
     @Modifying
-    @Query(value = "DELETE FROM Fee f WHERE f.id = :feeId AND f.user.id = :userId")
+    @Query(value = "DELETE FROM Fee f WHERE f.id = :feeId AND f.company.id = :companyId")
     fun deleteFeeById(
-        @Param("userId") userId: Long,
+        @Param("companyId") companyId: Long? = null,
         @Param("feeId") feeId: Long
     ): Int
 }

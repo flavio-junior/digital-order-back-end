@@ -32,7 +32,7 @@ class ObjectService {
     private lateinit var foodService: FoodService
 
     @Autowired
-    private lateinit var userService: UserService
+    private lateinit var companyService: CompanyService
 
     @Transactional
     fun saveObjects(
@@ -42,12 +42,12 @@ class ObjectService {
         objectsToSave: MutableList<ObjectRequestVO>? = null
     ): Pair<MutableList<Object>?, Double> {
         var total = 0.0
-        val userAuthenticated = userService.findUserById(userId = userId)
+        val userAuthenticated = companyService.getCompanyByUserLogged(userLoggedId = userId)
         val result = objectsToSave?.map { item ->
             when (item.type) {
                 TypeItem.FOOD -> {
                     val objectSaved = foodService.saveObjectFood(
-                        user = userAuthenticated,
+                        company = userAuthenticated,
                         order = order,
                         foodRequest = item,
                     )
@@ -62,7 +62,7 @@ class ObjectService {
 
                 TypeItem.ITEM -> {
                     val objectSaved = itemService.saveObjectItem(
-                        user = userAuthenticated,
+                        company = userAuthenticated,
                         order = order,
                         itemRequest = item,
                     )
@@ -77,7 +77,7 @@ class ObjectService {
 
                 else -> {
                     val objectProductInstanced = productService.buyProduct(
-                        user = userAuthenticated,
+                        company = userAuthenticated,
                         order = order,
                         buy = buy,
                         productRequest = item

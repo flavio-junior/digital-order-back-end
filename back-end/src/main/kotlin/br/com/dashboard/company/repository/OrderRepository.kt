@@ -13,24 +13,24 @@ import org.springframework.stereotype.Repository
 @Repository
 interface OrderRepository : JpaRepository<Order, Long> {
 
-    @Query("SELECT o from Order o WHERE o.user.id = :userId AND o.status =:status")
+    @Query("SELECT o from Order o WHERE o.company.id = :companyId AND o.status =:status")
     fun findAllOrdersOpen(
-        @Param("userId") userId: Long,
+        @Param("companyId") companyId: Long? = null,
         @Param("status") status: Status,
         pageable: Pageable
     ): Page<Order>?
 
     @Modifying
-    @Query("UPDATE Order o SET o.status =:status WHERE o.user.id = :userId AND o.id =:orderId")
+    @Query("UPDATE Order o SET o.status =:status WHERE o.company.id = :companyId AND o.id =:orderId")
     fun updateStatusOrder(
-        @Param("userId") userId: Long,
+        @Param("companyId") companyId: Long? = null,
         @Param("orderId") orderId: Long,
         @Param("status") status: Status
     )
 
-    @Query(value = "SELECT o FROM Order o WHERE o.user.id = :userId AND o.id = :orderId")
+    @Query(value = "SELECT o FROM Order o WHERE o.company.id = :companyId AND o.id = :orderId")
     fun findOrderById(
-        @Param("userId") userId: Long,
+        @Param("companyId") companyId: Long? = null,
         @Param("orderId") orderId: Long
     ): Order?
 
@@ -62,9 +62,9 @@ interface OrderRepository : JpaRepository<Order, Long> {
     )
 
     @Modifying
-    @Query(value = "DELETE FROM Order o WHERE o.id = :orderId AND o.user.id = :userId")
+    @Query(value = "DELETE FROM Order o WHERE o.id = :orderId AND o.company.id = :companyId")
     fun deleteOrderById(
-        @Param("userId") userId: Long,
+        @Param("companyId") companyId: Long? = null,
         @Param("orderId") orderId: Long
     ): Int
 }

@@ -1,11 +1,11 @@
 package br.com.dashboard.company.entities.order
 
 import br.com.dashboard.company.entities.address.Address
+import br.com.dashboard.company.entities.company.Company
 import br.com.dashboard.company.entities.fee.Fee
 import br.com.dashboard.company.entities.`object`.Object
 import br.com.dashboard.company.entities.payment.Payment
 import br.com.dashboard.company.entities.reservation.Reservation
-import br.com.dashboard.company.entities.user.User
 import br.com.dashboard.company.utils.common.Status
 import br.com.dashboard.company.utils.common.TypeOrder
 import jakarta.persistence.CascadeType
@@ -79,5 +79,5 @@ data class Order(
         joinColumns = [JoinColumn(name = "fk_order", referencedColumnName = "id")],
         inverseJoinColumns = [JoinColumn(name = "fk_company", referencedColumnName = "id")]
     )
-    var user: User? = null
+    var company: Company? = null
 )

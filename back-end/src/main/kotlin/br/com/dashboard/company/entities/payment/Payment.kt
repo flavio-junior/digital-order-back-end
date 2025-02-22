@@ -1,7 +1,7 @@
 package br.com.dashboard.company.entities.payment
 
+import br.com.dashboard.company.entities.company.Company
 import br.com.dashboard.company.entities.order.Order
-import br.com.dashboard.company.entities.user.User
 import br.com.dashboard.company.utils.common.PaymentType
 import br.com.dashboard.company.utils.common.TypeOrder
 import jakarta.persistence.*
@@ -45,5 +45,5 @@ data class Payment(
         joinColumns = [JoinColumn(name = "fk_payment", referencedColumnName = "id")],
         inverseJoinColumns = [JoinColumn(name = "fk_company", referencedColumnName = "id")]
     )
-    var user: User? = null
+    var company: Company? = null
 )

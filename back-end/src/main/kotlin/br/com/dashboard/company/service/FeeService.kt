@@ -25,7 +25,7 @@ class FeeService {
     private lateinit var feeRepository: FeeRepository
 
     @Autowired
-    private lateinit var userService: UserService
+    private lateinit var companyService: CompanyService
 
     @Autowired
     private lateinit var dayService: DayService
@@ -34,22 +34,23 @@ class FeeService {
     fun findAllFees(
         user: User
     ): List<FeeResponseVO> {
-        val fees = feeRepository.findAllFees(userId = user.id)
+        val companySaved = companyService.getCompanyByUserLogged(userLoggedId = user.id)
+        val fees = feeRepository.findAllFees(companyId = companySaved.id)
         return parseListObjects(fees, FeeResponseVO::class.java)
     }
 
     fun getFeeByType(
-        userId: Long,
+        companyId: Long? = null,
         assigned: Function
     ): Fee? {
-        return feeRepository.findFeeByAssigned(userId = userId, assigned = assigned)
+        return feeRepository.findFeeByAssigned(companyId = companyId, assigned = assigned)
     }
 
     fun getFee(
-        userId: Long,
+        companyId: Long? = null,
         feeId: Long
     ): Fee {
-        val feeSaved: Fee? = feeRepository.findFeeById(userId = userId, feeId = feeId)
+        val feeSaved: Fee? = feeRepository.findFeeById(companyId = companyId, feeId = feeId)
         if (feeSaved != null) {
             return feeSaved
         } else {
@@ -63,21 +64,21 @@ class FeeService {
         fee: FeeRequestVO
     ) {
         fee.assigned?.let {
-            if (checkNameFeeAlreadyExists(userId = user.id, assigned = it)) {
+            if (checkNameFeeAlreadyExists(companyId = user.id, assigned = it)) {
                 throw ObjectDuplicateException(message = DUPLICATE_NAME_FEE)
             } else {
                 val instancedFee: Fee = parseObject(origin = fee, destination = Fee::class.java)
-                instancedFee.user = userService.findUserById(userId = user.id)
+                instancedFee.company = companyService.getCompanyByUserLogged(userLoggedId = user.id)
                 feeRepository.save(instancedFee)
             }
         }
     }
 
     private fun checkNameFeeAlreadyExists(
-        userId: Long,
+        companyId: Long,
         assigned: Function
     ): Boolean {
-        val productResult = feeRepository.checkFeeAlreadyExists(userId = userId, assigned = assigned)
+        val productResult = feeRepository.checkFeeAlreadyExists(companyId = companyId, assigned = assigned)
         return productResult != null
     }
 
@@ -87,7 +88,7 @@ class FeeService {
         feeId: Long,
         days: DaysRequestVO
     ) {
-        val feeSaved = getFee(userId = user.id, feeId = feeId)
+        val feeSaved = getFee(companyId = user.id, feeId = feeId)
         feeSaved.days?.filter { day ->
             if (day.day == DayOfWeek.ALL) {
                 throw ObjectDuplicateException(message = DUPLICATE_DAY)
@@ -116,8 +117,9 @@ class FeeService {
         feeId: Long,
         percentage: PercentageRequestVO
     ) {
-        getFee(userId = user.id, feeId = feeId)
-        feeRepository.updatePriceFee(userId = user.id, feeId = feeId, percentage = percentage.percentage)
+        val companySaved = companyService.getCompanyByUserLogged(userLoggedId = user.id)
+        getFee(companyId = companySaved.id, feeId = feeId)
+        feeRepository.updatePriceFee(companyId = companySaved.id, feeId = feeId, percentage = percentage.percentage)
     }
 
     @Transactional
@@ -125,11 +127,12 @@ class FeeService {
         user: User,
         feeId: Long
     ) {
-        val feeSaved = getFee(userId = user.id, feeId = feeId)
+        val companySaved = companyService.getCompanyByUserLogged(userLoggedId = user.id)
+        val feeSaved = getFee(companyId = companySaved.id, feeId = feeId)
         feeSaved.days?.forEach { day ->
             dayService.deleteDay(feeId = feeId, dayId = day.id)
         }
-        feeRepository.deleteFeeById(userId = user.id, feeId = feeId)
+        feeRepository.deleteFeeById(companyId = companySaved.id, feeId = feeId)
     }
 
     @Transactional
@@ -138,7 +141,8 @@ class FeeService {
         feeId: Long,
         dayId: Long
     ) {
-        val feeSaved = getFee(userId = user.id, feeId = feeId)
+        val companySaved = companyService.getCompanyByUserLogged(userLoggedId = user.id)
+        val feeSaved = getFee(companyId = companySaved.id, feeId = feeId)
         val check = feeSaved.days?.filter { day ->
             if (day.id == dayId) {
                 return@filter true

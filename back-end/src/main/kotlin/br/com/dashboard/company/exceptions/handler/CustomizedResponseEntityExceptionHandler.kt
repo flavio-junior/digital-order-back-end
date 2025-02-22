@@ -61,6 +61,15 @@ class CustomizedResponseEntityExceptionHandler : ResponseEntityExceptionHandler(
         return ResponseEntity<ExceptionResponse>(exceptionResponse, HttpStatus.BAD_REQUEST)
     }
 
+    @ExceptionHandler(OperationUnauthorizedException::class)
+    fun handleOperationUnauthorizedExceptions(request: WebRequest): ResponseEntity<ExceptionResponse> {
+        val exceptionResponse = ExceptionResponse(
+            status = HttpStatus.FORBIDDEN.value(),
+            message = "Alert! Operation Unauthorized!"
+        )
+        return ResponseEntity<ExceptionResponse>(exceptionResponse, HttpStatus.FORBIDDEN)
+    }
+
     @ExceptionHandler(ResourceNotFoundException::class)
     fun handleResourceNotFoundException(
         exception: Exception,

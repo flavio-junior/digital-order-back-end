@@ -56,6 +56,9 @@ class OrderService {
     private lateinit var paymentService: PaymentService
 
     @Autowired
+    private lateinit var companyService: CompanyService
+
+    @Autowired
     private lateinit var userService: UserService
 
     @Autowired
@@ -75,8 +78,9 @@ class OrderService {
         status: Status,
         pageable: Pageable
     ): Page<OrderResponseVO> {
+        val companySaved = companyService.getCompanyByUserLogged(userLoggedId = user.id)
         val orders: Page<Order>? =
-            orderRepository.findAllOrdersOpen(userId = user.id, status = status, pageable = pageable)
+            orderRepository.findAllOrdersOpen(companyId = companySaved.id, status = status, pageable = pageable)
         return orders?.map { order -> parseObject(order, OrderResponseVO::class.java) }
             ?: throw ResourceNotFoundException(message = ORDER_NOT_FOUND)
     }
@@ -106,7 +110,8 @@ class OrderService {
         userId: Long,
         orderId: Long
     ): Order {
-        val orderSaved: Order? = orderRepository.findOrderById(userId = userId, orderId = orderId)
+        val companySaved = companyService.getCompanyByUserLogged(userLoggedId = userId)
+        val orderSaved: Order? = orderRepository.findOrderById(companyId = companySaved.id, orderId = orderId)
         if (orderSaved != null) {
             return orderSaved
         } else {
@@ -120,6 +125,7 @@ class OrderService {
         order: OrderRequestVO
     ): OrderResponseVO {
         val userAuthenticated = userService.findUserById(userId = user.id)
+        val companySaved = companyService.getCompanyByUserLogged(userLoggedId = user.id)
         val orderResult: Order = parseObject(order, Order::class.java)
         var total: Double
         var qrCode = false
@@ -140,7 +146,7 @@ class OrderService {
             total = objectsSaved.second
         }
         if (order.type == TypeOrder.RESERVATION) {
-            val fee = feeService.getFeeByType(userId = user.id, assigned = Function.WAITER)
+            val fee = feeService.getFeeByType(companyId = companySaved.id, assigned = Function.WAITER)
             if (fee != null) {
                 val saveFee = {
                     fee.author = authorService.saveAuthor(
@@ -150,7 +156,7 @@ class OrderService {
                             assigned = order.fee?.assigned ?: userAuthenticated?.name
                         )
                     )
-                    fee.user = userAuthenticated
+                    fee.company = companySaved
                     orderResult.fee = fee
                     val feeValue = (total * fee.percentage) / 100.0
                     total += feeValue
@@ -185,12 +191,12 @@ class OrderService {
             qrCode = true
         }
         orderResult.total = total
-        orderResult.user = userAuthenticated
+        orderResult.company = companySaved
         orderResult.payment = null
         val orderSaved = orderRepository.save(orderResult)
         if (savePayment) {
             orderSaved.payment = paymentService.savePayment(
-                user = userService.findUserById(userId = user.id),
+                company = companySaved,
                 order = orderSaved,
                 payment = order.payment,
                 author = orderSaved.fee?.author?.author ?: user.name,
@@ -397,7 +403,7 @@ class OrderService {
                 (orderResult.total * percentage) / (100 + percentage)
             } ?: 0.0
             orderResult.payment = paymentService.savePayment(
-                user = userService.findUserById(userId = user.id),
+                company = companyService.getCompanyByUserLogged(userLoggedId = user.id),
                 order = orderResult,
                 payment = payment,
                 fee = orderResult.fee != null,
@@ -420,7 +426,8 @@ class OrderService {
         orderId: Long,
         status: Status
     ) {
-        orderRepository.updateStatusOrder(userId = userId, orderId = orderId, status = status)
+        val companySaved = companyService.getCompanyByUserLogged(userLoggedId = userId)
+        orderRepository.updateStatusOrder(companyId = companySaved.id, orderId = orderId, status = status)
     }
 
     @Transactional
@@ -483,7 +490,7 @@ class OrderService {
         orderSaved.reservations?.forEach { reservation ->
             reservation.status = ReservationStatus.AVAILABLE
         }
-        orderRepository.deleteOrderById(userId = user.id, orderId = orderSaved.id)
+        orderRepository.deleteOrderById(companyId = orderSaved.company?.id, orderId = orderSaved.id)
     }
 
     companion object {
