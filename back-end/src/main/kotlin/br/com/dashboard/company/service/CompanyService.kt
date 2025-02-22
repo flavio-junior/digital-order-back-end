@@ -4,7 +4,6 @@ import br.com.dashboard.company.entities.company.Company
 import br.com.dashboard.company.entities.user.User
 import br.com.dashboard.company.repository.CompanyRepository
 import br.com.dashboard.company.utils.others.ConverterUtils.parseObject
-import br.com.dashboard.company.utils.others.generateCode
 import br.com.dashboard.company.vo.company.CompanyResponseVO
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
@@ -35,7 +34,7 @@ class CompanyService {
         val imageMainSavedUrl: URL = s3Service.uploadFile(file = mainImage, path = PATH_PROFILE, changeNameFile = true)
         val companySaved = companyRepository.save(
             Company(
-                identifier = generateCode(),
+                identifier = System.currentTimeMillis(),
                 date = LocalDate.now(),
                 hour = LocalTime.now().withNano(0),
                 name = name,

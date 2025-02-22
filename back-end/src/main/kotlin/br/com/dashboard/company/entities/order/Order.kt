@@ -75,9 +75,9 @@ data class Order(
     var payment: Payment? = null,
     @ManyToOne(cascade = [CascadeType.ALL])
     @JoinTable(
-        name = "tb_user_order",
+        name = "tb_company_order",
         joinColumns = [JoinColumn(name = "fk_order", referencedColumnName = "id")],
-        inverseJoinColumns = [JoinColumn(name = "fk_user", referencedColumnName = "id")]
+        inverseJoinColumns = [JoinColumn(name = "fk_company", referencedColumnName = "id")]
     )
     var user: User? = null
 )

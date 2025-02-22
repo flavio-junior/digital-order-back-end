@@ -24,9 +24,9 @@ data class Reservation(
     var order: Order? = null,
     @ManyToOne(cascade = [CascadeType.ALL])
     @JoinTable(
-        name = "tb_user_reservation",
+        name = "tb_company_reservation",
         joinColumns = [JoinColumn(name = "fk_reservation", referencedColumnName = "id")],
-        inverseJoinColumns = [JoinColumn(name = "fk_user", referencedColumnName = "id")]
+        inverseJoinColumns = [JoinColumn(name = "fk_company", referencedColumnName = "id")]
     )
     var user: User? = null
 )

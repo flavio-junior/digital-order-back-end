@@ -37,9 +37,9 @@ data class Product(
     var quantity: Int? = 0,
     @ManyToOne(cascade = [CascadeType.ALL])
     @JoinTable(
-        name = "tb_user_product",
+        name = "tb_company_product",
         joinColumns = [JoinColumn(name = "fk_product", referencedColumnName = "id")],
-        inverseJoinColumns = [JoinColumn(name = "fk_user", referencedColumnName = "id")]
+        inverseJoinColumns = [JoinColumn(name = "fk_company", referencedColumnName = "id")]
     )
     var user: User? = null
 )

@@ -24,9 +24,9 @@ data class Employee(
     var status: StatusEmployee? = null,
     @ManyToOne(cascade = [CascadeType.ALL])
     @JoinTable(
-        name = "tb_user_employee",
+        name = "tb_company_employee",
         joinColumns = [JoinColumn(name = "fk_employee", referencedColumnName = "id")],
-        inverseJoinColumns = [JoinColumn(name = "fk_user", referencedColumnName = "id")]
+        inverseJoinColumns = [JoinColumn(name = "fk_company", referencedColumnName = "id")]
     )
     var user: User? = null
 )

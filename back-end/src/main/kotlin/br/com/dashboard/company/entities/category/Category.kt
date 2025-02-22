@@ -22,9 +22,9 @@ data class Category(
     var name: String = "",
     @ManyToOne(cascade = [CascadeType.ALL])
     @JoinTable(
-        name = "tb_user_category",
+        name = "tb_company_category",
         joinColumns = [JoinColumn(name = "fk_category", referencedColumnName = "id")],
-        inverseJoinColumns = [JoinColumn(name = "fk_user", referencedColumnName = "id")]
+        inverseJoinColumns = [JoinColumn(name = "fk_company", referencedColumnName = "id")]
     )
     var user: User? = null
 )

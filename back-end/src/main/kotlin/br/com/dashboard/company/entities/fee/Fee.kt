@@ -39,9 +39,9 @@ data class Fee(
     var order: Order? = null,
     @ManyToOne(cascade = [CascadeType.ALL])
     @JoinTable(
-        name = "tb_user_fee",
+        name = "tb_company_fee",
         joinColumns = [JoinColumn(name = "fk_fee", referencedColumnName = "id")],
-        inverseJoinColumns = [JoinColumn(name = "fk_user", referencedColumnName = "id")]
+        inverseJoinColumns = [JoinColumn(name = "fk_company", referencedColumnName = "id")]
     )
     var user: User? = null
 )

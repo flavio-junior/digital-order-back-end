@@ -41,9 +41,9 @@ data class Payment(
     var order: Order? = null,
     @OneToOne(cascade = [CascadeType.ALL], orphanRemoval = true)
     @JoinTable(
-        name = "tb_payment_user",
+        name = "tb_company_payment",
         joinColumns = [JoinColumn(name = "fk_payment", referencedColumnName = "id")],
-        inverseJoinColumns = [JoinColumn(name = "fk_user", referencedColumnName = "id")]
+        inverseJoinColumns = [JoinColumn(name = "fk_company", referencedColumnName = "id")]
     )
     var user: User? = null
 )

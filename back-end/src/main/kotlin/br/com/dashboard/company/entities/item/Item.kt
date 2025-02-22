@@ -23,9 +23,9 @@ data class Item(
     var price: Double = 0.0,
     @ManyToOne(cascade = [CascadeType.ALL])
     @JoinTable(
-        name = "tb_user_item",
+        name = "tb_company_item",
         joinColumns = [JoinColumn(name = "fk_item", referencedColumnName = "id")],
-        inverseJoinColumns = [JoinColumn(name = "fk_user", referencedColumnName = "id")]
+        inverseJoinColumns = [JoinColumn(name = "fk_company", referencedColumnName = "id")]
     )
     var user: User? = null
 )

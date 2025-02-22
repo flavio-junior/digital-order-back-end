@@ -35,9 +35,9 @@ data class Food(
     var price: Double = 0.0,
     @ManyToOne(cascade = [CascadeType.ALL])
     @JoinTable(
-        name = "tb_user_food",
+        name = "tb_company_food",
         joinColumns = [JoinColumn(name = "fk_food", referencedColumnName = "id")],
-        inverseJoinColumns = [JoinColumn(name = "fk_user", referencedColumnName = "id")]
+        inverseJoinColumns = [JoinColumn(name = "fk_company", referencedColumnName = "id")]
     )
     var user: User? = null
 )

@@ -6,7 +6,7 @@ VALUES
     ('Comidas Típicas');
 
 INSERT INTO
-    tb_user_category (fk_user, fk_category)
+    tb_company_category (fk_company, fk_category)
 VALUES
     (1, 1),
     (1, 2),
@@ -23,7 +23,7 @@ VALUES
     ('Suco de maracujá', 5.00);
 
 INSERT INTO
-    tb_user_item (fk_user, fk_item)
+    tb_company_item (fk_company, fk_item)
 VALUES
     (1, 1),
     (1, 2),
@@ -47,7 +47,7 @@ VALUES
     ('Mesa 10', 'AVAILABLE');
 
 INSERT INTO
-    tb_user_reservation (fk_user, fk_reservation)
+    tb_company_reservation (fk_company, fk_reservation)
 VALUES
     (1, 1),
     (1, 2),
@@ -75,7 +75,7 @@ VALUES
     (DATE_TRUNC('second', NOW()), 'Paçoca de Carne de Sol', 12.00);
 
 INSERT INTO
-    tb_user_food (fk_food, fk_user)
+    tb_company_food (fk_food, fk_company)
 VALUES
     (1, 1),
     (2, 1),
@@ -113,7 +113,7 @@ VALUES
     (1, 1);
 
 INSERT INTO
-    tb_user_product (fk_product, fk_user)
+    tb_company_product (fk_product, fk_company)
 VALUES
     (1, 1);
 
@@ -125,7 +125,7 @@ VALUES
     (DATE_TRUNC('second', NOW()), 'RESERVATION', 'OPEN', 3, 62.00);
 
 INSERT INTO
-    tb_user_order (fk_order, fk_user)
+    tb_company_order (fk_order, fk_company)
 VALUES
     (1, 1),
     (2, 1),

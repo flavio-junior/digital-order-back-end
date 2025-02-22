@@ -1,6 +1,6 @@
 CREATE TABLE IF NOT EXISTS tb_company(
     id SERIAL PRIMARY KEY,
-    identifier INT NULL,
+    identifier BIGINT NOT NULL,
     date DATE NOT NULL,
     hour TIME NOT NULL,
     name VARCHAR(60) NOT NULL,
@@ -18,10 +18,10 @@ CREATE TABLE IF NOT EXISTS tb_category(
     name VARCHAR(60)
 );
 
-CREATE TABLE IF NOT EXISTS tb_user_category (
-    fk_user INT REFERENCES tb_user(id),
+CREATE TABLE IF NOT EXISTS tb_company_category (
+    fk_company INT REFERENCES tb_company(id),
     fk_category INT REFERENCES tb_category(id),
-    PRIMARY KEY (fk_user, fk_category)
+    PRIMARY KEY (fk_company, fk_category)
 );
 
 CREATE TABLE IF NOT EXISTS tb_reservation(
@@ -30,10 +30,10 @@ CREATE TABLE IF NOT EXISTS tb_reservation(
     status varchar(30) check (status in ('AVAILABLE', 'RESERVED'))
 );
 
-CREATE TABLE IF NOT EXISTS tb_user_reservation (
-    fk_user INT REFERENCES tb_user(id),
+CREATE TABLE IF NOT EXISTS tb_company_reservation (
+    fk_company INT REFERENCES tb_company(id),
     fk_reservation INT REFERENCES tb_reservation(id),
-    PRIMARY KEY (fk_user, fk_reservation)
+    PRIMARY KEY (fk_company, fk_reservation)
 );
 
 CREATE TABLE IF NOT EXISTS tb_item(
@@ -42,10 +42,10 @@ CREATE TABLE IF NOT EXISTS tb_item(
     price NUMERIC(10, 2) DEFAULT 0.0
 );
 
-CREATE TABLE IF NOT EXISTS tb_user_item (
-    fk_user INT REFERENCES tb_user(id),
+CREATE TABLE IF NOT EXISTS tb_company_item (
+    fk_company INT REFERENCES tb_company(id),
     fk_item INT REFERENCES tb_item(id),
-    PRIMARY KEY (fk_user, fk_item)
+    PRIMARY KEY (fk_company, fk_item)
 );
 
 CREATE TABLE IF NOT EXISTS tb_food (
@@ -55,10 +55,10 @@ CREATE TABLE IF NOT EXISTS tb_food (
     price NUMERIC(10, 2) DEFAULT 0.0
 );
 
-CREATE TABLE IF NOT EXISTS tb_user_food (
-    fk_user INT REFERENCES tb_user(id),
+CREATE TABLE IF NOT EXISTS tb_company_food (
+    fk_company INT REFERENCES tb_company(id),
     fk_food INT REFERENCES tb_food(id),
-    PRIMARY KEY (fk_user, fk_food)
+    PRIMARY KEY (fk_company, fk_food)
 );
 
 CREATE TABLE IF NOT EXISTS tb_product (
@@ -69,10 +69,10 @@ CREATE TABLE IF NOT EXISTS tb_product (
     stock_quantity INT NOT NULL
 );
 
-CREATE TABLE IF NOT EXISTS tb_user_product (
-    fk_user INT REFERENCES tb_user(id),
+CREATE TABLE IF NOT EXISTS tb_company_product (
+    fk_company INT REFERENCES tb_company(id),
     fk_product INT REFERENCES tb_product(id),
-    PRIMARY KEY (fk_user, fk_product)
+    PRIMARY KEY (fk_company, fk_product)
 );
 
 CREATE TABLE IF NOT EXISTS tb_food_category (
@@ -96,10 +96,10 @@ CREATE TABLE IF NOT EXISTS tb_order (
     total NUMERIC(10, 2) DEFAULT 0.0
 );
 
-CREATE TABLE IF NOT EXISTS tb_user_order (
+CREATE TABLE IF NOT EXISTS tb_company_order (
     fk_order INT REFERENCES tb_order(id),
-    fk_user INT REFERENCES tb_user(id),
-    PRIMARY KEY (fk_order, fk_user)
+    fk_company INT REFERENCES tb_company(id),
+    PRIMARY KEY (fk_order, fk_company)
 );
 
 CREATE TABLE IF NOT EXISTS tb_order_reservation (
@@ -162,10 +162,10 @@ CREATE TABLE IF NOT EXISTS tb_order_payment (
     PRIMARY KEY (fk_order, fk_payment)
 );
 
-CREATE TABLE IF NOT EXISTS tb_payment_user (
-    fk_user INT REFERENCES tb_user(id),
+CREATE TABLE IF NOT EXISTS tb_company_payment (
+    fk_company INT REFERENCES tb_company(id),
     fk_payment INT REFERENCES tb_payment(id),
-    PRIMARY KEY (fk_user, fk_payment)
+    PRIMARY KEY (fk_company, fk_payment)
 );
 
 CREATE TABLE IF NOT EXISTS tb_report (
@@ -176,10 +176,10 @@ CREATE TABLE IF NOT EXISTS tb_report (
     author VARCHAR(30) NOT NULL
 );
 
-CREATE TABLE IF NOT EXISTS tb_user_report (
-    fk_user INT REFERENCES tb_user(id),
+CREATE TABLE IF NOT EXISTS tb_company_report (
+    fk_company INT REFERENCES tb_company(id),
     fk_report INT REFERENCES tb_report(id),
-    PRIMARY KEY (fk_user, fk_report)
+    PRIMARY KEY (fk_company, fk_report)
 );
 
 CREATE TABLE IF NOT EXISTS tb_overview (
@@ -203,10 +203,10 @@ CREATE TABLE IF NOT EXISTS tb_employee (
     status varchar(30) check (status in ('ENABLED', 'DISABLED'))
 );
 
-CREATE TABLE IF NOT EXISTS tb_user_employee (
+CREATE TABLE IF NOT EXISTS tb_company_employee (
     fk_employee INT REFERENCES tb_employee(id),
-    fk_user INT REFERENCES tb_user(id),
-    PRIMARY KEY (fk_employee, fk_user)
+    fk_company INT REFERENCES tb_company(id),
+    PRIMARY KEY (fk_employee, fk_company)
 );
 
 CREATE TABLE IF NOT EXISTS tb_fee (
@@ -215,10 +215,10 @@ CREATE TABLE IF NOT EXISTS tb_fee (
     assigned varchar(30) check (assigned in ('WAITER'))
 );
 
-CREATE TABLE IF NOT EXISTS tb_user_fee (
+CREATE TABLE IF NOT EXISTS tb_company_fee (
     fk_fee INT REFERENCES tb_fee(id),
-    fk_user INT REFERENCES tb_user(id),
-    PRIMARY KEY (fk_fee, fk_user)
+    fk_company INT REFERENCES tb_company(id),
+    PRIMARY KEY (fk_fee, fk_company)
 );
 
 CREATE TABLE IF NOT EXISTS tb_order_fee (
