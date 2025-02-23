@@ -153,7 +153,7 @@ class OrderService {
                         user = user,
                         author = Author(
                             author = userAuthenticated?.name,
-                            assigned = order.fee?.assigned ?: userAuthenticated?.name
+                            assigned = order.fee?.assigned
                         )
                     )
                     fee.company = companySaved

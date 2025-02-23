@@ -237,7 +237,7 @@ CREATE TABLE IF NOT EXISTS tb_order_fee (
 CREATE TABLE IF NOT EXISTS tb_author (
     id SERIAL PRIMARY KEY,
     author VARCHAR(30) NOT NULL,
-    assigned VARCHAR(30) NOT NULL
+    assigned VARCHAR(30) NULL
 );
 
 CREATE TABLE IF NOT EXISTS tb_fee_author (

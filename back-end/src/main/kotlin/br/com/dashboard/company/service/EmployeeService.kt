@@ -70,16 +70,20 @@ class EmployeeService {
     @Transactional(readOnly = true)
     fun checkEmployeeAlreadyExists(
         user: User,
-        employeeName: String,
+        employeeName: String? = null,
         saveAuthor: () -> Unit = {}
     ) {
-        val companySaved = companyService.getCompanyByUserLogged(user = user)
-        val employeeSaved: Employee? =
-            employeeRepository.checkEmployeeAlreadyExists(companyId = companySaved.id, name = employeeName)
-        return if (employeeSaved != null) {
-            saveAuthor()
+        if (employeeName != null) {
+            val companySaved = companyService.getCompanyByUserLogged(user = user)
+            val employeeSaved: Employee? =
+                employeeRepository.checkEmployeeAlreadyExists(companyId = companySaved.id, name = employeeName)
+            return if (employeeSaved != null) {
+                saveAuthor()
+            } else {
+                throw ResourceNotFoundException(EMPLOYEE_NOT_FOUND)
+            }
         } else {
-            throw ResourceNotFoundException(EMPLOYEE_NOT_FOUND)
+            saveAuthor()
         }
     }
 

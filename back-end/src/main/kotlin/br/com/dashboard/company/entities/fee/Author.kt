@@ -9,7 +9,7 @@ data class Author(
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     var id: Long = 0,
     var author: String? = "",
-    var assigned: String? = "",
+    var assigned: String? = null,
     @OneToOne(cascade = [CascadeType.ALL], orphanRemoval = true)
     @JoinTable(
         name = "tb_fee_author",

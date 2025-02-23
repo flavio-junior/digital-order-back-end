@@ -25,7 +25,7 @@ class AuthorService {
         var authorSaved = Author()
         employeeService.checkEmployeeAlreadyExists(
             user = user,
-            employeeName = author.assigned ?: "",
+            employeeName = author.assigned,
             saveAuthor = {
                 authorSaved = authorRepository.save(author)
             }
