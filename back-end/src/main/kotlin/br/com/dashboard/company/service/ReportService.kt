@@ -31,7 +31,7 @@ class ReportService {
         user: User,
         pageable: Pageable
     ): Page<ReportResponseVO> {
-        val companySaved = companyService.getCompanyByUserLogged(userLoggedId = user.id)
+        val companySaved = companyService.getCompanyByUserLogged(user = user)
         val reports: Page<Report> = reportRepository.findAllReports(companyId = companySaved.id, pageable = pageable)
         return reports.map { report -> parseObject(report, ReportResponseVO::class.java) }
     }
@@ -42,17 +42,17 @@ class ReportService {
         date: String,
         pageable: Pageable
     ): Page<ReportResponseVO> {
-        val companySaved = companyService.getCompanyByUserLogged(userLoggedId = user.id)
+        val companySaved = companyService.getCompanyByUserLogged(user = user)
         val reports: Page<Report> =
             reportRepository.findReportsByDate(companyId = companySaved.id, date = date, pageable = pageable)
         return reports.map { report -> parseObject(report, ReportResponseVO::class.java) }
     }
 
     fun getReport(
-        userId: Long,
+        user: User,
         reportId: Long
     ): Report {
-        val companySaved = companyService.getCompanyByUserLogged(userLoggedId = userId)
+        val companySaved = companyService.getCompanyByUserLogged(user = user)
         val reportSaved: Report? = reportRepository.findReportById(companyId = companySaved.id, reportId = reportId)
         if (reportSaved != null) {
             return reportSaved
@@ -69,17 +69,17 @@ class ReportService {
         val reportResult: Report = parseObject(report, Report::class.java)
         reportResult.date = LocalDate.now()
         reportResult.hour = LocalTime.now().withNano(0)
-        reportResult.company = companyService.getCompanyByUserLogged(userLoggedId = user.id)
+        reportResult.company = companyService.getCompanyByUserLogged(user = user)
         return parseObject(reportRepository.save(reportResult), ReportResponseVO::class.java)
     }
 
     @Transactional
     fun deleteReport(
-        userId: Long,
+        user: User,
         reportId: Long
     ) {
         val actualDate = LocalDate.now()
-        val reportSaved = getReport(userId = userId, reportId = reportId)
+        val reportSaved = getReport(user = user, reportId = reportId)
         if (reportSaved.date != null) {
             val daysDifference = ChronoUnit.DAYS.between(actualDate, reportSaved.date)
             if (daysDifference > 7) {

@@ -1,5 +1,6 @@
 package br.com.dashboard.company.entities.company
 
+import br.com.dashboard.company.entities.employee.Employee
 import br.com.dashboard.company.entities.user.User
 import jakarta.persistence.*
 import java.time.LocalDate
@@ -24,5 +25,12 @@ data class Company(
         joinColumns = [JoinColumn(name = "fk_company", referencedColumnName = "id")],
         inverseJoinColumns = [JoinColumn(name = "fk_user", referencedColumnName = "id")]
     )
-    var user: User? = null
+    var user: User? = null,
+    @ManyToOne(cascade = [CascadeType.ALL])
+    @JoinTable(
+        name = "tb_company_employee",
+        joinColumns = [JoinColumn(name = "fk_company", referencedColumnName = "id")],
+        inverseJoinColumns = [JoinColumn(name = "fk_employee", referencedColumnName = "id")]
+    )
+    var employee: Employee? = null
 )

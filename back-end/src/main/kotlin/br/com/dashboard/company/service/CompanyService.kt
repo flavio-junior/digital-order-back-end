@@ -4,6 +4,7 @@ import br.com.dashboard.company.entities.company.Company
 import br.com.dashboard.company.entities.user.User
 import br.com.dashboard.company.exceptions.OperationUnauthorizedException
 import br.com.dashboard.company.repository.CompanyRepository
+import br.com.dashboard.company.utils.common.TypeAccount
 import br.com.dashboard.company.utils.others.ConverterUtils.parseObject
 import br.com.dashboard.company.vo.company.CompanyResponseVO
 import org.springframework.beans.factory.annotation.Autowired
@@ -48,10 +49,24 @@ class CompanyService {
 
     @Transactional(readOnly = true)
     fun getCompanyByUserLogged(
-        userLoggedId: Long
+        user: User
     ): Company {
-        return companyRepository.getCompanyByUserLogged(userLoggedId = userLoggedId)
-            ?: throw OperationUnauthorizedException()
+        return when (user.typeAccount) {
+            TypeAccount.ADMIN -> {
+                companyRepository.getCompanyByUserLogged(userLoggedId = user.id)
+                    ?: throw OperationUnauthorizedException()
+            }
+
+            TypeAccount.USER -> {
+                val userSaved = userService.findUserById(userId = user.id)
+                companyRepository.getCompanyByEmployeeLogged(employeeLoggedId = userSaved?.employee?.id)
+                    ?: throw OperationUnauthorizedException()
+            }
+
+            else -> {
+                throw OperationUnauthorizedException()
+            }
+        }
     }
 
     companion object {

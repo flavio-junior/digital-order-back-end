@@ -31,7 +31,7 @@ class ReservationService {
         name: String?,
         pageable: Pageable
     ): Page<ReservationResponseVO> {
-        val companySaved = companyService.getCompanyByUserLogged(userLoggedId = user.id)
+        val companySaved = companyService.getCompanyByUserLogged(user = user)
         val reservations: Page<Reservation>? =
             reservationRepository.findAllReservations(companyId = companySaved.id, name = name, pageable = pageable)
         return reservations?.map { reservation -> parseObject(reservation, ReservationResponseVO::class.java) }
@@ -43,7 +43,7 @@ class ReservationService {
         user: User,
         name: String
     ): List<ReservationResponseVO> {
-        val companySaved = companyService.getCompanyByUserLogged(userLoggedId = user.id)
+        val companySaved = companyService.getCompanyByUserLogged(user = user)
         val reservations: List<Reservation> =
             reservationRepository.findReservationByName(companyId = companySaved.id, reservationName = name)
         return reservations.map { reservation -> parseObject(reservation, ReservationResponseVO::class.java) }
@@ -54,15 +54,15 @@ class ReservationService {
         user: User,
         id: Long
     ): ReservationResponseVO {
-        val reservation = getReservation(userId = user.id, reservationId = id)
+        val reservation = getReservation(user = user, reservationId = id)
         return parseObject(reservation, ReservationResponseVO::class.java)
     }
 
     fun getReservation(
-        userId: Long,
+        user: User,
         reservationId: Long
     ): Reservation {
-        val companySaved = companyService.getCompanyByUserLogged(userLoggedId = userId)
+        val companySaved = companyService.getCompanyByUserLogged(user = user)
         val reservationSaved: Reservation? =
             reservationRepository.findReservationById(companyId = companySaved.id, reservationId = reservationId)
         if (reservationSaved != null) {
@@ -77,10 +77,10 @@ class ReservationService {
         user: User,
         reservation: ReservationRequestVO
     ): ReservationResponseVO {
-        if (!checkNameReservationAlreadyExists(userId = user.id, name = reservation.name)) {
+        if (!checkNameReservationAlreadyExists(user = user, name = reservation.name)) {
             val reservationResult: Reservation = parseObject(reservation, Reservation::class.java)
             reservationResult.status = ReservationStatus.AVAILABLE
-            reservationResult.company = companyService.getCompanyByUserLogged(userLoggedId = user.id)
+            reservationResult.company = companyService.getCompanyByUserLogged(user = user)
             return parseObject(reservationRepository.save(reservationResult), ReservationResponseVO::class.java)
         } else {
             throw ObjectDuplicateException(message = DUPLICATE_NAME_RESERVATION)
@@ -106,13 +106,13 @@ class ReservationService {
     }
 
     fun validateReservationsToSave(
-        userId: Long,
+        user: User,
         reservations: MutableList<ReservationResponseVO>?,
         status: ReservationStatus
     ): MutableList<Reservation> {
         val reservationsToSave = mutableListOf<Reservation>()
         reservations?.forEach { reservationVO ->
-            val reservationSave = getReservation(userId = userId, reservationId = reservationVO.id)
+            val reservationSave = getReservation(user = user, reservationId = reservationVO.id)
             if (reservationSave.status == ReservationStatus.RESERVED) {
                 throw ObjectDuplicateException(message = "The '${reservationSave.name}' is already in use")
             }
@@ -123,10 +123,10 @@ class ReservationService {
     }
 
     private fun checkNameReservationAlreadyExists(
-        userId: Long,
+        user: User,
         name: String
     ): Boolean {
-        val companySaved = companyService.getCompanyByUserLogged(userLoggedId = userId)
+        val companySaved = companyService.getCompanyByUserLogged(user = user)
         val reservationResult =
             reservationRepository.checkNameReservationAlreadyExists(companyId = companySaved.id, name = name)
         return reservationResult != null
@@ -137,8 +137,8 @@ class ReservationService {
         user: User,
         reservation: ReservationResponseVO
     ): ReservationResponseVO {
-        if (!checkNameReservationAlreadyExists(userId = user.id, name = reservation.name)) {
-            val reservationSaved: Reservation = getReservation(userId = user.id, reservationId = reservation.id)
+        if (!checkNameReservationAlreadyExists(user = user, name = reservation.name)) {
+            val reservationSaved: Reservation = getReservation(user = user, reservationId = reservation.id)
             reservationSaved.name = reservation.name
             return parseObject(reservationRepository.save(reservationSaved), ReservationResponseVO::class.java)
         } else {
@@ -148,11 +148,11 @@ class ReservationService {
 
     @Transactional
     fun updateStatusReservation(
-        userId: Long,
+        user: User,
         reservationId: Long,
         status: ReservationStatus
     ) {
-        val companySaved = companyService.getCompanyByUserLogged(userLoggedId = userId)
+        val companySaved = companyService.getCompanyByUserLogged(user = user)
         reservationRepository.updateStatusReservation(
             companyId = companySaved.id,
             reservationId = reservationId,
@@ -170,10 +170,10 @@ class ReservationService {
 
     @Transactional
     fun deleteReservation(
-        userId: Long,
+        user: User,
         reservationId: Long
     ) {
-        val reservationSaved: Reservation = getReservation(userId = userId, reservationId = reservationId)
+        val reservationSaved: Reservation = getReservation(user = user, reservationId = reservationId)
         reservationRepository.deleteReservationById(
             companyId = reservationSaved.company?.id,
             reservationId = reservationSaved.id

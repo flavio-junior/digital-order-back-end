@@ -78,7 +78,7 @@ class OrderService {
         status: Status,
         pageable: Pageable
     ): Page<OrderResponseVO> {
-        val companySaved = companyService.getCompanyByUserLogged(userLoggedId = user.id)
+        val companySaved = companyService.getCompanyByUserLogged(user = user)
         val orders: Page<Order>? =
             orderRepository.findAllOrdersOpen(companyId = companySaved.id, status = status, pageable = pageable)
         return orders?.map { order -> parseObject(order, OrderResponseVO::class.java) }
@@ -90,7 +90,7 @@ class OrderService {
         user: User,
         orderId: Long
     ): OrderResponseVO {
-        val order = getOrder(userId = user.id, orderId = orderId)
+        val order = getOrder(user = user, orderId = orderId)
         return parseObject(order, OrderResponseVO::class.java)
     }
 
@@ -107,10 +107,10 @@ class OrderService {
     }
 
     private fun getOrder(
-        userId: Long,
+        user: User,
         orderId: Long
     ): Order {
-        val companySaved = companyService.getCompanyByUserLogged(userLoggedId = userId)
+        val companySaved = companyService.getCompanyByUserLogged(user = user)
         val orderSaved: Order? = orderRepository.findOrderById(companyId = companySaved.id, orderId = orderId)
         if (orderSaved != null) {
             return orderSaved
@@ -125,7 +125,7 @@ class OrderService {
         order: OrderRequestVO
     ): OrderResponseVO {
         val userAuthenticated = userService.findUserById(userId = user.id)
-        val companySaved = companyService.getCompanyByUserLogged(userLoggedId = user.id)
+        val companySaved = companyService.getCompanyByUserLogged(user = user)
         val orderResult: Order = parseObject(order, Order::class.java)
         var total: Double
         var qrCode = false
@@ -133,7 +133,7 @@ class OrderService {
         orderResult.createdAt = LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS)
         if (order.type == TypeOrder.SHOPPING_CART) {
             orderResult.status = Status.CLOSED
-            val objectsSaved = objectService.saveObjects(userId = user.id, buy = true, objectsToSave = order.objects)
+            val objectsSaved = objectService.saveObjects(user = user, buy = true, objectsToSave = order.objects)
             orderResult.objects = objectsSaved.first
             total = objectsSaved.second
             if (order.payment == null) {
@@ -141,7 +141,7 @@ class OrderService {
             }
         } else {
             orderResult.status = Status.OPEN
-            val objectsSaved = objectService.saveObjects(userId = user.id, objectsToSave = order.objects)
+            val objectsSaved = objectService.saveObjects(user = user, objectsToSave = order.objects)
             orderResult.objects = objectsSaved.first
             total = objectsSaved.second
         }
@@ -175,7 +175,7 @@ class OrderService {
             orderResult.fee = null
         }
         orderResult.reservations = reservationService.validateReservationsToSave(
-            userId = user.id,
+            user = user,
             reservations = order.reservations,
             status = ReservationStatus.RESERVED
         )
@@ -218,14 +218,14 @@ class OrderService {
         orderId: Long,
         objects: MutableList<ObjectRequestVO>
     ) {
-        val orderSaved = getOrder(orderId = orderId, userId = user.id)
+        val orderSaved = getOrder(orderId = orderId, user = user)
         objects.map { objectAvailable ->
             val objectFound = orderSaved.objects?.find { it.name == objectAvailable.name }
             if (objectFound != null) {
                 throw ObjectDuplicateException(message = OBJECT_ALREADY_EXISTS)
             }
         }
-        val objectsSaved = objectService.saveObjects(userId = user.id, order = orderSaved, objectsToSave = objects)
+        val objectsSaved = objectService.saveObjects(user = user, order = orderSaved, objectsToSave = objects)
         orderRepository.updateQuantityOrder(orderId = orderId, objectsSaved.first?.size)
         incrementDataOrder(
             orderId = orderId,
@@ -240,7 +240,7 @@ class OrderService {
         objectId: Long,
         objectActual: UpdateObjectRequestVO
     ) {
-        val orderSaved: Order = getOrder(userId = user.id, orderId = orderId)
+        val orderSaved: Order = getOrder(user = user, orderId = orderId)
         val identifiedObject = orderSaved.objects?.firstOrNull { it.id == objectId }
         if (identifiedObject != null) {
             val objectSaved = objectService.getObject(orderId = orderSaved.id, objectId = objectId)
@@ -306,9 +306,9 @@ class OrderService {
         orderId: Long,
         reservationsToSava: MutableList<ReservationResponseVO>
     ) {
-        val orderSaved = getOrder(userId = user.id, orderId = orderId)
+        val orderSaved = getOrder(user = user, orderId = orderId)
         val reservationsToSaved = reservationService.validateReservationsToSave(
-            userId = user.id,
+            user = user,
             reservations = reservationsToSava,
             status = ReservationStatus.RESERVED
         )
@@ -321,12 +321,12 @@ class OrderService {
         orderId: Long,
         reservationId: Long
     ) {
-        val orderSaved = getOrder(orderId = orderId, userId = user.id)
+        val orderSaved = getOrder(orderId = orderId, user = user)
         val reservationExisting = orderSaved.reservations?.firstOrNull { it.id == reservationId }
         if (reservationExisting != null) {
             reservationService.removeReservationOrder(orderId = orderId, reservationId = reservationId)
             reservationService.updateStatusReservation(
-                userId = user.id,
+                user = user,
                 reservationId = reservationId,
                 status = ReservationStatus.AVAILABLE
             )
@@ -359,7 +359,7 @@ class OrderService {
         force: Boolean = false,
         payment: PaymentRequestVO
     ): OrderResponseVO {
-        val orderResult = getOrder(userId = user.id, orderId = orderId)
+        val orderResult = getOrder(user = user, orderId = orderId)
         if (orderResult.status == Status.CLOSED) {
             throw ObjectDuplicateException(message = ORDER_ALREADY_CLOSED)
         } else {
@@ -397,13 +397,13 @@ class OrderService {
                     }
                 }
             }
-            updateStatusOrder(userId = user.id, orderId = orderId, status = Status.CLOSED)
+            updateStatusOrder(user = user, orderId = orderId, status = Status.CLOSED)
             orderResult.status = Status.CLOSED
             val valueFee = orderResult.fee?.percentage?.let { percentage ->
                 (orderResult.total * percentage) / (100 + percentage)
             } ?: 0.0
             orderResult.payment = paymentService.savePayment(
-                company = companyService.getCompanyByUserLogged(userLoggedId = user.id),
+                company = companyService.getCompanyByUserLogged(user = user),
                 order = orderResult,
                 payment = payment,
                 fee = orderResult.fee != null,
@@ -422,11 +422,11 @@ class OrderService {
 
     @Transactional
     fun updateStatusOrder(
-        userId: Long,
+        user: User,
         orderId: Long,
         status: Status
     ) {
-        val companySaved = companyService.getCompanyByUserLogged(userLoggedId = userId)
+        val companySaved = companyService.getCompanyByUserLogged(user = user)
         orderRepository.updateStatusOrder(companyId = companySaved.id, orderId = orderId, status = status)
     }
 
@@ -437,7 +437,7 @@ class OrderService {
         addressId: Long,
         updateAddressRequestVO: UpdateAddressRequestVO
     ) {
-        getOrder(userId = user.id, orderId = orderId)
+        getOrder(user = user, orderId = orderId)
         addressService.updateAddress(addressId = addressId, updateAddressRequestVO = updateAddressRequestVO)
     }
 
@@ -447,7 +447,7 @@ class OrderService {
         orderId: Long,
         status: UpdateStatusDeliveryRequestVO
     ) {
-        val orderSaved = getOrder(userId = user.id, orderId = orderId)
+        val orderSaved = getOrder(user = user, orderId = orderId)
         orderSaved.objects?.forEach {
             if (it.status == ObjectStatus.PENDING) {
                 throw InternalErrorClient(message = OBJECT_WITH_PENDING_DELIVERY)
@@ -461,7 +461,7 @@ class OrderService {
         user: User,
         orderId: Long
     ) {
-        val orderSaved: Order = getOrder(userId = user.id, orderId = orderId)
+        val orderSaved: Order = getOrder(user = user, orderId = orderId)
         when (orderSaved.type) {
             TypeOrder.RESERVATION -> {
                 if (orderSaved.fee?.author?.id != null) {

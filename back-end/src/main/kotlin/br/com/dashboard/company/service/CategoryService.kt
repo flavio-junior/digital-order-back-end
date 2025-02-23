@@ -29,7 +29,7 @@ class CategoryService {
         name: String?,
         pageable: Pageable
     ): Page<CategoryResponseVO> {
-        val companySaved = companyService.getCompanyByUserLogged(userLoggedId = user.id)
+        val companySaved = companyService.getCompanyByUserLogged(user = user)
         val categories: Page<Category> =
             categoryRepository.findAllCategories(companyId = companySaved.id, name = name, pageable = pageable)
         return categories.map { category -> parseObject(category, CategoryResponseVO::class.java) }
@@ -40,7 +40,7 @@ class CategoryService {
         user: User,
         name: String
     ): List<CategoryResponseVO> {
-        val companySaved = companyService.getCompanyByUserLogged(userLoggedId = user.id)
+        val companySaved = companyService.getCompanyByUserLogged(user = user)
         val products: List<Category> = categoryRepository.findCategoryByName(companyId = companySaved.id, name = name)
         return products.map { product -> parseObject(product, CategoryResponseVO::class.java) }
     }
@@ -50,15 +50,15 @@ class CategoryService {
         user: User,
         categoryId: Long
     ): CategoryResponseVO {
-        val category = getCategory(categoryId = categoryId, userId = user.id)
+        val category = getCategory(categoryId = categoryId, user = user)
         return parseObject(category, CategoryResponseVO::class.java)
     }
 
     fun getCategory(
-        userId: Long,
+        user: User,
         categoryId: Long
     ): Category {
-        val companySaved = companyService.getCompanyByUserLogged(userLoggedId = userId)
+        val companySaved = companyService.getCompanyByUserLogged(user = user)
         val categorySaved: Category? =
             categoryRepository.findCategoryById(companyId = companySaved.id, categoryId = categoryId)
         if (categorySaved != null) {
@@ -69,11 +69,11 @@ class CategoryService {
     }
 
     fun converterCategories(
-        userId: Long,
+        user: User,
         categories: MutableList<CategoryResponseVO>? = null
     ): MutableList<Category>? {
         val result = categories?.map { category ->
-            getCategory(categoryId = category.id, userId = userId)
+            getCategory(categoryId = category.id, user = user)
         }?.toMutableList()
         return result
     }
@@ -83,7 +83,7 @@ class CategoryService {
         user: User,
         category: CategoryResponseVO
     ): CategoryResponseVO {
-        val companySaved = companyService.getCompanyByUserLogged(userLoggedId = user.id)
+        val companySaved = companyService.getCompanyByUserLogged(user = user)
         if (!checkNameCategoryAlreadyExists(companyId = companySaved.id, name = category.name)) {
             val categoryResult: Category = parseObject(category, Category::class.java)
             categoryResult.company = companySaved
@@ -105,9 +105,9 @@ class CategoryService {
         user: User,
         category: CategoryResponseVO
     ): CategoryResponseVO {
-        val companySaved = companyService.getCompanyByUserLogged(userLoggedId = user.id)
+        val companySaved = companyService.getCompanyByUserLogged(user = user)
         if (!checkNameCategoryAlreadyExists(companyId = companySaved.id, name = category.name)) {
-            val categoryResult: Category = getCategory(userId = user.id, categoryId = category.id)
+            val categoryResult: Category = getCategory(user = user, categoryId = category.id)
             categoryResult.name = category.name
             return parseObject(categoryRepository.save(categoryResult), CategoryResponseVO::class.java)
         } else {
@@ -118,11 +118,11 @@ class CategoryService {
 
     @Transactional
     fun deleteCategory(
-        userId: Long,
+        user: User,
         categoryId: Long
     ) {
-        val companySaved = companyService.getCompanyByUserLogged(userLoggedId = userId)
-        val category = getCategory(userId = userId, categoryId = categoryId)
+        val companySaved = companyService.getCompanyByUserLogged(user = user)
+        val category = getCategory(user = user, categoryId = categoryId)
         categoryRepository.deleteCategoryById(categoryId = category.id, companyId = companySaved.id)
     }
 

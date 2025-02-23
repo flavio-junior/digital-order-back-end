@@ -74,7 +74,7 @@ class PaymentService {
         code: Long?,
         pageable: Pageable
     ): Page<PaymentResponseVO> {
-        val companySaved = companyService.getCompanyByUserLogged(userLoggedId = user.id)
+        val companySaved = companyService.getCompanyByUserLogged(user = user)
         val payments: Page<Payment>? =
             paymentRepository.getAllPaymentsDay(companyId = companySaved.id, code = code, pageable = pageable)
         return payments?.map { payment ->
@@ -90,7 +90,7 @@ class PaymentService {
         end: LocalDate?,
         type: TypeAnalysis
     ): AnaliseDayVO {
-        val companySaved = companyService.getCompanyByUserLogged(userLoggedId = user.id)
+        val companySaved = companyService.getCompanyByUserLogged(user = user)
         return when (type) {
             TypeAnalysis.DAY -> {
                 if (start != null && end != null) {

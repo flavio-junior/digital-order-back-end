@@ -1,6 +1,5 @@
 package br.com.dashboard.company.service
 
-import br.com.dashboard.company.entities.company.Company
 import br.com.dashboard.company.entities.`object`.Object
 import br.com.dashboard.company.entities.`object`.Overview
 import br.com.dashboard.company.entities.order.Order
@@ -44,7 +43,7 @@ class ProductService {
         name: String?,
         pageable: Pageable
     ): Page<ProductResponseVO> {
-        val companySaved = companyService.getCompanyByUserLogged(userLoggedId = user.id)
+        val companySaved = companyService.getCompanyByUserLogged(user = user)
         val products: Page<Product>? =
             productRepository.findAllProducts(companyId = companySaved.id, name = name, pageable = pageable)
         return products?.map { product -> parseObject(product, ProductResponseVO::class.java) }
@@ -56,7 +55,7 @@ class ProductService {
         user: User,
         name: String
     ): List<ProductResponseVO> {
-        val companySaved = companyService.getCompanyByUserLogged(userLoggedId = user.id)
+        val companySaved = companyService.getCompanyByUserLogged(user = user)
         val products: List<Product> = productRepository.findProductByName(companyId = companySaved.id, name = name)
         return products.map { product -> parseObject(product, ProductResponseVO::class.java) }
     }
@@ -66,15 +65,15 @@ class ProductService {
         user: User,
         productId: Long
     ): ProductResponseVO {
-        val product = getProduct(userId = user.id, productId = productId)
+        val product = getProduct(user = user, productId = productId)
         return parseObject(product, ProductResponseVO::class.java)
     }
 
     fun getProduct(
-        userId: Long,
+        user: User,
         productId: Long
     ): Product {
-        val companySaved = companyService.getCompanyByUserLogged(userLoggedId = userId)
+        val companySaved = companyService.getCompanyByUserLogged(user = user)
         val productSaved: Product? = productRepository.findProductById(companyId = companySaved.id, productId = productId)
         if (productSaved != null) {
             return productSaved
@@ -88,12 +87,12 @@ class ProductService {
         user: User,
         product: ProductRequestVO
     ): ProductResponseVO {
-        if (!checkNameProductAlreadyExists(userId = user.id, name = product.name)) {
+        if (!checkNameProductAlreadyExists(user = user, name = product.name)) {
             val productResult: Product = parseObject(product, Product::class.java)
             productResult.categories =
-                categoryService.converterCategories(userId = user.id, categories = product.categories)
+                categoryService.converterCategories(user = user, categories = product.categories)
             productResult.createdAt = LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS)
-            productResult.company = companyService.getCompanyByUserLogged(userLoggedId = user.id)
+            productResult.company = companyService.getCompanyByUserLogged(user = user)
             return parseObject(productRepository.save(productResult), ProductResponseVO::class.java)
         } else {
             throw ObjectDuplicateException(message = DUPLICATE_NAME_PRODUCT)
@@ -101,23 +100,23 @@ class ProductService {
     }
 
     private fun checkNameProductAlreadyExists(
-        userId: Long,
+        user: User,
         name: String
     ): Boolean {
-        val companySaved = companyService.getCompanyByUserLogged(userLoggedId = userId)
+        val companySaved = companyService.getCompanyByUserLogged(user = user)
         val productResult = productRepository.checkNameProductAlreadyExists(companyId = companySaved.id, name = name)
         return productResult != null
     }
 
     @Transactional
     fun buyProduct(
-        company: Company? = null,
+        user: User,
         order: Order? = null,
         buy: Boolean = false,
         productRequest: ObjectRequestVO
     ): Pair<Object, Double> {
         var total = 0.0
-        val productSaved = getProduct(userId = company?.id ?: 0, productId = productRequest.identifier)
+        val productSaved = getProduct(user = user, productId = productRequest.identifier)
         checkBodyProduct(product = productSaved, quantityRequest = productRequest.quantity)
         val objectProductResult: Object = parseObject(productRequest, Object::class.java)
         objectProductResult.identifier = productRequest.identifier
@@ -140,10 +139,9 @@ class ProductService {
             )
         }
         objectProductResult.order = order
-        productSaved.company = company
         total += priceCalculated
         productRepository.buyProduct(
-            companyId = company?.id ?: 0,
+            companyId = user.id,
             productId = productSaved.id,
             quantity = productRequest.quantity
         )
@@ -155,7 +153,7 @@ class ProductService {
         productId: Long,
         quantity: Int
     ) {
-        val productSaved = getProduct(userId = user.id, productId = productId)
+        val productSaved = getProduct(user = user, productId = productId)
         productRepository.buyProduct(companyId = productSaved.company?.id, productId = productId, quantity = quantity)
     }
 
@@ -177,12 +175,12 @@ class ProductService {
         user: User,
         product: ProductResponseVO
     ): ProductResponseVO {
-        if (!checkNameProductAlreadyExists(userId = user.id, name = product.name)) {
-            val productSaved: Product = getProduct(userId = user.id, productId = product.id)
+        if (!checkNameProductAlreadyExists(user = user, name = product.name)) {
+            val productSaved: Product = getProduct(user = user, productId = product.id)
             productSaved.name = product.name
             productSaved.categories?.clear()
             productSaved.categories =
-                categoryService.converterCategories(userId = user.id, categories = product.categories)
+                categoryService.converterCategories(user = user, categories = product.categories)
             productSaved.price = product.price
             productSaved.quantity = product.quantity
             return parseObject(productRepository.save(productSaved), ProductResponseVO::class.java)
@@ -197,7 +195,7 @@ class ProductService {
         productId: Long,
         price: PriceRequestVO
     ) {
-        val productSaved = getProduct(userId = user.id, productId = productId)
+        val productSaved = getProduct(user = user, productId = productId)
         productRepository.updatePriceProduct(companyId = productSaved.company?.id, idProduct = productSaved.id, price = price.price)
     }
 
@@ -207,7 +205,7 @@ class ProductService {
         productId: Long,
         restockProduct: RestockProductRequestVO
     ) {
-        val productSaved = getProduct(userId = user.id, productId = productId)
+        val productSaved = getProduct(user = user, productId = productId)
         productRepository.restockProduct(
             companyId = productSaved.company?.id,
             idProduct = productSaved.id,
@@ -220,7 +218,7 @@ class ProductService {
         user: User,
         productId: Long
     ) {
-        val productSaved = getProduct(userId = user.id, productId = productId)
+        val productSaved = getProduct(user = user, productId = productId)
         productSaved.categories = null
         productRepository.deleteProductById(companyId = productSaved.company?.id, productId = productId)
     }

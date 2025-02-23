@@ -4,6 +4,7 @@ import br.com.dashboard.company.security.JwtTokenFilter
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
+import org.springframework.http.HttpMethod
 import org.springframework.security.authentication.AuthenticationManager
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
@@ -60,6 +61,7 @@ class SecurityConfig {
                     ).permitAll()
                     .requestMatchers("/api/dashboard/company/profile/v1/**").hasRole("ADMIN")
                     .requestMatchers("/api/dashboard/company/employees/v1/**").hasRole("ADMIN")
+                    .requestMatchers(HttpMethod.GET, "api/dashboard/company/categories/v1**").hasRole("USER")
                     .requestMatchers("api/dashboard/company/categories/v1**").hasRole("ADMIN")
                     .requestMatchers("api/dashboard/company/foods/v1**").hasRole("ADMIN")
                     .requestMatchers("api/dashboard/company/items/v1**").hasRole("ADMIN")

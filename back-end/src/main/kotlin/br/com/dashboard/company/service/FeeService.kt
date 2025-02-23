@@ -34,7 +34,7 @@ class FeeService {
     fun findAllFees(
         user: User
     ): List<FeeResponseVO> {
-        val companySaved = companyService.getCompanyByUserLogged(userLoggedId = user.id)
+        val companySaved = companyService.getCompanyByUserLogged(user = user)
         val fees = feeRepository.findAllFees(companyId = companySaved.id)
         return parseListObjects(fees, FeeResponseVO::class.java)
     }
@@ -68,7 +68,7 @@ class FeeService {
                 throw ObjectDuplicateException(message = DUPLICATE_NAME_FEE)
             } else {
                 val instancedFee: Fee = parseObject(origin = fee, destination = Fee::class.java)
-                instancedFee.company = companyService.getCompanyByUserLogged(userLoggedId = user.id)
+                instancedFee.company = companyService.getCompanyByUserLogged(user = user)
                 feeRepository.save(instancedFee)
             }
         }
@@ -117,7 +117,7 @@ class FeeService {
         feeId: Long,
         percentage: PercentageRequestVO
     ) {
-        val companySaved = companyService.getCompanyByUserLogged(userLoggedId = user.id)
+        val companySaved = companyService.getCompanyByUserLogged(user = user)
         getFee(companyId = companySaved.id, feeId = feeId)
         feeRepository.updatePriceFee(companyId = companySaved.id, feeId = feeId, percentage = percentage.percentage)
     }
@@ -127,7 +127,7 @@ class FeeService {
         user: User,
         feeId: Long
     ) {
-        val companySaved = companyService.getCompanyByUserLogged(userLoggedId = user.id)
+        val companySaved = companyService.getCompanyByUserLogged(user = user)
         val feeSaved = getFee(companyId = companySaved.id, feeId = feeId)
         feeSaved.days?.forEach { day ->
             dayService.deleteDay(feeId = feeId, dayId = day.id)
@@ -141,7 +141,7 @@ class FeeService {
         feeId: Long,
         dayId: Long
     ) {
-        val companySaved = companyService.getCompanyByUserLogged(userLoggedId = user.id)
+        val companySaved = companyService.getCompanyByUserLogged(user = user)
         val feeSaved = getFee(companyId = companySaved.id, feeId = feeId)
         val check = feeSaved.days?.filter { day ->
             if (day.id == dayId) {

@@ -378,7 +378,7 @@ class ReservationController {
         @AuthenticationPrincipal user: User,
         @PathVariable(value = "id") id: Long
     ): ResponseEntity<*> {
-        reservationService.deleteReservation(userId = user.id, reservationId = id)
+        reservationService.deleteReservation(user = user, reservationId = id)
         return ResponseEntity.noContent().build<Any>()
     }
 }

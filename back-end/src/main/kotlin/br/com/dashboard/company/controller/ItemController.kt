@@ -377,7 +377,7 @@ class ItemController {
         @AuthenticationPrincipal user: User,
         @PathVariable(value = "id") id: Long
     ): ResponseEntity<*> {
-        itemService.deleteItem(userId = user.id, itemId = id)
+        itemService.deleteItem(user = user, itemId = id)
         return ResponseEntity.noContent().build<Any>()
     }
 }

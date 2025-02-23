@@ -1,6 +1,5 @@
 package br.com.dashboard.company.service
 
-import br.com.dashboard.company.entities.company.Company
 import br.com.dashboard.company.entities.food.Food
 import br.com.dashboard.company.entities.`object`.Object
 import br.com.dashboard.company.entities.order.Order
@@ -41,7 +40,7 @@ class FoodService {
         foodName: String?,
         pageable: Pageable
     ): Page<FoodResponseVO> {
-        val companySaved = companyService.getCompanyByUserLogged(userLoggedId = user.id)
+        val companySaved = companyService.getCompanyByUserLogged(user = user)
         val foods: Page<Food>? =
             foodRepository.findAllFoods(companyId = companySaved.id, foodName = foodName, pageable = pageable)
         return foods?.map { food -> parseObject(food, FoodResponseVO::class.java) }
@@ -53,7 +52,7 @@ class FoodService {
         user: User,
         name: String
     ): List<FoodResponseVO> {
-        val companySaved = companyService.getCompanyByUserLogged(userLoggedId = user.id)
+        val companySaved = companyService.getCompanyByUserLogged(user = user)
         val foods: List<Food> = foodRepository.findFoodByName(companyId = companySaved.id, foodName = name)
         return foods.map { food -> parseObject(food, FoodResponseVO::class.java) }
     }
@@ -63,15 +62,15 @@ class FoodService {
         user: User,
         foodId: Long
     ): FoodResponseVO {
-        val food = getFood(userId = user.id, foodId = foodId)
+        val food = getFood(user = user, foodId = foodId)
         return parseObject(food, FoodResponseVO::class.java)
     }
 
     fun getFood(
-        userId: Long,
+        user: User,
         foodId: Long
     ): Food {
-        val companySaved = companyService.getCompanyByUserLogged(userLoggedId = userId)
+        val companySaved = companyService.getCompanyByUserLogged(user = user)
         val foodSaved: Food? = foodRepository.findFoodById(companyId = companySaved.id, foodId = foodId)
         if (foodSaved != null) {
             return foodSaved
@@ -85,11 +84,11 @@ class FoodService {
         user: User,
         food: FoodRequestVO
     ): FoodResponseVO {
-        if (!checkFoodNameAlreadyExists(userId = user.id, foodName = food.name)) {
+        if (!checkFoodNameAlreadyExists(user = user, foodName = food.name)) {
             val foodResult: Food = parseObject(food, Food::class.java)
-            foodResult.categories = categoryService.converterCategories(userId = user.id, categories = food.categories)
+            foodResult.categories = categoryService.converterCategories(user = user, categories = food.categories)
             foodResult.createdAt = LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS)
-            foodResult.company = companyService.getCompanyByUserLogged(userLoggedId = user.id)
+            foodResult.company = companyService.getCompanyByUserLogged(user = user)
             return parseObject(foodRepository.save(foodResult), FoodResponseVO::class.java)
         } else {
             throw ObjectDuplicateException(message = DUPLICATE_NAME_FOOD)
@@ -97,33 +96,32 @@ class FoodService {
     }
 
     private fun checkFoodNameAlreadyExists(
-        userId: Long,
+        user: User,
         foodName: String
     ): Boolean {
-        val companySaved = companyService.getCompanyByUserLogged(userLoggedId = userId)
+        val companySaved = companyService.getCompanyByUserLogged(user = user)
         val foodResult = foodRepository.checkNameFoodAlreadyExists(companyId = companySaved.id, foodName = foodName)
         return foodResult != null
     }
 
     @Transactional
     fun saveObjectFood(
-        company: Company? = null,
+        user: User,
         order: Order? = null,
         foodRequest: ObjectRequestVO
     ): Pair<Object, Double> {
         var total = 0.0
-        val productSaved = getFood(userId = company?.id ?: 0, foodId = foodRequest.identifier)
+        val foodSaved = getFood(user = user, foodId = foodRequest.identifier)
         val objectItemResult: Object = parseObject(foodRequest, Object::class.java)
         objectItemResult.identifier = foodRequest.identifier
         objectItemResult.type = foodRequest.type
-        objectItemResult.name = productSaved.name
-        objectItemResult.price = productSaved.price
+        objectItemResult.name = foodSaved.name
+        objectItemResult.price = foodSaved.price
         objectItemResult.quantity = foodRequest.quantity
-        val priceCalculated = (productSaved.price * foodRequest.quantity)
+        val priceCalculated = (foodSaved.price * foodRequest.quantity)
         objectItemResult.total = priceCalculated
         objectItemResult.status = ObjectStatus.PENDING
         objectItemResult.order = order
-        productSaved.company = company
         total += priceCalculated
         return Pair(objectItemResult, total)
     }
@@ -133,11 +131,11 @@ class FoodService {
         user: User,
         food: FoodResponseVO
     ): FoodResponseVO {
-        if (!checkFoodNameAlreadyExists(userId = user.id, foodName = food.name)) {
-            val foodSaved: Food = getFood(userId = user.id, foodId = food.id)
+        if (!checkFoodNameAlreadyExists(user = user, foodName = food.name)) {
+            val foodSaved: Food = getFood(user = user, foodId = food.id)
             foodSaved.name = food.name
             foodSaved.categories?.clear()
-            foodSaved.categories = categoryService.converterCategories(userId = user.id, categories = food.categories)
+            foodSaved.categories = categoryService.converterCategories(user = user, categories = food.categories)
             foodSaved.price = food.price
             return parseObject(foodRepository.save(foodSaved), FoodResponseVO::class.java)
         } else {
@@ -151,7 +149,7 @@ class FoodService {
         foodId: Long,
         price: PriceRequestVO
     ) {
-        val foodSaved = getFood(userId = user.id, foodId = foodId)
+        val foodSaved = getFood(user = user, foodId = foodId)
         foodRepository.updatePriceFood(companyId = foodSaved.company?.id, idFood = foodSaved.id, price = price.price)
     }
 
@@ -160,7 +158,7 @@ class FoodService {
         user: User,
         foodId: Long
     ) {
-        val foodSaved = getFood(userId = user.id, foodId = foodId)
+        val foodSaved = getFood(user = user, foodId = foodId)
         foodSaved.categories = null
         foodRepository.deleteFoodById(companyId = foodSaved.company?.id, foodId = foodId)
     }

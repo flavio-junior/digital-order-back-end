@@ -114,6 +114,7 @@ class AuthService {
             newUser.email = data.email
             newUser.password = passwordEncoder.encode(data.password)
             newUser.typeAccount = data.type
+            newUser.employee = data.employee
             return userRepository.save(newUser)
         }
     }

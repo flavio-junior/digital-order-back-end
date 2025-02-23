@@ -41,7 +41,7 @@ class EmployeeService {
         name: String?,
         pageable: Pageable
     ): Page<EmployeeResponseVO> {
-        val companySaved = companyService.getCompanyByUserLogged(userLoggedId = user.id)
+        val companySaved = companyService.getCompanyByUserLogged(user = user)
         val employees: Page<Employee>? =
             employeeRepository.findAllEmployees(companyId = companySaved.id, name = name, pageable = pageable)
         return employees?.map { employee -> parseObject(employee, EmployeeResponseVO::class.java) }
@@ -53,7 +53,7 @@ class EmployeeService {
         user: User,
         employeeId: Long
     ): EmployeeResponseVO {
-        val employee = getEmployee(userId = user.id, employeeId = employeeId)
+        val employee = getEmployee(user = user, employeeId = employeeId)
         return parseObject(employee, EmployeeResponseVO::class.java)
     }
 
@@ -62,7 +62,7 @@ class EmployeeService {
         user: User,
         name: String
     ): List<EmployeeResponseVO> {
-        val companySaved = companyService.getCompanyByUserLogged(userLoggedId = user.id)
+        val companySaved = companyService.getCompanyByUserLogged(user = user)
         val employees = employeeRepository.findEmployeeByName(companyId = companySaved.id, name = name)
         return parseListObjects(employees, EmployeeResponseVO::class.java)
     }
@@ -73,7 +73,7 @@ class EmployeeService {
         employeeName: String,
         saveAuthor: () -> Unit = {}
     ) {
-        val companySaved = companyService.getCompanyByUserLogged(userLoggedId = user.id)
+        val companySaved = companyService.getCompanyByUserLogged(user = user)
         val employeeSaved: Employee? =
             employeeRepository.checkEmployeeAlreadyExists(companyId = companySaved.id, name = employeeName)
         return if (employeeSaved != null) {
@@ -84,10 +84,10 @@ class EmployeeService {
     }
 
     fun getEmployee(
-        userId: Long,
+        user: User,
         employeeId: Long
     ): Employee {
-        val companySaved = companyService.getCompanyByUserLogged(userLoggedId = userId)
+        val companySaved = companyService.getCompanyByUserLogged(user = user)
         val employeeSaved: Employee? =
             employeeRepository.findEmployeeById(companyId = companySaved.id, employeeId = employeeId)
         if (employeeSaved != null) {
@@ -107,14 +107,15 @@ class EmployeeService {
         createNewEmployee.name = employee.name
         createNewEmployee.function = employee.function
         createNewEmployee.status = StatusEmployee.ENABLED
-        createNewEmployee.company = companyService.getCompanyByUserLogged(userLoggedId = user.id)
+        createNewEmployee.company = companyService.getCompanyByUserLogged(user = user)
         employeeRepository.save(createNewEmployee)
         val createAccountToEmployee = SignUpVO(
             name = employee.name,
             surname = employee.surname,
             email = employee.email,
             password = employee.password,
-            type = TypeAccount.USER
+            type = TypeAccount.USER,
+            employee = createNewEmployee
         )
         authService.signUp(data = createAccountToEmployee)
     }
@@ -153,8 +154,8 @@ class EmployeeService {
         user: User,
         employeeId: Long
     ) {
-        val userSaved = companyService.getCompanyByUserLogged(userLoggedId = user.id)
-        val employeeSaved = getEmployee(userId = user.id, employeeId = employeeId)
+        val userSaved = companyService.getCompanyByUserLogged(user = user)
+        val employeeSaved = getEmployee(user = user, employeeId = employeeId)
         if (employeeSaved.status == StatusEmployee.ENABLED) {
             throw InternalErrorClient(message = EMPLOYEE_WITH_ACTIVE_PROFILE)
         }

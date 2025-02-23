@@ -218,7 +218,7 @@ class ReportController(private val reportService: ReportService) {
         @AuthenticationPrincipal user: User,
         @PathVariable(value = "id") reportId: Long
     ): ResponseEntity<*> {
-        reportService.deleteReport(userId = user.id, reportId = reportId)
+        reportService.deleteReport(user = user, reportId = reportId)
         return ResponseEntity.noContent().build<Any>()
     }
 }

@@ -13,6 +13,12 @@ CREATE TABLE IF NOT EXISTS tb_user_company (
     PRIMARY KEY (fk_user, fk_company)
 );
 
+CREATE TABLE IF NOT EXISTS tb_user_employee (
+    fk_user INT REFERENCES tb_user(id),
+    fk_employee INT REFERENCES tb_employee(id),
+    PRIMARY KEY (fk_user, fk_employee)
+);
+
 CREATE TABLE IF NOT EXISTS tb_category(
     id SERIAL PRIMARY KEY,
     name VARCHAR(60)

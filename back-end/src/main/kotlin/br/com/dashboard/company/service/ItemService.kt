@@ -1,6 +1,5 @@
 package br.com.dashboard.company.service
 
-import br.com.dashboard.company.entities.company.Company
 import br.com.dashboard.company.entities.item.Item
 import br.com.dashboard.company.entities.`object`.Object
 import br.com.dashboard.company.entities.order.Order
@@ -35,7 +34,7 @@ class ItemService {
         name: String?,
         pageable: Pageable
     ): Page<ItemResponseVO> {
-        val companySaved = companyService.getCompanyByUserLogged(userLoggedId = user.id)
+        val companySaved = companyService.getCompanyByUserLogged(user = user)
         val items: Page<Item>? = itemRepository.findAllItems(companyId = companySaved.id, name = name, pageable = pageable)
         return items?.map { reservation -> parseObject(reservation, ItemResponseVO::class.java) }
             ?: throw ResourceNotFoundException(message = ITEM_NOT_FOUND)
@@ -46,7 +45,7 @@ class ItemService {
         user: User,
         name: String
     ): List<ItemResponseVO> {
-        val companySaved = companyService.getCompanyByUserLogged(userLoggedId = user.id)
+        val companySaved = companyService.getCompanyByUserLogged(user = user)
         val items: List<Item> = itemRepository.findItemByName(companyId = companySaved.id, name = name)
         return items.map { item -> parseObject(item, ItemResponseVO::class.java) }
     }
@@ -56,7 +55,7 @@ class ItemService {
         user: User,
         idItem: Long
     ): ItemResponseVO {
-        val companySaved = companyService.getCompanyByUserLogged(userLoggedId = user.id)
+        val companySaved = companyService.getCompanyByUserLogged(user = user)
         val itemSaved: Item? = itemRepository.findItemById(companyId = companySaved.id, itemId = idItem)
         if (itemSaved != null) {
             return parseObject(itemSaved, ItemResponseVO::class.java)
@@ -66,10 +65,10 @@ class ItemService {
     }
 
     fun getItem(
-        userId: Long,
+        user: User,
         itemId: Long
     ): Item {
-        val companySaved = companyService.getCompanyByUserLogged(userLoggedId = userId)
+        val companySaved = companyService.getCompanyByUserLogged(user = user)
         val itemSaved: Item? = itemRepository.findItemById(companyId = companySaved.id, itemId = itemId)
         if (itemSaved != null) {
             return itemSaved
@@ -83,9 +82,9 @@ class ItemService {
         user: User,
         item: ItemRequestVO
     ): ItemResponseVO {
-        if (!checkNameItemAlreadyExists(userId = user.id, name = item.name)) {
+        if (!checkNameItemAlreadyExists(user = user, name = item.name)) {
             val itemResult: Item = parseObject(item, Item::class.java)
-            itemResult.company = companyService.getCompanyByUserLogged(userLoggedId = user.id)
+            itemResult.company = companyService.getCompanyByUserLogged(user = user)
             return parseObject(itemRepository.save(itemResult), ItemResponseVO::class.java)
         } else {
             throw ObjectDuplicateException(message = DUPLICATE_NAME_ITEM)
@@ -93,22 +92,22 @@ class ItemService {
     }
 
     private fun checkNameItemAlreadyExists(
-        userId: Long,
+        user: User,
         name: String
     ): Boolean {
-        val companySaved = companyService.getCompanyByUserLogged(userLoggedId = userId)
+        val companySaved = companyService.getCompanyByUserLogged(user = user)
         val itemResult = itemRepository.checkNameItemAlreadyExists(companyId = companySaved.id, name = name)
         return itemResult != null
     }
 
     @Transactional
     fun saveObjectItem(
-        company: Company? = null,
+        user: User,
         order: Order? = null,
         itemRequest: ObjectRequestVO
     ): Pair<Object, Double> {
         var total = 0.0
-        val productSaved = getItem(userId = company?.id ?: 0, itemId = itemRequest.identifier)
+        val productSaved = getItem(user = user, itemId = itemRequest.identifier)
         val objectItemResult: Object = parseObject(itemRequest, Object::class.java)
         objectItemResult.identifier = itemRequest.identifier
         objectItemResult.type = itemRequest.type
@@ -119,7 +118,6 @@ class ItemService {
         objectItemResult.total = priceCalculated
         objectItemResult.status = ObjectStatus.PENDING
         objectItemResult.order = order
-        productSaved.company = company
         total += priceCalculated
         return Pair(objectItemResult, total)
     }
@@ -129,8 +127,8 @@ class ItemService {
         user: User,
         item: ItemResponseVO
     ): ItemResponseVO {
-        if (!checkNameItemAlreadyExists(userId = user.id, name = item.name)) {
-            val itemSaved: Item = getItem(userId = user.id, itemId = item.id)
+        if (!checkNameItemAlreadyExists(user = user, name = item.name)) {
+            val itemSaved: Item = getItem(user = user, itemId = item.id)
             itemSaved.name = item.name
             itemSaved.price = item.price
             return parseObject(itemRepository.save(itemSaved), ItemResponseVO::class.java)
@@ -145,16 +143,16 @@ class ItemService {
         itemId: Long,
         price: PriceRequestVO
     ) {
-        val itemSaved = getItem(userId = user.id, itemId = itemId)
+        val itemSaved = getItem(user = user, itemId = itemId)
         itemRepository.updateItemPrice(companyId = itemSaved.id, idItem = itemId, price = price.price)
     }
 
     @Transactional
     fun deleteItem(
-        userId: Long,
+        user: User,
         itemId: Long
     ) {
-        val itemSaved: Item = getItem(userId = userId, itemId = itemId)
+        val itemSaved: Item = getItem(user = user, itemId = itemId)
         itemRepository.deleteItemById(companyId = itemSaved.company?.id, itemId = itemSaved.id)
     }
 

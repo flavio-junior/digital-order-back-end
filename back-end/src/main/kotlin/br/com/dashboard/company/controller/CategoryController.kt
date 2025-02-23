@@ -320,7 +320,7 @@ class CategoryController {
         @AuthenticationPrincipal user: User,
         @PathVariable(value = "id") categoryId: Long
     ): ResponseEntity<*> {
-        categoryService.deleteCategory(userId = user.id, categoryId = categoryId)
+        categoryService.deleteCategory(user = user, categoryId = categoryId)
         return ResponseEntity.noContent().build<Any>()
     }
 }
