@@ -9,10 +9,10 @@
 		<relativePath/>
 	</parent>
 	<groupId>br.com</groupId>
-	<artifactId>dashboard.company</artifactId>
+	<artifactId>.digital.order</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>dashboard.company</name>
-	<description>Demo project for Spring Boot</description>
+	<name>.digital.order</name>
+	<description>Digital Order</description>
 	<url/>
 	<licenses>
 		<license/>
