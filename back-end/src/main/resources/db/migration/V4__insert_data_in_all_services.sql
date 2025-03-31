@@ -1,4 +1,9 @@
 INSERT INTO
+    tb_company (identifier, date, hour, name, main_image)
+VALUES
+    (1234, CURRENT_DATE, CURRENT_TIME, 'Jr. Tech Solutions Ltda', 'https://example.com/images/tech_solutions.png');
+
+INSERT INTO
     tb_category (name)
 VALUES
     ('Bebidas'),
@@ -172,13 +177,13 @@ VALUES
     (3, 7);
 
 INSERT INTO
-    tb_payment (date, hour, code, type_order, type_payment, discount, value_discount, total)
+    tb_payment (date, hour, code, author, assigned, type_order, type_payment, discount, value_discount, total)
 VALUES
-    ('2025-01-07', '10:30:00', 1000000001, 'DELIVERY', 'CREDIT_CAD', TRUE, 5.00, 95.00),
-    ('2025-01-06', '12:00:00', 1000000002, 'ORDER', 'DEBIT_CAD', FALSE, 0.00, 120.00),
-    ('2025-01-05', '15:45:00', 1000000003, 'RESERVATION', 'PIX', TRUE, 10.00, 90.00),
-    ('2025-01-04', '18:20:00', 1000000004, 'SHOPPING_CART', 'MONEY', FALSE, 0.00, 50.00),
-    ('2025-01-03', '20:10:00', 1000000005, 'DELIVERY', 'PIX', TRUE, 15.00, 85.00);
+    ('2025-01-07', '10:30:00', 1000000001, 'Flávio', 'Flávio', 'DELIVERY', 'CREDIT_CAD', TRUE, 5.00, 95.00),
+    ('2025-01-06', '12:00:00', 1000000002, 'Flávio', 'Flávio', 'ORDER', 'DEBIT_CAD', FALSE, 0.00, 120.00),
+    ('2025-01-05', '15:45:00', 1000000003, 'Flávio', 'Flávio', 'RESERVATION', 'PIX', TRUE, 10.00, 90.00),
+    ('2025-01-04', '18:20:00', 1000000004, 'Flávio', 'Flávio', 'SHOPPING_CART', 'MONEY', FALSE, 0.00, 50.00),
+    ('2025-01-03', '20:10:00', 1000000005, 'Flávio', 'Flávio', 'DELIVERY', 'PIX', TRUE, 15.00, 85.00);
 
 INSERT INTO
     tb_order_payment (fk_order, fk_payment)
