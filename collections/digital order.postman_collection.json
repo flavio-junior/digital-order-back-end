@@ -1,0 +1,2959 @@
+{
+	"info": {
+		"_postman_id": "80b0df08-88db-4f5a-9102-d42d14334210",
+		"name": "digital order",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "19925093",
+		"_collection_link": "https://gold-eclipse-488450.postman.co/workspace/Projects-and-Student~e7d25d4b-b386-4d48-8cfb-e14654f0ebee/collection/19925093-80b0df08-88db-4f5a-9102-d42d14334210?action=share&source=collection_link&creator=19925093"
+	},
+	"item": [
+		{
+			"name": "api",
+			"item": [
+				{
+					"name": "auth",
+					"item": [
+						{
+							"name": "confirm email address",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"email\": \"flaviojunior.ofc@outlook.com\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}/api/auth/v1/confirm-email-address",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"auth",
+										"v1",
+										"confirm-email-address"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "check code send to confirm email",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/api/auth/v1/check-code-existent/2081",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"auth",
+										"v1",
+										"check-code-existent",
+										"2081"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "send recover token",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"email\": \"flaviojunior.work@gmail.com\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}/api/auth/v1/recover-password",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"auth",
+										"v1",
+										"recover-password"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "check recover password Copy",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/api/auth/v1/check-recover-password/5797",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"auth",
+										"v1",
+										"check-recover-password",
+										"5797"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "sign-up",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"name\": \"Flávio\",\r\n    \"surname\": \"Jr\",\r\n    \"email\": \"flaviojunior.ofc@outlook.com\",\r\n    \"password\": \"admin123\",\r\n    \"type\": \"ADMIN\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}/api/auth/v1/signUp",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"auth",
+										"v1",
+										"signUp"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "sign-in",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"if(responseCode.code >= 200 && responseCode.code <= 299) {\r",
+											"    var jsonData = JSON.parse(responseBody)\r",
+											"\r",
+											"    postman.setEnvironmentVariable(\"accessToken\", jsonData.accessToken);\r",
+											"    postman.setEnvironmentVariable(\"refreshToken\", jsonData.refreshToken);\r",
+											"}"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"email\": \"{{email}}\",\r\n    \"password\": \"{{password}}\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}/api/auth/v1/signIn",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"auth",
+										"v1",
+										"signIn"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "refresh token",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"if(responseCode.code >= 200 && responseCode.code <= 299) {\r",
+											"    var jsonData = JSON.parse(responseBody)\r",
+											"\r",
+											"    postman.setEnvironmentVariable(\"accessToken\", jsonData.accessToken);\r",
+											"    postman.setEnvironmentVariable(\"refreshToken\", jsonData.refreshToken);\r",
+											"}"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "PUT",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"disabled": true
+									},
+									{
+										"key": "Accept",
+										"value": "application/json",
+										"disabled": true
+									},
+									{
+										"key": "Authorization",
+										"value": "Bearer {{refreshToken}}"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"email\": \"{{email}}\"\n}",
+									"options": {
+										"raw": {
+											"headerFamily": "json",
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}/api/auth/v1/refresh/{{email}}",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"auth",
+										"v1",
+										"refresh",
+										"{{email}}"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "create new password",
+							"request": {
+								"method": "PUT",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"name\": \"Flávio\",\r\n    \"surname\": \"Júnior\",\r\n    \"email\": \"juniorflavio.ofc@gmail.com\",\r\n    \"password\": \"admin123\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}/api/auth/v1/new-password",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"auth",
+										"v1",
+										"new-password"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "employee",
+					"item": [
+						{
+							"name": "find all employees",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{accessToken}}",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "{{baseUrl}}/api/digital/order/employees/v1?name=&page=0&size=30&sort=asc",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"digital",
+										"order",
+										"employees",
+										"v1"
+									],
+									"query": [
+										{
+											"key": "name",
+											"value": ""
+										},
+										{
+											"key": "page",
+											"value": "0"
+										},
+										{
+											"key": "size",
+											"value": "30"
+										},
+										{
+											"key": "sort",
+											"value": "asc"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "find employee by id",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{accessToken}}",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "{{baseUrl}}/api/digital/order/employees/v1/23",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"digital",
+										"order",
+										"employees",
+										"v1",
+										"23"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "find employee by name",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{accessToken}}",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "{{baseUrl}}/api/digital/order/employees/v1/find/employee/by/v",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"digital",
+										"order",
+										"employees",
+										"v1",
+										"find",
+										"employee",
+										"by",
+										"v"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "create new employee",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{accessToken}}",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"name\": \"Marcos\",\r\n    \"surname\": \"Jr\",\r\n    \"email\": \"marcos.ofc@gmail.com\",\r\n    \"password\": \"admin123\",\r\n    \"function\": \"WAITER\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}/api/digital/order/employees/v1",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"digital",
+										"order",
+										"employees",
+										"v1"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "disabled profile employee",
+							"request": {
+								"method": "PATCH",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{accessToken}}",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "{{baseUrl}}/api/digital/order/employees/v1/disabled/9",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"digital",
+										"order",
+										"employees",
+										"v1",
+										"disabled",
+										"9"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "enabled profile employee",
+							"request": {
+								"method": "PATCH",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{accessToken}}",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "{{baseUrl}}/api/digital/order/employees/v1/enabled/9",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"digital",
+										"order",
+										"employees",
+										"v1",
+										"enabled",
+										"9"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "delete employee",
+							"request": {
+								"method": "DELETE",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{accessToken}}",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "{{baseUrl}}/api/digital/order/employees/v1/2",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"digital",
+										"order",
+										"employees",
+										"v1",
+										"2"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "category",
+					"item": [
+						{
+							"name": "find all categories",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{accessToken}}",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "{{baseUrl}}/api/digital/order/categories/v1?name=&page=0&size=10&sort=name,asc",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"digital",
+										"order",
+										"categories",
+										"v1"
+									],
+									"query": [
+										{
+											"key": "name",
+											"value": ""
+										},
+										{
+											"key": "page",
+											"value": "0"
+										},
+										{
+											"key": "size",
+											"value": "10"
+										},
+										{
+											"key": "sort",
+											"value": "name,asc"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "find category by id",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{accessToken}}",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "{{baseUrl}}/api/digital/order/categories/v1/10",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"digital",
+										"order",
+										"categories",
+										"v1",
+										"10"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "find category by name",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{accessToken}}",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "{{baseUrl}}/api/digital/order/categories/v1/find/category/by/a",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"digital",
+										"order",
+										"categories",
+										"v1",
+										"find",
+										"category",
+										"by",
+										"a"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "create new category",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{accessToken}}",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"name\": \"Carnes\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}/api/digital/order/categories/v1",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"digital",
+										"order",
+										"categories",
+										"v1"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "update category",
+							"request": {
+								"method": "PUT",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{accessToken}}",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"id\": 29,\r\n    \"name\": \"Refrigerantes - Update\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}/api/digital/order/categories/v1",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"digital",
+										"order",
+										"categories",
+										"v1"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "delete category",
+							"request": {
+								"method": "DELETE",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{accessToken}}",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "{{baseUrl}}/api/digital/order/categories/v1/29",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"digital",
+										"order",
+										"categories",
+										"v1",
+										"29"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "company",
+					"item": [
+						{
+							"name": "create profile of company",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{accessToken}}",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "formdata",
+									"formdata": [
+										{
+											"key": "name",
+											"value": "Lanchonete Frango Assado",
+											"type": "text"
+										},
+										{
+											"key": "main_image",
+											"type": "file",
+											"src": "/C:/Users/flavi/Downloads/garcom-servindo-prato-comida-cover-silhueta-de-cupula-sinais-de-mao-de-garcom-com-bandeja-de-servico-garcom-servindo_734654-1591.jpg"
+										}
+									]
+								},
+								"url": {
+									"raw": "{{baseUrl}}/api/digital/order/profile/v1",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"digital",
+										"order",
+										"profile",
+										"v1"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "product",
+					"item": [
+						{
+							"name": "find all products",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{accessToken}}",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "{{baseUrl}}/api/digital/order/products/v1?name=&page=0&size=30&sort=asc",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"digital",
+										"order",
+										"products",
+										"v1"
+									],
+									"query": [
+										{
+											"key": "name",
+											"value": ""
+										},
+										{
+											"key": "page",
+											"value": "0"
+										},
+										{
+											"key": "size",
+											"value": "30"
+										},
+										{
+											"key": "sort",
+											"value": "asc"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "find product by id",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{accessToken}}",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "{{baseUrl}}/api/digital/order/products/v1/11",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"digital",
+										"order",
+										"products",
+										"v1",
+										"11"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "find product by name",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{accessToken}}",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "{{baseUrl}}/api/digital/order/products/v1/find/product/by/a",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"digital",
+										"order",
+										"products",
+										"v1",
+										"find",
+										"product",
+										"by",
+										"a"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "create new product",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{accessToken}}",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"name\": \"refrigerante fanta - 1 Litro\",\r\n    \"categories\": [\r\n        {\r\n            \"id\": 1,\r\n            \"name\": \"Bebidas\"\r\n        }\r\n    ],\r\n    \"price\": 9.99,\r\n    \"quantity\": 100\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}/api/dashboard/company/products/v1",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"dashboard",
+										"company",
+										"products",
+										"v1"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "update product",
+							"request": {
+								"method": "PUT",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{accessToken}}",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "    {\r\n        \"id\": 10,\r\n        \"created_at\": \"2024-11-13T22:10:43.579939Z\",\r\n        \"name\": \"refrigerante fanta - 1 Litros | Update\",\r\n        \"categories\": [\r\n             {\r\n                \"id\": 3,\r\n                \"name\": \"Bebidas\"\r\n            }\r\n        ],\r\n        \"price\": 11.99,\r\n        \"quantity\": 10\r\n    }",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}/api/dashboard/company/products/v1",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"dashboard",
+										"company",
+										"products",
+										"v1"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "update price of product",
+							"request": {
+								"method": "PATCH",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{accessToken}}",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"price\": 14.99\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}/api/dashboard/company/products/v1/update/price/product/11",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"dashboard",
+										"company",
+										"products",
+										"v1",
+										"update",
+										"price",
+										"product",
+										"11"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "restock product",
+							"request": {
+								"method": "PATCH",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{accessToken}}",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"quantity\": 9\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}/api/dashboard/company/products/v1/restock/product/11",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"dashboard",
+										"company",
+										"products",
+										"v1",
+										"restock",
+										"product",
+										"11"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "delete product",
+							"request": {
+								"method": "DELETE",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{accessToken}}",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "{{baseUrl}}/api/dashboard/company/products/v1/1",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"dashboard",
+										"company",
+										"products",
+										"v1",
+										"1"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "fee",
+					"item": [
+						{
+							"name": "find all fees",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{accessToken}}",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "{{baseUrl}}/api/digital/order/fees/v1",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"digital",
+										"order",
+										"fees",
+										"v1"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "create new fee",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{accessToken}}",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"percentage\": 10,\r\n    \"assigned\": \"WAITER\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}/api/digital/order/fees/v1",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"digital",
+										"order",
+										"fees",
+										"v1"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "add days fee",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{accessToken}}",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n  \"days\": [\"SUNDAY\"]\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}/api/digital/order/fees/v1/add/days/fee/29",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"digital",
+										"order",
+										"fees",
+										"v1",
+										"add",
+										"days",
+										"fee",
+										"29"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "update price of fee",
+							"request": {
+								"method": "PATCH",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{accessToken}}",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"price\": 10.0\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}/api/digital/order/fees/v1/update/price/fee/2",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"digital",
+										"order",
+										"fees",
+										"v1",
+										"update",
+										"price",
+										"fee",
+										"2"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "delete fee",
+							"request": {
+								"method": "DELETE",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{accessToken}}",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "{{baseUrl}}/api/digital/order/fees/v1/34",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"digital",
+										"order",
+										"fees",
+										"v1",
+										"34"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "delete day of fee",
+							"request": {
+								"method": "DELETE",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{accessToken}}",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "{{baseUrl}}/api/digital/order/fees/v1/fee/7/20",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"digital",
+										"order",
+										"fees",
+										"v1",
+										"fee",
+										"7",
+										"20"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "food",
+					"item": [
+						{
+							"name": "find all foods",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{accessToken}}",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "{{baseUrl}}/api/digital/order/foods/v1?name=&page=0&size=30&sort=asc",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"digital",
+										"order",
+										"foods",
+										"v1"
+									],
+									"query": [
+										{
+											"key": "name",
+											"value": ""
+										},
+										{
+											"key": "page",
+											"value": "0"
+										},
+										{
+											"key": "size",
+											"value": "30"
+										},
+										{
+											"key": "sort",
+											"value": "asc"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "find food by id",
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{accessToken}}",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"name\": \"Arroz carreteiro - Update\",\r\n    \"description\": \"Mistura de carne de sol desfiada, farinha de mandioca, batata e sal a gosto - Udate\",\r\n    \"categories\": [\r\n        {\r\n            \"id\": 3,\r\n            \"name\": \"Comidas Típicas\"\r\n        }\r\n    ],\r\n    \"price\": 30.00\r\n  }",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}/api/digital/order/foods/v1/11",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"digital",
+										"order",
+										"foods",
+										"v1",
+										"11"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "find food by name",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{accessToken}}",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "{{baseUrl}}/api/digital/order/foods/v1/find/food/by/a",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"digital",
+										"order",
+										"foods",
+										"v1",
+										"find",
+										"food",
+										"by",
+										"a"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "create new food",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{accessToken}}",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"name\": \"Arroz carreteiro 3\",\r\n    \"categories\": [\r\n        {\r\n            \"id\": 3,\r\n            \"name\": \"Comidas Típicas\"\r\n        }\r\n    ],\r\n    \"price\": 30.00\r\n  }",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}/api/digital/order/foods/v1",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"digital",
+										"order",
+										"foods",
+										"v1"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "update food",
+							"request": {
+								"method": "PUT",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{accessToken}}",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"id\": 11,\r\n    \"created_at\": \"2024-11-17T11:12:53.640003Z\",\r\n    \"name\": \"Arroz carreteiro - Update\",\r\n    \"categories\": [\r\n        {\r\n            \"id\": 1,\r\n            \"name\": \"Bebidas\"\r\n        }\r\n    ],\r\n    \"price\": 35.0\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}/api/digital/order/foods/v1",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"digital",
+										"order",
+										"foods",
+										"v1"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "update price of food",
+							"request": {
+								"method": "PATCH",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{accessToken}}",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"price\": 32.00\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}/api/digital/order/foods/v1/update/price/food/11",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"digital",
+										"order",
+										"foods",
+										"v1",
+										"update",
+										"price",
+										"food",
+										"11"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "delete food",
+							"request": {
+								"method": "DELETE",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{accessToken}}",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "{{baseUrl}}/api/digital/order/foods/v1/12",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"digital",
+										"order",
+										"foods",
+										"v1",
+										"12"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "reservations",
+					"item": [
+						{
+							"name": "find all reservations",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{accessToken}}",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "{{baseUrl}}/api/digital/order/reservations/v1?name=&page=0&size=30&sort=asc",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"digital",
+										"order",
+										"reservations",
+										"v1"
+									],
+									"query": [
+										{
+											"key": "name",
+											"value": ""
+										},
+										{
+											"key": "page",
+											"value": "0"
+										},
+										{
+											"key": "size",
+											"value": "30"
+										},
+										{
+											"key": "sort",
+											"value": "asc"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "find reservation by id",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{accessToken}}",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "{{baseUrl}}/api/digital/order/reservations/v1/11",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"digital",
+										"order",
+										"reservations",
+										"v1",
+										"11"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "find reservation by name",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{accessToken}}",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "{{baseUrl}}/api/digital/order/reservations/v1/find/reservation/by/mesa 10",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"digital",
+										"order",
+										"reservations",
+										"v1",
+										"find",
+										"reservation",
+										"by",
+										"mesa 10"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "create new reservation",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{accessToken}}",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"name\": \"Mesa 11\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}/api/digital/order/reservations/v1",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"digital",
+										"order",
+										"reservations",
+										"v1"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "generate reservations",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{accessToken}}",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"prefix\": \"Mesa\",\r\n    \"start\": 1,\r\n    \"end\": 9\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}/api/digital/order/reservations/v1/generate/reservations",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"digital",
+										"order",
+										"reservations",
+										"v1",
+										"generate",
+										"reservations"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "update reservation",
+							"request": {
+								"method": "PUT",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{accessToken}}",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"id\": 11,\r\n    \"name\": \"Mesa 11 - Update\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}/api/dashboard/company/reservations/v1",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"dashboard",
+										"company",
+										"reservations",
+										"v1"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "delete reservation",
+							"request": {
+								"method": "DELETE",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{accessToken}}",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "{{baseUrl}}/api/digital/order/reservations/v1/1",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"digital",
+										"order",
+										"reservations",
+										"v1",
+										"1"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "items",
+					"item": [
+						{
+							"name": "find all items",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{accessToken}}",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "{{baseUrl}}/api/digital/order/items/v1?name=&page=0&size=30&sort=asc",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"digital",
+										"order",
+										"items",
+										"v1"
+									],
+									"query": [
+										{
+											"key": "name",
+											"value": ""
+										},
+										{
+											"key": "page",
+											"value": "0"
+										},
+										{
+											"key": "size",
+											"value": "30"
+										},
+										{
+											"key": "sort",
+											"value": "asc"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "find item by name",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{accessToken}}",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "{{baseUrl}}/api/digital/order/items/v1/find/item/by/a",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"digital",
+										"order",
+										"items",
+										"v1",
+										"find",
+										"item",
+										"by",
+										"a"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "find item by id",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{accessToken}}",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "{{baseUrl}}/api/digital/order/items/v1/1",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"digital",
+										"order",
+										"items",
+										"v1",
+										"1"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "create nem item",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{accessToken}}",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"name\": \"w\",\r\n    \"price\": 19.0\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}/api/digital/order/items/v1",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"digital",
+										"order",
+										"items",
+										"v1"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "update item",
+							"request": {
+								"method": "PUT",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{accessToken}}",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"id\": 1,\r\n    \"name\": \"Batata Frita - Update\",\r\n    \"price\": 30.0\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}/api/digital/order/items/v1",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"digital",
+										"order",
+										"items",
+										"v1"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "update price of item",
+							"request": {
+								"method": "PATCH",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{accessToken}}",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"price\": 14.99\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}/api/digital/order/items/v1/update/price/item/7",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"digital",
+										"order",
+										"items",
+										"v1",
+										"update",
+										"price",
+										"item",
+										"7"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "delete item",
+							"request": {
+								"method": "DELETE",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{accessToken}}",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "{{baseUrl}}/api/dashboard/company/items/v1/7",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"dashboard",
+										"company",
+										"items",
+										"v1",
+										"7"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "user",
+					"item": [
+						{
+							"name": "check user authenticated",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{accessToken}}",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "{{baseUrl}}/api/user/profile/v1/authenticated",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"user",
+										"profile",
+										"v1",
+										"authenticated"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "update information",
+							"request": {
+								"method": "PATCH",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{accessToken}}",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"name\": \"Flávio - Update\",\r\n    \"surname\": \"Júnior - Update\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}/api/user/profile/v1/change/information",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"user",
+										"profile",
+										"v1",
+										"change",
+										"information"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "update email of user",
+							"request": {
+								"method": "PATCH",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{accessToken}}",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"email\": \"flaviojunior.work@gmail.com\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}/api/user/profile/v1/change/email",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"user",
+										"profile",
+										"v1",
+										"change",
+										"email"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "update password of user",
+							"request": {
+								"method": "PATCH",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{accessToken}}",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"password\": \"admin123\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}/api/user/profile/v1/change/password",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"user",
+										"profile",
+										"v1",
+										"change",
+										"password"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "order",
+					"item": [
+						{
+							"name": "list all orders open",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{accessToken}}",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "{{baseUrl}}/api/digital/order/orders/v1/open?page=0&size=30&sort=asc",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"digital",
+										"order",
+										"orders",
+										"v1",
+										"open"
+									],
+									"query": [
+										{
+											"key": "page",
+											"value": "0"
+										},
+										{
+											"key": "size",
+											"value": "30"
+										},
+										{
+											"key": "sort",
+											"value": "asc"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "find order by id",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{accessToken}}",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "{{baseUrl}}/api/digital/order/orders/v1/387",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"digital",
+										"order",
+										"orders",
+										"v1",
+										"387"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "find order by Code payment",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{accessToken}}",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "{{baseUrl}}/api/digital/order/orders/v1/payment/by/code/1736354539176",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"digital",
+										"order",
+										"orders",
+										"v1",
+										"payment",
+										"by",
+										"code",
+										"1736354539176"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "create new order",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{accessToken}}",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"type\": \"SHOPPING_CART\",\r\n    \"fee\": \r\n        {\r\n            \"assigned\": \"Marcos\"\r\n        },\r\n    \"objects\": [\r\n        {\r\n            \"identifier\": 36,\r\n            \"type\": \"PRODUCT\",\r\n            \"quantity\": 1\r\n        }\r\n    ],\r\n    \"payment\": {\r\n        \"type\": \"MONEY\",\r\n        \"discount\": true,\r\n        \"value\": 1.0\r\n    }\r\n}\r\n",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}/api/digital/order/orders/v1",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"digital",
+										"order",
+										"orders",
+										"v1"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "close order",
+							"request": {
+								"method": "PUT",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{accessToken}}",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"type\": \"PIX\",\r\n    \"discount\": false,\r\n    \"value\": 0.0,\r\n    \"remove\": false\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}/api/digital/order/orders/v1/payment/387",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"digital",
+										"order",
+										"orders",
+										"v1",
+										"payment",
+										"387"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "delete order",
+							"request": {
+								"method": "DELETE",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{accessToken}}",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "{{baseUrl}}/api/digital/order/orders/v1/291",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"digital",
+										"order",
+										"orders",
+										"v1",
+										"291"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "update object",
+							"request": {
+								"method": "PUT",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{accessToken}}",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"action\": \"UPDATE_STATUS_OVERVIEW\",\r\n    \"overview\": 612,\r\n    \"quantity\": 1,\r\n    \"status\": \"DELIVERED\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}/api/digital/order/orders/v1/391/update/object/566",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"digital",
+										"order",
+										"orders",
+										"v1",
+										"391",
+										"update",
+										"object",
+										"566"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "update status of delivery",
+							"request": {
+								"method": "PUT",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{accessToken}}",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"status\": \"DELIVERED\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}/api/digital/order/orders/v1/21/update/status/delivery",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"digital",
+										"order",
+										"orders",
+										"v1",
+										"21",
+										"update",
+										"status",
+										"delivery"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "remove reservation",
+							"request": {
+								"method": "DELETE",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{accessToken}}",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "{{baseUrl}}/api/digital/order/orders/v1/135/remove/reservation/5",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"digital",
+										"order",
+										"orders",
+										"v1",
+										"135",
+										"remove",
+										"reservation",
+										"5"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "increment more Objects order",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{accessToken}}",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "[\r\n    {\r\n        \"identifier\":1,\r\n        \"name\":\"Batata Frita\",\r\n        \"quantity\":1,\r\n        \"type\":\"ITEM\"\r\n        }\r\n]",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}/api/digital/order/orders/v1/134/increment/more/objects/order",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"digital",
+										"order",
+										"orders",
+										"v1",
+										"134",
+										"increment",
+										"more",
+										"objects",
+										"order"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "increment more reservations order",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{accessToken}}",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "[\r\n    {\r\n        \"id\": 1,\r\n        \"name\": \"Mesa 01\",\r\n        \"status\": \"AVAILABLE\"\r\n    },\r\n    {\r\n        \"id\": 11,\r\n        \"name\": \"Mesa 03\",\r\n        \"status\": \"AVAILABLE\"\r\n    }\r\n]",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}/api/digital/order/orders/v1/37/increment/more/reservations/order",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"digital",
+										"order",
+										"orders",
+										"v1",
+										"37",
+										"increment",
+										"more",
+										"reservations",
+										"order"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "update address of order",
+							"request": {
+								"method": "PUT",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{accessToken}}",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": " {\r\n        \"street\": \"Frei Damião\",\r\n        \"number\": 65,\r\n        \"district\": \"Centro\",\r\n        \"complement\": \"Praça de Eventos\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}/api/digital/order/orders/v1/215/update/address/158",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"digital",
+										"order",
+										"orders",
+										"v1",
+										"215",
+										"update",
+										"address",
+										"158"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "analysis",
+					"item": [
+						{
+							"name": "find all payments",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{accessToken}}",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "{{baseUrl}}/api/digital/order/payment/v1/details/all",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"digital",
+										"order",
+										"payment",
+										"v1",
+										"details",
+										"all"
+									],
+									"query": [
+										{
+											"key": "code",
+											"value": "1738606024377",
+											"disabled": true
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "get details of analysis",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{accessToken}}",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"type\": \"DAY\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}/api/digital/order/payment/v1/details/analysis?start=2025-01-01&end=2025-02-21",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"digital",
+										"order",
+										"payment",
+										"v1",
+										"details",
+										"analysis"
+									],
+									"query": [
+										{
+											"key": "date",
+											"value": "2025-02-03",
+											"disabled": true
+										},
+										{
+											"key": "start",
+											"value": "2025-01-01"
+										},
+										{
+											"key": "end",
+											"value": "2025-02-21"
+										}
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "report",
+					"item": [
+						{
+							"name": "create new report",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{accessToken}}",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"resume\": \"Contrary to popular belief, Lorem Ipsum is not simply random text. It has roots in a piece of classical Latin literature from 45 BC, making it over 2000 years old. Richard McClintock, a Latin professor at Hampden-Sydney College in Virginia, looked up one of the more obscure Latin words, consectetur, from a Lorem Ipsum passage, and going through the cites of the word in classical literature, discovered the undoubtable source. Lorem Ipsum comes from sections 1.10.32 and 1.10.33 of.\",\r\n    \"author\": \"Flávio\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}/api/digital/order/report/v1",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"digital",
+										"order",
+										"report",
+										"v1"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "find all reports",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{accessToken}}",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "{{baseUrl}}/api/digital/order/report/v1/find/all",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"digital",
+										"order",
+										"report",
+										"v1",
+										"find",
+										"all"
+									],
+									"query": [
+										{
+											"key": "size",
+											"value": "1",
+											"disabled": true
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "find all reports by date",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{accessToken}}",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "{{baseUrl}}/api/digital/order/report/v1/find/by/date?date=2025-01-15",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"digital",
+										"order",
+										"report",
+										"v1",
+										"find",
+										"by",
+										"date"
+									],
+									"query": [
+										{
+											"key": "date",
+											"value": "2025-01-15"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "delete report",
+							"request": {
+								"method": "DELETE",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{accessToken}}",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "{{baseUrl}}/api/digital/order/report/v1/5",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"digital",
+										"order",
+										"report",
+										"v1",
+										"5"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "settings",
+					"item": [
+						{
+							"name": "check updates",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{accessToken}}",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "{{baseUrl}}/api/settings/v1/check/updates/1.1.1",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"settings",
+										"v1",
+										"check",
+										"updates",
+										"1.1.1"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "create new version",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{accessToken}}",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "formdata",
+									"formdata": [
+										{
+											"key": "file",
+											"type": "file",
+											"src": "/E:/setup/Output/launcher.exe"
+										},
+										{
+											"key": "version",
+											"value": "1.0.0",
+											"type": "text"
+										}
+									]
+								},
+								"url": {
+									"raw": "{{baseUrl}}/api/settings/v1/create/file",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"settings",
+										"v1",
+										"create",
+										"file"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "update version by id",
+							"request": {
+								"method": "PATCH",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{accessToken}}",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "formdata",
+									"formdata": [
+										{
+											"key": "file",
+											"type": "file",
+											"src": "/E:/setup/Output/launcher.exe"
+										}
+									]
+								},
+								"url": {
+									"raw": "{{baseUrl}}/api/settings/v1/update/file/2/1.0.0",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"settings",
+										"v1",
+										"update",
+										"file",
+										"2",
+										"1.0.0"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				}
+			]
+		}
+	]
+}
