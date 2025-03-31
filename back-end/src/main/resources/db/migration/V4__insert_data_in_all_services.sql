@@ -1,7 +1,14 @@
 INSERT INTO
     tb_company (identifier, date, hour, name, main_image)
 VALUES
-    (1234, CURRENT_DATE, CURRENT_TIME, 'Jr. Tech Solutions Ltda', 'https://example.com/images/tech_solutions.png');
+    (1234, CURRENT_DATE, CURRENT_TIME, 'Jr. Tech Solutions Ltda', 'https://example.com/images/tech_solutions.png'),
+    (5678, CURRENT_DATE, CURRENT_TIME, 'Porto Digital SA', 'https://example.com/images/tech_solutions.png');
+
+INSERT INTO
+    tb_user_company (fk_user, fk_company)
+VALUES
+    (1, 1),
+    (2, 2);
 
 INSERT INTO
     tb_category (name)

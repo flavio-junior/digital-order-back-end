@@ -13,6 +13,5 @@ spring:
   jpa:
     hibernate:
       ddl-auto: none
-      dialect: org.hibernate.dialect.PostgreSQLDialect
     open-in-view: false
     show-sql: false
